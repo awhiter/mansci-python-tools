@@ -1,0 +1,21 @@
+name: mansci-python
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - spyder
+  - jupyterlab
+  - ipykernel
+  - jupytext
+  - numpy
+  - pandas
+  - scipy
+  - statsmodels
+  - matplotlib
+  - scikit-learn
+  - sympy
+  - openpyxl
+  - networkx
+  - seaborn
+  - requests
+  - pip

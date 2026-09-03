@@ -1,0 +1,2 @@
+#!/bin/bash
+exec "$HOME/Library/Application Support/ManagementScienceVSCode/launcher/launch-vscode-mac.command"
