@@ -109,11 +109,11 @@ class InstallerTests(unittest.TestCase):
                 with (app / 'Contents/Info.plist').open('rb') as f:
                     self.assertEqual(plistlib.load(f)['CFBundleIconFile'], 'spyder.icns')
                 self.assertIn(str(home / 'support/Spyder/launch.py'), (app / 'Contents/MacOS/launch').read_text())
+                self.assertNotIn('conda', (app / 'Contents/MacOS/launch').read_text())
             calls = [call.args[0] for call in run.call_args_list]
             clean = next(i for i, args in enumerate(calls) if args[:2] == ['/usr/bin/xattr', '-cr'])
             sign = next(i for i, args in enumerate(calls) if args and args[0] == 'codesign')
             self.assertLess(clean, sign)
-                self.assertNotIn('conda', (app / 'Contents/MacOS/launch').read_text())
 
     def test_lab_browser_url_and_no_process_signal(self):
         spec = importlib.util.spec_from_file_location('student_lab', ROOT / 'distributions/ManSci-Lab/payload/student_lab.py')
