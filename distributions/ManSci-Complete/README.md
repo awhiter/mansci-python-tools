@@ -1,5 +1,17 @@
-# ManSci Complete
+# ManSci Complete — staff-testing installer
 
-This package installs the shared Core, Spyder, JupyterLab and VS Code teaching configurations. Read `OVERALL-GUIDE.md`, install Miniconda and ordinary VS Code, then run the installer for your operating system.
+Extract the whole ZIP to a local folder and close ManSci tools before updating.
+Run **Install-All-Windows.bat** in Windows or **Install-All-Mac.command** on Mac.
 
-The `Packages` folder contains the same four modular distributions supplied separately. The Complete installer runs them in the supported order; there is no separate competing implementation.
+The guided installer checks prerequisites first, offers installation where supported,
+asks for consent to required terms, prepares Python and local AI, then creates launchers.
+Keep its window open and watch for prompts. Several stages can take many minutes.
+For Ollama choose **local use**, not sign-in; its service starts automatically.
+
+Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
+architecture information and automatic log locations. On failure the window stays open.
+Rerun after resolving the error; student work and existing model data are preserved.
+
+All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
+test.ipynb and a folder README without overwriting existing work.
+This is for staff testing, not yet approved for student rollout.

@@ -1,10 +1,17 @@
-# ManSci Python Core
+# ManSci Core — staff-testing installer
 
-Install this first. It creates or safely updates the shared `mansci-python` environment (including Statsmodels), registers the **Management Science Python** kernel, prepares `Documents/ManSci Code`, checks Ollama and downloads Qwen2.5-Coder 3B.
+Extract the whole ZIP to a local folder and close ManSci tools before updating.
+Run **Install-Windows.bat** in Windows or **Install-Mac.command** on Mac.
 
-- macOS: double-click `Install-Mac.command`.
-- Windows: double-click `Install-Windows.bat`.
+The guided installer checks prerequisites first, offers installation where supported,
+asks for consent to required terms, prepares Python and local AI, then creates launchers.
+Keep its window open and watch for prompts. Several stages can take many minutes.
+For Ollama choose **local use**, not sign-in; its service starts automatically.
 
-The Mac installer detects Apple silicon versus Intel automatically; separate downloads are not needed. Install Miniconda first from the [official Miniconda page](https://docs.conda.io/projects/miniconda/en/latest/). Full Anaconda is not required.
+Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
+architecture information and automatic log locations. On failure the window stays open.
+Rerun after resolving the error; student work and existing model data are preserved.
 
-Core creates `test.py`, `test.ipynb`, and a short folder README without overwriting existing files. Keep program code, notebooks and data in `Documents/ManSci Code` so every ManSci tool sees the same work.
+All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
+test.ipynb and a folder README without overwriting existing work.
+This is for staff testing, not yet approved for student rollout.

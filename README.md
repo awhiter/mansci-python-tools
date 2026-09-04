@@ -4,7 +4,7 @@ Cross-platform teaching distributions for a consistent Management Science Python
 
 ## Download
 
-Most students should download **ManSci-Complete.zip** from the repository's [latest release](../../releases/latest). Separate Core, Spyder, JupyterLab and VS Code packages are also available there.
+Staff testers should download **ManSci-Complete.zip** from the repository's [latest release](https://github.com/awhiter/mansci-python-tools/releases/latest). Separate Core, Spyder, JupyterLab and VS Code packages are also available there.
 
 Do not download an installer from the source-code ZIP generated automatically by GitHub: use the named files attached under **Assets** on the release page.
 
@@ -24,9 +24,9 @@ The aim is to let students choose the most appropriate coding interface without 
 
 ## Prerequisites
 
-Install [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/) before using any distribution. Full Anaconda is not required.
+The guided installer detects Conda and offers per-user [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install) installation if missing. Software and channel-term consent remain explicit; no manual acceptance commands are needed.
 
-Students using the VS Code package must also install ordinary [Visual Studio Code](https://code.visualstudio.com/) first. The installers check Ollama and attempt to install it where supported; otherwise they direct the student to [ollama.com/download](https://ollama.com/download).
+VS Code and Ollama are checked before Python packages. Windows Package Manager or existing Homebrew can install them with consent; otherwise the installer stops upfront with instructions. Choose local use if Ollama asks; its service starts automatically.
 
 The single macOS installer detects Apple silicon and Intel automatically.
 
@@ -51,4 +51,6 @@ SHA-256 checksums are provided in [`SHA256SUMS.txt`](SHA256SUMS.txt) and attache
 
 ## Support status
 
-This is a private teaching distribution currently prepared for testing. Generated AI output should always be reviewed and run before use.
+This is a **public staff-testing distribution**, not yet approved for students. Read [STAFF-TESTING.md](STAFF-TESTING.md). Automated checks have not certified fresh Windows/Mac installation. AI output must be reviewed and tested.
+
+Maintainers: run `python tools/build_release.py` to synchronise embedded Core/helper copies and build five ZIPs/checksums under release-assets. Edit shared installer logic in installer/, not its generated copies.

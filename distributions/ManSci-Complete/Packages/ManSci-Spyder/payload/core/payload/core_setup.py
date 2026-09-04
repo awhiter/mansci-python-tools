@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-CORE_VERSION = "2026.09.03.1"
+CORE_VERSION = "2026.09.04.1"
 
 
 def support_dir() -> Path:
@@ -86,9 +86,7 @@ print("Average demand:", data["demand"].mean())
     nb = home / "test.ipynb"
     if not nb.exists():
         nb.write_text(json.dumps(notebook(), indent=2) + "\n", encoding="utf-8")
-    marker = support_dir() / "Core" / "version.txt"
-    marker.parent.mkdir(parents=True, exist_ok=True)
-    marker.write_text(CORE_VERSION + "\n", encoding="utf-8")
+    # The orchestrator writes the version only after Python AND local AI pass.
     print(f"Shared coding home: {home}")
 
 

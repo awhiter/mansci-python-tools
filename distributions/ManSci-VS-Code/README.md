@@ -1,5 +1,17 @@
-# ManSci VS Code
+# ManSci VS-Code — staff-testing installer
 
-Install ordinary **Visual Studio Code** first from [code.visualstudio.com](https://code.visualstudio.com/), then run this package's installer. The installer checks and updates **ManSci Core** automatically.
+Extract the whole ZIP to a local folder and close ManSci tools before updating.
+Run **Install-Windows.bat** in Windows or **Install-Mac.command** on Mac.
 
-The **ManSci VS Code** launcher uses isolated settings and extensions, opens the shared `Documents/ManSci Code` folder, selects `mansci-python`, supplies a private **Management Science Python** kernelspec for notebooks, uses the **Light+** theme and configures Qwen2.5-Coder 3B through Continue. Students do not need to import a profile or select an interpreter manually. The desktop launcher uses VS Code's standard icon.
+The guided installer checks prerequisites first, offers installation where supported,
+asks for consent to required terms, prepares Python and local AI, then creates launchers.
+Keep its window open and watch for prompts. Several stages can take many minutes.
+For Ollama choose **local use**, not sign-in; its service starts automatically.
+
+Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
+architecture information and automatic log locations. On failure the window stays open.
+Rerun after resolving the error; student work and existing model data are preserved.
+
+All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
+test.ipynb and a folder README without overwriting existing work.
+This is for staff testing, not yet approved for student rollout.

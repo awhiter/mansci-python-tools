@@ -1,5 +1,17 @@
-# ManSci Lab
+# ManSci Lab — staff-testing installer
 
-Run the installer for your operating system. It checks and updates **ManSci Core**, installs the tested local Jupyter chat components and creates a **ManSci Lab** desktop launcher.
+Extract the whole ZIP to a local folder and close ManSci tools before updating.
+Run **Install-Windows.bat** in Windows or **Install-Mac.command** on Mac.
 
-JupyterLab opens the shared `Documents/ManSci Code` folder and exposes only the **Management Science Python** kernel. Its local Qwen assistant needs no account or shared API key and remembers recent messages within a chat. The desktop launcher uses JupyterLab's standard icon.
+The guided installer checks prerequisites first, offers installation where supported,
+asks for consent to required terms, prepares Python and local AI, then creates launchers.
+Keep its window open and watch for prompts. Several stages can take many minutes.
+For Ollama choose **local use**, not sign-in; its service starts automatically.
+
+Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
+architecture information and automatic log locations. On failure the window stays open.
+Rerun after resolving the error; student work and existing model data are preserved.
+
+All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
+test.ipynb and a folder README without overwriting existing work.
+This is for staff testing, not yet approved for student rollout.

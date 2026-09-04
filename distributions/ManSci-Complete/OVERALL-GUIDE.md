@@ -1,61 +1,50 @@
-# Management Science Python Teaching Distributions
+# Management Science tools — guided installation / staff testing
 
-## Purpose
+Release 2026.09.04.1 is public for staff testing, not yet approved for student rollout.
 
-These distributions give Management Science students a consistent Python platform across the programme. **Spyder**, **JupyterLab** and **VS Code** all:
+## Choose and start
 
-- run the same `mansci-python` Conda environment;
-- use the same scientific, data-analysis and optimisation-supporting Python packages;
-- open the same `Documents/ManSci Code` home folder;
-- use the **Management Science Python** notebook kernel; and
-- use the same local Qwen2.5-Coder 3B model where an AI interface is provided.
+ManSci Complete installs Core, Spyder, JupyterLab and VS Code. Individual tool packages embed the same versioned Core and update it if needed. All tools share Python 3.13 in `mansci-python`, the Management Science Python kernel and `Documents/ManSci Code`. The common scientific packages include Statsmodels.
 
-Code and data are therefore portable between tools. A `.py` file developed with Spyder can be opened in VS Code; a notebook developed in ManSci Lab can be opened in VS Code; both see the same package versions and files.
+Extract the ENTIRE ZIP to a local folder, not a network share or the Mac host's shared folder in a Windows VM. Close all ManSci tools before updating. Keep an internet connection and enough disk space for Python, applications and the roughly 2 GB Qwen model. Run Install-All-Windows.bat or Install-All-Mac.command for Complete; individual packages use Install-Windows.bat / Install-Mac.command.
 
-The common environment includes NumPy, pandas, SciPy, Statsmodels, Matplotlib, scikit-learn, SymPy, openpyxl, NetworkX, Seaborn and Requests, alongside the packages required by the three applications.
+## Five guided stages
 
-## Which download to use
+Keep the window open. Watch for prompts in it AND other software installer windows. Quiet periods during package solving, installation and downloads may last many minutes, especially in a VM.
 
-- **ManSci Core** installs the shared environment, kernel, coding home, tests, Ollama and Qwen model. Use this alone only when preparing the foundation.
-- **ManSci Spyder** adds the beginner-friendly scientific IDE, isolated settings and launcher.
-- **ManSci Lab** adds JupyterLab, the local conversational coding assistant and launcher.
-- **ManSci VS Code** adds the isolated teaching profile, Python/Jupyter extensions, Continue local assistant and launcher. Ordinary VS Code must first be installed from [code.visualstudio.com](https://code.visualstudio.com/).
-- **ManSci Complete** contains all four packages and a master installer. This is the simplest choice for students expected to use all three tools.
+1. **Prerequisites.** VS Code (when selected) and Ollama are checked BEFORE Python packages. Windows offers Windows Package Manager installation when available; Mac offers Homebrew when already installed. Their installers may need your response. If automation is unavailable or declined, installation stops upfront with links. Install the missing application and rerun.
+2. **Terms and Conda.** Existing Conda is discovered in common locations or a folder you specify. If missing, per-user Miniconda installation is offered after explicit consent. Channel terms are displayed before a separate acceptance question. Only after you agree are the acceptance commands run automatically. Staff must follow institutional licensing guidance; this installer does not determine eligibility.
+3. **Python.** Core creates/updates the environment, checks imports, registers the kernel and prepares the shared folder. A healthy current Core is reused. No pruning or deletion of student work is performed.
+4. **Local AI.** Ollama's local service starts automatically and is checked for readiness. You do NOT need to type `ollama` in a terminal. If Ollama opens, choose **local use**, not sign-in; no account is needed. Qwen2.5-Coder 3B is approximately 2 GB. `pulling` followed by letters/numbers and progress bars are normal. Existing models are reused. An AI failure is reported rather than labelled full success.
+5. **Tools and launchers.** Selected settings/extensions and stable launchers are installed. Windows shortcut paths are constructed safely and checked after saving. Use the ManSci desktop launchers.
 
-Each tool installer contains the required Core version. If Core is absent or out of date, the tool installer updates it first. Reinstallation updates components safely and does not overwrite student work.
+## Manual prerequisites when requested
 
-## Recommended order
+- Miniconda: https://www.anaconda.com/docs/getting-started/miniconda/install — install for the operating system INSIDE a VM, not its host. Use the per-user defaults, then rerun. No manual channel-acceptance commands are required by this guided release.
+- VS Code: https://code.visualstudio.com/download — use a Windows user installation; on Mac move the app into Applications.
+- Ollama: https://ollama.com/download — install in its normal location and select local use if asked, then rerun.
 
-For the Complete package:
+You do not need to install a package manager just for ManSci. Homebrew itself is never installed automatically. Miniconda consent reference: https://www.anaconda.com/legal . On Mac, approve downloaded installers only through the normal OS security flow after checking their source; do not globally disable protections.
 
-1. Install Miniconda from the [official Miniconda page](https://docs.conda.io/projects/miniconda/en/latest/).
-2. Install ordinary VS Code from [code.visualstudio.com](https://code.visualstudio.com/).
-3. Extract the entire ZIP.
-4. Run `Install-All-Mac.command` or `Install-All-Windows.bat`.
+## Architecture
 
-For separate packages, install Core first and then any tool packages. It is also safe to start directly with a tool package because it checks Core automatically.
+The Mac installer chooses Apple silicon or Intel Miniconda automatically. Windows 11 ARM VMware is identified explicitly: this release offers Windows x64 Miniconda under emulation with an extra confirmation. This is a staff-testing configuration, not a claim of native ARM package support. VS Code/Ollama use their vendor/package-manager builds. VM graphics acceleration and local-model performance need testing.
 
-## Apple silicon and Intel Macs
+## Shared work and customisation
 
-One Mac installer supports both architectures. It detects `arm64` (Apple silicon) or `x86_64` (Intel), and Conda obtains packages for that architecture. Students must choose the matching Miniconda installer; no separate ManSci ZIP is necessary.
+Core creates test.py, test.ipynb and a short README in Documents/ManSci Code without overwriting existing files. Keep code, notebooks and data there, in module/assignment subfolders. Back up important work. To change the home, edit Documents/ManSci Code Home.txt to contain one absolute folder path and restart the tools.
 
-## Shared coding home
+Spyder uses Light/Spyder and resets its initial Files/working directory to the shared home on launch. VS Code uses Light+, an isolated profile, Continue and a private ManSci kernelspec. JupyterLab uses the managed kernel and a tool-free local persona retaining recent chat context. Continue's first-run Hub card may need dismissing once, without sign-in. Small models still make mistakes and do not automatically know every file/cell.
 
-All launchers open:
+## Errors and automatic logs
 
-- Windows: `Documents\ManSci Code`
-- macOS: `Documents/ManSci Code`
+Top-level installers pause on BOTH success and failure. Read the error before closing. Logs are saved automatically:
 
-Core creates a README plus `test.py` and `test.ipynb` there. Students should keep Python code, notebooks and associated data in this folder, organised into subfolders as needed. To change the home, edit `Documents/ManSci Code Home.txt`, enter one full folder path, then restart the ManSci tools.
+- Windows: `%LOCALAPPDATA%\ManagementScience\Logs\install-<date-time>.log`. Paste `%LOCALAPPDATA%\ManagementScience\Logs` into File Explorer.
+- Mac: `~/Library/Logs/ManagementScience/install-<date-time>.log`. Use Finder → Go → Go to Folder.
 
-## Ollama and local AI
+The precise path is printed at startup and on failure. Send the newest log to staff. Runtime logs, including ollama-service.log and launch.log, are in the per-user ManagementScience support folder's Logs directory. Fix the reported error and rerun; student work and existing model data are retained. Reopen Finder or sign out/in if standard desktop icons remain cached.
 
-Core checks for Ollama and downloads `qwen2.5-coder:3b`. On Windows it attempts installation through `winget`; on macOS it attempts installation through Homebrew when available. If automatic installation is unavailable, it directs the student to [ollama.com/download](https://ollama.com/download); rerunning Core completes the model setup afterward.
+## Validation limits
 
-Qwen runs locally and needs no shared API key. It is deliberately a small teaching model, so generated code must be reviewed and tested. ManSci Lab provides the local Jupyter chat experience, while ManSci VS Code provides Continue chat, inline edits and completions. Spyder remains a focused coding environment without an additional AI panel.
-
-Desktop launchers use the standard Spyder, JupyterLab and Visual Studio Code icons, while retaining their short ManSci names so students can distinguish the managed teaching setup from an ordinary installation.
-
-## Reinstallation and files
-
-Launchers are copied to stable per-user support folders and never point into an extracted ZIP. A distribution can therefore be moved or deleted after installation. Rerunning an installer refreshes its launcher and configuration without deleting `ManSci Code`, conversations or unrelated environment packages.
+Automated Python/configuration/package checks do not replace clean-machine tests. This release has NOT been end-to-end certified on fresh Windows x64, Windows ARM VMware, Intel Mac or Apple silicon Mac installations. See STAFF-TESTING.md in the repository before student rollout.

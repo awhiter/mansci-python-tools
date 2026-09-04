@@ -1,5 +1,17 @@
-# ManSci Spyder
+# ManSci Spyder — staff-testing installer
 
-Run the installer for your operating system. It checks and updates **ManSci Core** automatically, then creates a **ManSci Spyder** desktop launcher.
+Extract the whole ZIP to a local folder and close ManSci tools before updating.
+Run **Install-Windows.bat** in Windows or **Install-Mac.command** on Mac.
 
-Spyder and its Files pane open the shared `Documents/ManSci Code` folder, run directly from `mansci-python`, use the **Light** interface theme and the **Spyder** syntax-highlighting theme. Its settings are isolated from an ordinary Spyder installation. The desktop launcher uses Spyder's standard icon.
+The guided installer checks prerequisites first, offers installation where supported,
+asks for consent to required terms, prepares Python and local AI, then creates launchers.
+Keep its window open and watch for prompts. Several stages can take many minutes.
+For Ollama choose **local use**, not sign-in; its service starts automatically.
+
+Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
+architecture information and automatic log locations. On failure the window stays open.
+Rerun after resolving the error; student work and existing model data are preserved.
+
+All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
+test.ipynb and a folder README without overwriting existing work.
+This is for staff testing, not yet approved for student rollout.

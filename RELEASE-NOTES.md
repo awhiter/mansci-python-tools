@@ -1,25 +1,15 @@
-# Management Science Python Tools 2026.09.03.2
+# 2026.09.04.1 — Guided installation / staff testing
 
-Initial formal release of the modular Management Science Python teaching distributions.
+- Five announced stages, upfront VS Code/Ollama checks and persistent failure windows.
+- Automatic per-user Miniconda offered after consent; existing/custom Conda supported.
+- Channel terms displayed and accepted only after explicit agreement; no manual commands.
+- Package-manager installation offers or clear manual prerequisite instructions.
+- Ollama service started and awaited automatically; local-use/no-account guidance and explicit ~2 GB Qwen download message.
+- Existing models reused; failed local AI is not reported as full success.
+- Windows TargetPath corrected using Join-Path, safe arguments and shortcut read-back checks.
+- Automatic logs, corrected batch variable handling, shared Core and preserved student work.
+- Shared coding folder, light themes, Statsmodels, standard icons and local AI retained.
 
-## Included assets
+**For staff testing only.** Automated tests are not clean-machine certification. Windows ARM VMware uses x64 Python emulation and needs validation. See STAFF-TESTING.md.
 
-- `ManSci-Complete.zip` — Core plus all three coding tools; recommended for most students.
-- `ManSci-Core.zip` — shared Conda environment, kernel, coding home, tests, Ollama and Qwen setup.
-- `ManSci-Spyder.zip` — isolated Spyder configuration and launcher.
-- `ManSci-Lab.zip` — managed JupyterLab and local Qwen chat.
-- `ManSci-VS-Code.zip` — isolated VS Code teaching profile and local Continue assistant.
-- `SHA256SUMS.txt` — checksums for verifying downloads.
-
-## Configuration highlights
-
-- Shared `mansci-python` environment using Python 3.13.
-- Shared `Documents/ManSci Code` home folder.
-- Management Science Python kernel registered consistently.
-- Statsmodels and the wider scientific Python package set included.
-- Automatic Apple silicon/Intel detection.
-- Stable launchers using standard tool-specific icons.
-- Spyder Files pane opens in the shared coding home.
-- VS Code receives a private kernelspec to avoid first-run kernel selection.
-
-The release is private while installation testing and documentation review continue.
+Download ManSci-Complete.zip for all tools or individual packages. SHA256SUMS.txt covers the five ZIPs. This release supersedes 2026.09.03.2 for installation testing.
