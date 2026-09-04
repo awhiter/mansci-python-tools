@@ -95,11 +95,14 @@ def main():
     for kind in ('Spyder','Lab','VS-Code'):
         folder = DIST / ('ManSci-' + kind)
         entrypoints(folder, kind)
+        shutil.rmtree(folder / 'payload/core', ignore_errors=True)
         shutil.copytree(DIST / 'ManSci-Core', folder / 'payload/core', dirs_exist_ok=True)
     complete = DIST / 'ManSci-Complete'
     entrypoints(complete, 'Complete')
     for kind in ('Core','Spyder','Lab','VS-Code'):
-        shutil.copytree(DIST / ('ManSci-' + kind), complete / 'Packages' / ('ManSci-' + kind), dirs_exist_ok=True)
+        destination = complete / 'Packages' / ('ManSci-' + kind)
+        shutil.rmtree(destination, ignore_errors=True)
+        shutil.copytree(DIST / ('ManSci-' + kind), destination, dirs_exist_ok=True)
     shutil.copy2(ROOT / 'DISTRIBUTION-GUIDE.md', complete / 'OVERALL-GUIDE.md')
     OUT.mkdir(exist_ok=True)
     sums = []

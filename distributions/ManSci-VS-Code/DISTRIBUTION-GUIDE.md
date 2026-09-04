@@ -1,8 +1,10 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.12 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.13 is public for staff testing, not yet approved for student rollout.
 
 Core installs an offline **ManSci Help** guide on the Desktop and in the Windows Start menu or Mac `~/Applications`. It covers installation, shared working practices, Mac and Windows launcher behaviour, kernels, local AI, reinstalling, logs and what to send staff. Its heading displays the installed distribution release. The installer does not pin it automatically.
+
+The older **ManSci Check** and **ManSci VS Code Check** launcher icons are retired. Installing this release removes only those obsolete generated shortcuts/apps from the Desktop and application menu. The diagnostic Python scripts remain available internally or in the shared folder for staff-directed troubleshooting.
 
 Windows Spyder now also has an explicit ManSci window identity and relaunch command. After upgrading from an older release, manually unpin its old Python/Spyder taskbar entry and pin the newly installed **ManSci Spyder** Start entry. The running window and shortcut use the standard Spyder icon. The installer never changes pins automatically.
 

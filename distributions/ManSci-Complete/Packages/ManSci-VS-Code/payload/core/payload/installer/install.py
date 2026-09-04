@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.12'
+VERSION = '2026.09.04.13'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -70,6 +70,13 @@ def install_help(payload):
     else:
         replace_mac_app('ManSci Help', 'mansci-python', icon_source,
                         'exec /usr/bin/open ' + shlex.quote(str(help_file)), root)
+        # These launcher apps were created by older ManSci releases. Diagnostics
+        # remain available internally; remove only the obsolete generated icons.
+        for parent in (Path.home() / 'Applications', Path.home() / 'Desktop'):
+            for name in ('ManSci Check.app', 'ManSci VS Code Check.app'):
+                obsolete = parent / name
+                if obsolete.is_symlink() or obsolete.is_file(): obsolete.unlink()
+                elif obsolete.is_dir(): shutil.rmtree(obsolete)
     print('PASS: ManSci Help installed on the Desktop and in the application menu.')
 
 def run(args, *, capture=False, env=None):

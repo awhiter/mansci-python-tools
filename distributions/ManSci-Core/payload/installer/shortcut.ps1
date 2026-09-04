@@ -12,6 +12,13 @@ $shell = New-Object -ComObject WScript.Shell
 $desktop = [Environment]::GetFolderPath('Desktop')
 $programs = Join-Path ([Environment]::GetFolderPath('Programs')) 'Management Science'
 New-Item -ItemType Directory -Force -Path $programs | Out-Null
+# Remove only diagnostic shortcut names created by superseded ManSci releases.
+foreach ($folder in @($desktop, $programs)) {
+    foreach ($oldName in @('ManSci Check.lnk', 'ManSci VS Code Check.lnk')) {
+        $oldPath = Join-Path $folder $oldName
+        if (Test-Path -LiteralPath $oldPath -PathType Leaf) { Remove-Item -LiteralPath $oldPath -Force }
+    }
+}
 if ($AppId) {
     Add-Type -Path (Join-Path $PSScriptRoot 'WindowsLauncher.cs') -ReferencedAssemblies System.dll,System.Core.dll,System.Windows.Forms.dll,System.Management.dll
 }

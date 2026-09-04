@@ -53,6 +53,8 @@ class InstallerTests(unittest.TestCase):
         self.assertIn("GetFolderPath('Programs')", text)
         self.assertNotIn("'$env:WINDIR", text)
         self.assertIn('$check.TargetPath', text)
+        self.assertIn('ManSci VS Code Check.lnk', text)
+        self.assertIn('Remove-Item -LiteralPath $oldPath', text)
         for forbidden in ('InvokeVerb', 'Taskband', 'taskbarpin', 'LayoutModification'):
             self.assertNotIn(forbidden, text)
 
@@ -79,6 +81,10 @@ class InstallerTests(unittest.TestCase):
     def test_mac_help_is_a_fresh_signed_app_with_offline_target(self):
         with tempfile.TemporaryDirectory(prefix='ManSci help ') as directory:
             home = Path(directory); root = home / 'support'
+            for parent in ('Desktop', 'Applications'):
+                for name in ('ManSci Check.app', 'ManSci VS Code Check.app'):
+                    old = home / parent / name
+                    (old / 'Contents').mkdir(parents=True)
             with patch.object(m, 'support', return_value=root), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run') as run:
                 m.install_help(ROOT / 'distributions/ManSci-Core/payload')
             for parent in ('Desktop', 'Applications'):
@@ -86,6 +92,8 @@ class InstallerTests(unittest.TestCase):
                 launch = (app / 'Contents/MacOS/launch').read_text()
                 self.assertIn('/usr/bin/open', launch)
                 self.assertIn(str(root / 'Core/ManSci-Help.html'), launch)
+                self.assertFalse((home / parent / 'ManSci Check.app').exists())
+                self.assertFalse((home / parent / 'ManSci VS Code Check.app').exists())
             self.assertTrue(any(call.args[0][0] == 'codesign' for call in run.call_args_list))
 
     def test_windows_launcher_uses_permanent_paths_with_spaces(self):

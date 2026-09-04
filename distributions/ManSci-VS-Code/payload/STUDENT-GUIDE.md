@@ -48,6 +48,6 @@ To use a different shared folder, edit `ManSci Code Home.txt` in Documents, put 
 
 ## Checking the setup
 
-Run `student-profile-check.py`. All lines should say PASS. You can also open **ManSci VS Code Check** on Windows, or run `check-vscode-mac.command` from the distribution on macOS.
+Run `student-profile-check.py` from the shared folder. All lines should say PASS. The old **ManSci Check** and **ManSci VS Code Check** desktop launchers have been retired; use **ManSci Help** for guidance and send this script's output to staff when requested.
 
 If the interpreter shown at the bottom of VS Code is not `mansci-python`, close ManSci VS Code and rerun the installer. Do not import another profile into this isolated instance.

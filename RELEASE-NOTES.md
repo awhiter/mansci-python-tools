@@ -1,4 +1,10 @@
-# 2026.09.04.12 — FAQ clarification / staff testing
+# 2026.09.04.13 — Retire legacy Check launchers / staff testing
+
+The **ManSci Check** and **ManSci VS Code Check** desktop/application-menu launchers from older releases are now obsolete because **ManSci Help** provides the student-facing guidance. Installing this release removes only those exact legacy generated shortcuts/apps on Windows and Mac; it does not alter other desktop items or pins. The diagnostic Python scripts remain internal/available for staff-directed support, and the FAQ now names `student-profile-check.py` when its output is required.
+
+The unused old Mac/Windows VS Code check-launch wrappers are no longer included in the payload. Release building now replaces embedded Core/tool trees instead of merging them, preventing deleted legacy files from persisting in later ZIPs. No environment, model or tool behaviour changes. Tests cover targeted cleanup, and archives are checked to ensure obsolete wrappers are absent.
+
+## Previous 2026.09.04.12 — FAQ clarification / staff testing
 
 Clarifies the Mac FAQ entry about an empty VS Code window after red-close. It now gives only the relevant recovery choices—use the pinned ManSci launcher or open `Documents/ManSci Code` through File → Open Folder—and no longer suggests reinstalling as part of ordinary use. Software behaviour is unchanged from 2026.09.04.11.
 

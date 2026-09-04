@@ -4,6 +4,7 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 
 - [ ] Existing taskbar pins/order remain unchanged by installation.
 - [ ] ManSci Help appears on Desktop and in Start / `~/Applications`, opens the local FAQ in the default browser, shows the installed release and works offline.
+- [ ] Upgrade removes only old ManSci Check / ManSci VS Code Check launchers from Desktop and application menu; no unrelated shortcut, Dock item or taskbar pin changes.
 - [ ] Help remains usable at narrow and enlarged text sizes; internal navigation and external links work; security wording matches the current platform behaviour.
 - [ ] Each ManSci Start menu entry can be pinned/unpinned manually with its standard icon.
 - [ ] Each pin relaunches the teaching setup after closing the tool, rebooting and moving the extracted ZIP folder.
