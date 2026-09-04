@@ -5,6 +5,7 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Existing taskbar pins/order remain unchanged by installation.
 - [ ] Each ManSci Start menu entry can be pinned/unpinned manually with its standard icon.
 - [ ] Each pin relaunches the teaching setup after closing the tool, rebooting and moving the extracted ZIP folder.
+- [ ] Replace the old Spyder/Python pin; pin the running Spyder window as well as testing the Start entry. After closing, it retains the Spyder icon/name and relaunches successfully without blank consoles.
 - [ ] Manually replace old Lab/Code pins with new Start entries; Code groups under its ManSci pin after startup.
 - [ ] Ordinary VS Code opened alongside ManSci Code keeps its own identity and profile.
 - [ ] Repeated Lab launch focuses the existing native window without a second tab/window, including when minimised.

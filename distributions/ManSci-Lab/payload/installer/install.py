@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.5'
+VERSION = '2026.09.04.6'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -164,7 +164,7 @@ def install_tool(kind, source, conda, python, code, ollama):
         shutil.copy2(source / 'icons' / (icon + '.ico'), target / (icon + '.ico'))
         (target / 'launcher-runtime.txt').write_text(str(pythonw) + '\n' + str(launch) + '\n', encoding='utf-8')
         executable = target / (title + '.exe')
-        app_id = {'Lab': 'uk.ac.ucl.mansci.Lab', 'VS-Code': 'uk.ac.ucl.mansci.Code'}.get(kind, '')
+        app_id = {'Spyder': 'uk.ac.ucl.mansci.Spyder', 'Lab': 'uk.ac.ucl.mansci.Lab', 'VS-Code': 'uk.ac.ucl.mansci.Code'}.get(kind, '')
         if app_id:
             profile = str(root / 'user-data') if kind == 'VS-Code' else ''
             (target / 'window-runtime.txt').write_text('\n'.join([kind, app_id, profile, str(target / (icon + '.ico')), title]) + '\n', encoding='utf-8')

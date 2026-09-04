@@ -79,6 +79,13 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual(runtime, [str(python.with_name('pythonw.exe')), str(root / 'Spyder/launch.py')])
             self.assertTrue(any('build-windows-launcher.ps1' in str(call.args[0]) for call in run.call_args_list))
             self.assertTrue((root / 'Spyder/spyder.ico').is_file())
+            window = (root / 'Spyder/window-runtime.txt').read_text().splitlines()
+            self.assertEqual(window, ['Spyder', 'uk.ac.ucl.mansci.Spyder', '',
+                                     str(root / 'Spyder/spyder.ico'), 'ManSci Spyder'])
+            self.assertEqual(args[args.index('-AppId') + 1], window[1])
+            source = (ROOT / 'installer/WindowsLauncher.cs').read_text()
+            self.assertIn('window[0] == "Spyder"', source)
+            self.assertIn('if (managedWindow)', source)
 
     def test_compiled_launcher_is_windowless_and_has_icon(self):
         build = (ROOT / 'installer/build-windows-launcher.ps1').read_text()

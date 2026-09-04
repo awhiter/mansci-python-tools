@@ -13,7 +13,8 @@ entry in Start, right-click and choose **Pin to taskbar** (possibly under **More
 The installer never changes your pins. Pin the ManSci entry, not the ordinary
 running ordinary VS Code icon. Lab now opens its own reusable window; ManSci Code
 windows receive the same taskbar identity as their launcher. When upgrading from
-an earlier release, manually unpin old Lab/Code entries and repin the new Start entries.
+an earlier release, manually replace old pins with the new Start entries, including
+Spyder/Python pins: Spyder now also retains its ManSci identity and relaunch command.
 
 Read **DISTRIBUTION-GUIDE.md** for the five stages, manual fallback instructions,
 architecture information and automatic log locations. On failure the window stays open.

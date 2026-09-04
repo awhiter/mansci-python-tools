@@ -25,7 +25,7 @@ internal static class ManSciLauncher
             string settings = Path.Combine(root, "window-runtime.txt");
             string[] window = File.Exists(settings) ? File.ReadAllLines(settings) : new string[0];
             bool code = window.Length == 5 && window[0] == "VS-Code";
-            bool lab = window.Length == 5 && window[0] == "Lab";
+            bool managedWindow = window.Length == 5 && (window[0] == "Lab" || window[0] == "Spyder");
             using (Mutex gate = new Mutex(false, "Local\\ManSci." + ManSciTaskbar.PathHash(root)))
             {
             bool owned = false;
@@ -58,7 +58,7 @@ internal static class ManSciLauncher
             using (Process child = Process.Start(start))
             {
                 Thread watcher = null;
-                if (lab)
+                if (managedWindow)
                 {
                     watcher = new Thread(delegate() {
                         try { ManSciTaskbar.MonitorProcess(child, window); }

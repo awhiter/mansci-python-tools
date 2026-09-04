@@ -1,4 +1,10 @@
-# 2026.09.04.5 — Reusable Lab window and Code taskbar grouping / staff testing
+# 2026.09.04.6 — Spyder taskbar relaunch fix / staff testing
+
+Spyder now receives an explicit ManSci taskbar identity, standard Spyder icon and relaunch command, matching its shortcut. Previously its running window retained Python's identity, so pinning that window could leave a non-working Python pin after closing. This uses the same window-property mechanism already used for Lab, without changing Spyder's windowless Python host or kernel handling. Lab and Code behaviour is unchanged.
+
+Close Spyder, install the updated Spyder ZIP (or Complete ZIP), manually unpin the old Python/Spyder entry, and pin **ManSci Spyder** from Start. No environment/model removal is required. Test closing and reopening from the pin; Windows runtime verification remains a staff-machine check. Installer regression tests now check Spyder's matching shortcut/window identity and relaunch payload.
+
+## Previous 2026.09.04.5 — Reusable Lab window and Code taskbar grouping
 
 Lab now opens in its own native application-style window on Windows and Mac. Repeated launches request focus on that window rather than creating browser tabs. Closing the window preserves the notebook server; File → Shut Down stops it. The Windows installer checks WebView2, and installs the Python webview dependency automatically.
 
