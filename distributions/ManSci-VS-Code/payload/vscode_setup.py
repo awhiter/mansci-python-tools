@@ -437,6 +437,9 @@ def launch(code_executable: str) -> None:
             "CONDA_EXE": str(manifest["conda"]),
             "CONTINUE_GLOBAL_DIR": str(root / "continue"),
             "JUPYTER_PATH": str(root / "jupyter"),
+            "MANSCI_REOPEN_HOME": "1" if sys.platform == "darwin" else "0",
+            "MANSCI_WORKSPACE": str(workspace),
+            "MANSCI_HOME_POINTER": str(Path.home() / "Documents" / "ManSci Code Home.txt"),
         }
     )
     kwargs: dict = {

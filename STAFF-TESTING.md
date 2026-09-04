@@ -25,6 +25,8 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Desktop launchers with paths containing spaces work, with no leftover terminal.
 - [ ] test.py/test.ipynb run in mansci-python; Statsmodels imports in each tool.
 - [ ] First notebook execution in VS Code needs no manual kernel selection.
+- [ ] Mac: close ManSci VS Code's window with red close, click its active Dock icon and confirm the shared folder reopens in the same window; Command-Q quits it.
+- [ ] Mac: an explicit workspace, loose file, unsaved tab and remote window are not replaced by the Dock reopen helper; ordinary VS Code is unaffected.
 - [ ] Wait for Preparing ManSci kernel to finish; confirm ManSci Startup output reports the installed environment.
 - [ ] Cancel the VS Code inbound-network firewall prompt and verify local scripts/notebooks still run.
 - [ ] Lab opens its dedicated window without asking for an HTML file association; a second launch reuses the window and server.

@@ -3,11 +3,38 @@
 // Jupyter and checks this capability. Fail visibly rather than guess kernel IDs.
 const vscode = require('vscode');
 const fs = require('fs');
+const path = require('path');
+
+async function reopenMacHome(output) {
+    // Only the isolated Mac process launched by ManSci opts into this behaviour.
+    // Preserve remote windows, explicit workspaces, loose files and unsaved tabs.
+    if (process.platform !== 'darwin' || process.env.MANSCI_REOPEN_HOME !== '1' ||
+        vscode.env.remoteName || vscode.workspace.workspaceFile ||
+        vscode.workspace.workspaceFolders?.length ||
+        vscode.workspace.textDocuments?.some(doc => !doc.isClosed && (doc.isUntitled || doc.uri.scheme === 'file')) ||
+        vscode.window.tabGroups?.all.some(group => group.tabs.length)) return false;
+    try {
+        let home = process.env.MANSCI_WORKSPACE;
+        const pointer = process.env.MANSCI_HOME_POINTER;
+        if (pointer && fs.existsSync(pointer)) home = fs.readFileSync(pointer, 'utf8').trim();
+        if (!home || !path.isAbsolute(home) || !fs.statSync(home).isDirectory()) {
+            throw Error('The shared coding folder is missing or its path is invalid.');
+        }
+        output.appendLine('Reopening shared coding folder: ' + home);
+        await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.file(home), {forceReuseWindow: true});
+        return true;
+    } catch (error) {
+        output.appendLine('Could not reopen ManSci home: ' + String(error));
+        vscode.window.showWarningMessage('ManSci could not reopen the shared coding folder. Use File → Open Folder or check Documents/ManSci Code Home.txt.');
+        return false;
+    }
+}
 
 async function activate(context) {
     const output = vscode.window.createOutputChannel('ManSci Startup');
     const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
     context.subscriptions.push(output, status);
+    if (await reopenMacHome(output)) return;
     const python = process.env.MANSCI_PYTHON;
     if (!python || !fs.existsSync(python)) {
         output.appendLine('Installed Python path is missing. Rerun the ManSci installer.');

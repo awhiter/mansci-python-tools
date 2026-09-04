@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.8 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.9 is public for staff testing, not yet approved for student rollout.
 
 Windows Spyder now also has an explicit ManSci window identity and relaunch command. After upgrading from an older release, manually unpin its old Python/Spyder taskbar entry and pin the newly installed **ManSci Spyder** Start entry. The running window and shortcut use the standard Spyder icon. The installer never changes pins automatically.
 
@@ -57,6 +57,8 @@ The Mac installer chooses Apple silicon or Intel Miniconda automatically. Window
 Core creates test.py, test.ipynb and a short README in Documents/ManSci Code without overwriting existing files. Keep code, notebooks and data there, in module/assignment subfolders. Back up important work. To change the home, edit Documents/ManSci Code Home.txt to contain one absolute folder path and restart the tools.
 
 Spyder uses Light/Spyder and resets its initial Files/working directory to the shared home on launch. VS Code uses Light+, an isolated profile, Continue and a private ManSci kernelspec. JupyterLab uses the managed kernel and a tool-free local persona retaining recent chat context. Continue's first-run Hub card may need dismissing once, without sign-in. Small models still make mistakes and do not automatically know every file/cell.
+
+On Mac, the red close button closes the VS Code window but normally leaves the application running in the Dock; **Command-Q** quits it. If clicking the active ManSci VS Code Dock icon creates an empty window, the ManSci startup helper reopens the current shared coding folder in that same window. It does not replace a folder/workspace, loose file, unsaved tab or remote window that the user deliberately opened, and it does not affect ordinary VS Code.
 
 ## Errors and automatic logs
 

@@ -1,4 +1,12 @@
-# 2026.09.04.8 — Mac launcher update fix / staff testing
+# 2026.09.04.9 — Mac VS Code Dock reopen fix / staff testing
+
+Fixes the Mac behaviour where closing the ManSci VS Code window left the application active in the Dock—as is normal on macOS—but clicking that active icon opened an empty window. The isolated ManSci startup helper now detects that exact empty local-window case and reopens the current folder from `Documents/ManSci Code Home.txt` in the same window.
+
+Safeguards prevent it replacing a deliberately opened folder/workspace, loose file, unsaved tab or remote window. It is enabled only in the ManSci-launched Mac process and does not affect ordinary VS Code or Windows. Command-Q remains the normal way to quit VS Code completely on Mac.
+
+Install the updated VS Code ZIP (or Complete ZIP) with ManSci VS Code closed, then test: open from its launcher, close the window using red close, and click its still-active Dock icon. No environment/model removal is required. Nine automated helper tests pass; hands-on Dock verification remains required.
+
+## Previous 2026.09.04.8 — Mac launcher update fix / staff testing
 
 Fixes a Mac reinstall failure where Finder/download extended attributes on an existing generated `.app` launcher caused code signing to report “resource fork, Finder information, or similar detritus not allowed.” The installer now clears extended attributes only from each generated ManSci launcher immediately before signing; it does not touch student work or general application settings.
 
