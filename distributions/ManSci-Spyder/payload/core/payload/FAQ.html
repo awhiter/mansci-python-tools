@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ManSci Help</title><style>
+:root{color-scheme:light;--blue:#075985;--pale:#e0f2fe;--warn:#fff7ed;--line:#cbd5e1}*{box-sizing:border-box}
+body{font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;margin:0;background:#f8fafc}
+header{background:var(--blue);color:white;padding:2rem max(5vw,1rem)}header h1{margin:0 0 .3rem}header p{margin:.2rem 0}
+main{max-width:980px;margin:auto;padding:1.5rem}nav,.card{background:white;border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.3rem;margin:0 0 1rem}
+nav a{display:inline-block;margin:.2rem 1rem .2rem 0}h2{color:var(--blue);margin-top:.2rem}h3{margin-bottom:.25rem}ol,ul{padding-left:1.5rem}
+.note{background:var(--pale);border-left:5px solid #0284c7;padding:.8rem 1rem}.warning{background:var(--warn);border-left:5px solid #ea580c;padding:.8rem 1rem}
+code{background:#eef2f7;padding:.1rem .3rem;border-radius:4px}a{color:#0369a1}footer{color:#475569;padding:1rem;text-align:center}
+</style></head><body>
+<header><h1>ManSci Help</h1><p>Management Science Python tools · installed release <strong>{{VERSION}}</strong></p><p>Spyder · JupyterLab · VS Code · one shared Python environment and coding folder</p></header>
+<main><nav><strong>Jump to:</strong> <a href="#install">Installation</a><a href="#working">Everyday working</a><a href="#mac">Mac</a><a href="#windows">Windows</a><a href="#python">Python and notebooks</a><a href="#ai">Local AI</a><a href="#repair">Repair and support</a></nav>
+
+<section class="card" id="install"><h2>Installation</h2>
+<h3>What should I install?</h3><p><strong>ManSci Complete</strong> installs Core and configures all three tools. Core creates the <code>mansci-python</code> environment, kernel, shared folder, examples, local Qwen model and this Help launcher. Individual tool installers include and verify the same Core.</p>
+<h3>Before starting</h3><ul><li>Extract the <strong>entire ZIP</strong> to a normal local folder.</li><li>Keep an internet connection and several GB of free space.</li><li>Close ManSci tools before updating.</li><li>Keep the installer window open and respond to prompts. Conda solving and the roughly 2 GB model download can take many minutes.</li><li>For Ollama choose local use; no account or terminal command is required.</li></ul>
+<h3>How do I know it finished?</h3><p>Do not assume that a closed or quiet window means success. Look for <strong>INSTALLATION COMPLETE</strong>. If it says installation not complete, preserve the displayed log location and use the guidance below.</p>
+</section>
+
+<section class="card" id="working"><h2>Everyday working</h2>
+<p>All tools use <code>mansci-python</code> and <code>Documents/ManSci Code</code>, so code and data can move between Spyder, Lab and VS Code. Keep programme work in this folder and back up important files.</p>
+<p>To change the shared folder, put one absolute folder path in <code>Documents/ManSci Code Home.txt</code>, save it, and restart all tools. Existing work is not moved automatically.</p>
+<ul><li><strong>Spyder:</strong> suited to Python scripts and <code>#%%</code> cells. Files opens in the shared folder.</li><li><strong>ManSci Lab:</strong> suited to notebooks. Closing its window normally leaves the local server and kernels running for quick reconnection. Use <strong>File → Shut Down</strong> to stop them.</li><li><strong>ManSci VS Code:</strong> uses an isolated teaching profile. It should not alter ordinary VS Code.</li></ul>
+</section>
+
+<section class="card" id="mac"><h2>Mac questions</h2>
+<h3>“Apple could not verify…”</h3><p>This expected message means our installer has not been Apple Developer ID-signed and notarised; it does not itself mean malware was detected. Only proceed for a ZIP obtained through the teaching team’s GitHub link.</p>
+<ol><li>Click <strong>Done</strong>, not Move to Bin.</li><li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li><li>Under Security, find the blocked installer and click <strong>Open Anyway</strong>.</li><li>Authenticate and confirm Open. Do not disable general security protections.</li></ol>
+<p class="warning"><strong>Stop</strong> if macOS explicitly says malware was detected or the software will damage your computer. Contact the teaching team. That is a different warning.</p>
+<h3>Close versus Quit</h3><p>The red button closes a window but often leaves the application active. Use <strong>Command-Q</strong> to quit completely.</p>
+<h3>Putting ManSci VS Code in the Dock</h3><ol><li>Quit VS Code.</li><li>Remove an existing ordinary VS Code Dock item if necessary.</li><li>In Finder open your home folder’s <strong>Applications</strong> folder.</li><li>Drag <strong>ManSci VS Code.app</strong> into the Dock.</li></ol><p>Do not choose <strong>Keep in Dock</strong> on Microsoft VS Code’s running icon: macOS then saves the ordinary Microsoft application, which cannot remember the ManSci launch settings after Quit. While running, Microsoft’s icon may appear separately.</p>
+<h3>An empty VS Code window appears after red-close</h3><p>Clicking the still-running Dock icon should reopen the shared folder. If it does not, use the pinned ManSci launcher or <strong>File → Open Folder</strong>, then run the latest installer and check it reaches INSTALLATION COMPLETE.</p>
+</section>
+
+<section class="card" id="windows"><h2>Windows questions</h2>
+<p>Mac Open Anyway steps do not apply. Windows may show its own security, firewall or permission prompts; a permission prompt is not proof that software is safe. Contact staff about unexpected warnings.</p>
+<h3>Taskbar pins</h3><p>Open Start, find <strong>ManSci Spyder</strong>, <strong>ManSci Lab</strong> or <strong>ManSci VS Code</strong>, right-click and choose <strong>Pin to taskbar</strong> (possibly under More). Pin the ManSci entry, not an ordinary Python/VS Code icon. The installer never changes pins automatically. After launcher updates, unpin an old item and repin the new Start entry.</p>
+<h3>Firewall prompt for VS Code</h3><p>Local scripts and notebooks do not normally require inbound public-network access. Cancel the prompt unless your course specifically requires network sharing. Web requests made by your own code are separate.</p>
+</section>
+
+<section class="card" id="python"><h2>Python, cells and notebooks</h2>
+<ul><li>The interpreter should be from the <code>mansci-python</code> environment.</li><li>The notebook kernel should be <strong>Management Science Python</strong>.</li><li>In Spyder, <strong>Ctrl/Command-Enter</strong> runs the current cell; <strong>Shift-Enter</strong> runs and advances when that shortcut is assigned.</li><li>The displayed <code>%runcell</code> line is Spyder’s record of how a cell was executed, not an error.</li><li>A Jupyter “not trusted” message concerns whether saved notebook output may run active content. It does not mean the Python code failed.</li></ul>
+<p>If a kernel/interpreter is missing, close the tool, rerun its latest installer to completion, then run the diagnostic checker. Do not create another similarly named environment.</p>
+</section>
+
+<section class="card" id="ai"><h2>Local AI assistant</h2>
+<p>Qwen2.5-Coder 3B runs locally through Ollama. It needs no shared key or account. The first response can be slow—especially in a VM or with limited memory—and a small model can misunderstand context or produce incorrect code. Review and test everything it suggests.</p>
+<ul><li>Give explicit context: say Python, describe the required input/output, and paste the relevant code when necessary.</li><li>In VS Code use the ManSci-configured Continue interface, not GitHub Copilot sign-in.</li><li>In Lab choose the configured local persona/model. Recent chat context is retained, but the model does not automatically understand every open notebook cell.</li></ul>
+</section>
+
+<section class="card" id="repair"><h2>Repair, reinstall and contact staff</h2>
+<p>Reinstalling updates the environment and permanent launchers; it should not delete files in ManSci Code, chats or downloaded Ollama models. Always extract a newly downloaded ZIP rather than running an old extracted installer.</p>
+<h3>Logs</h3><ul><li>Windows: <code>%LOCALAPPDATA%\ManagementScience\Logs</code></li><li>Mac: <code>~/Library/Logs/ManagementScience</code></li></ul>
+<h3>What to send the teaching team</h3><ol><li>Your operating system, Mac chip or Windows architecture, and whether it is a VM.</li><li>The installed release shown at the top of this page.</li><li>The exact action and complete error message or screenshot.</li><li>The newest installation/launch log and diagnostic-checker result.</li><li>Whether the installer ended with INSTALLATION COMPLETE.</li></ol>
+<p class="note">Do not send passwords, API keys, notebook access tokens, confidential data or unrelated personal files.</p>
+</section></main><footer>Management Science Python Tools · Offline help · For current downloads and source see <a href="https://github.com/awhiter/mansci-python-tools">GitHub</a>.</footer>
+</body></html>

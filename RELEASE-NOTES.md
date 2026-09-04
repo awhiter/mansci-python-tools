@@ -1,4 +1,12 @@
-# 2026.09.04.10 — Reliable Mac launcher replacement / staff testing
+# 2026.09.04.11 — Offline ManSci Help launcher / staff testing
+
+Core now installs **ManSci Help** on the Desktop and in the Windows Start menu or Mac `~/Applications`. It opens a local, responsive HTML FAQ in the default browser and works offline. The heading displays the installed release for support. No Dock/taskbar item is added automatically.
+
+The guide consolidates installation order and completion, macOS Gatekeeper approval, Windows prompts and pins, the shared code folder, tool-specific closing/quitting, Jupyter server reuse, Mac VS Code Dock limitations, interpreters/kernels, Spyder cells, local Qwen expectations, safe reinstalling, log locations and a support-information checklist. Security wording distinguishes an unnotarised warning from explicit malware detection and never recommends disabling general protections.
+
+Every installer embeds Core, so rerunning any 2026.09.04.11 package installs or refreshes the same Help launcher even when the Python environment is already healthy. Tool/environment/model behaviour is unchanged from 2026.09.04.10. Automated tests cover launcher construction and archive content; staff should inspect links, readability and both platform launchers before student rollout.
+
+## Previous 2026.09.04.10 — Reliable Mac launcher replacement / staff testing
 
 The 2026.09.04.9 Complete installation did not reach VS Code on the reported Mac: it stopped signing the existing Lab desktop bundle, leaving VS Code at launcher 2026.09.04.8 and helper 0.2.0. Its Desktop folder is managed by Apple's File Provider and reapplied `com.apple.macl`/Finder metadata that recursive attribute cleanup could not reliably remove.
 

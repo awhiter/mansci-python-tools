@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$Name,
       [Parameter(Mandatory=$true)][string]$Executable,
       [Parameter(Mandatory=$true)][string]$Icon,
+      [string]$Arguments = '',
       [string]$AppId = '')
 $ErrorActionPreference = 'Stop'
 $target = $Executable
@@ -18,7 +19,7 @@ foreach ($folder in @($desktop, $programs)) {
 $shortcutPath = Join-Path $folder ($Name + '.lnk')
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $target
-$shortcut.Arguments = ''
+$shortcut.Arguments = $Arguments
 $shortcut.WorkingDirectory = Split-Path -Parent $Executable
 $shortcut.IconLocation = $Icon + ',0'
 $shortcut.Save()

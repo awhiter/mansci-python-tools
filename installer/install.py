@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.10'
+VERSION = '2026.09.04.11'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -20,6 +20,57 @@ PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
 def support():
     return (Path.home() / 'Library/Application Support/ManagementScience' if sys.platform == 'darwin'
             else Path(os.environ['LOCALAPPDATA']) / 'ManagementScience')
+
+def replace_mac_app(title, icon, icon_source, command, staging_root):
+    import plistlib
+    for parent in (Path.home() / 'Applications', Path.home() / 'Desktop'):
+        parent.mkdir(parents=True, exist_ok=True)
+        app = parent / (title + '.app')
+        staging = staging_root / ('.' + title + '-' + str(time.time_ns()) + '.app')
+        (staging / 'Contents/MacOS').mkdir(parents=True)
+        (staging / 'Contents/Resources').mkdir(parents=True)
+        shutil.copyfile(icon_source, staging / 'Contents/Resources' / (icon + '.icns'))
+        entry = staging / 'Contents/MacOS/launch'
+        entry.write_text('#!/bin/bash\nulimit -n 4096 2>/dev/null || true\n' + command + '\n')
+        entry.chmod(0o755)
+        with (staging / 'Contents/Info.plist').open('wb') as f:
+            plistlib.dump({'CFBundleName': title, 'CFBundleIdentifier': 'uk.ac.ucl.mansci.' + title.lower().replace(' ', '-'),
+                          'CFBundleExecutable': 'launch', 'CFBundlePackageType': 'APPL',
+                          'CFBundleIconFile': icon + '.icns', 'CFBundleVersion': VERSION}, f)
+        run(['/usr/bin/xattr', '-cr', staging])
+        run(['codesign', '--force', '--deep', '--sign', '-', staging])
+        backup = app.with_name('.' + app.name + '.replace-' + str(time.time_ns()))
+        try:
+            if app.exists() or app.is_symlink(): app.rename(backup)
+            staging.rename(app)
+        except Exception:
+            if not (app.exists() or app.is_symlink()) and (backup.exists() or backup.is_symlink()): backup.rename(app)
+            raise
+        finally:
+            if staging.exists(): shutil.rmtree(staging)
+        if backup.is_symlink() or backup.is_file(): backup.unlink()
+        elif backup.exists(): shutil.rmtree(backup)
+        app.touch()
+        register = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
+        if Path(register).exists(): run([register, '-f', app])
+
+def install_help(payload):
+    import shlex
+    root = support() / 'Core'
+    root.mkdir(parents=True, exist_ok=True)
+    help_file = root / 'ManSci-Help.html'
+    help_file.write_text((payload / 'FAQ.html').read_text(encoding='utf-8').replace('{{VERSION}}', VERSION), encoding='utf-8')
+    icon_source = payload / 'icons' / ('mansci-python.ico' if os.name == 'nt' else 'mansci-python.icns')
+    icon = root / icon_source.name
+    shutil.copy2(icon_source, icon)
+    if os.name == 'nt':
+        explorer = Path(os.environ['WINDIR']) / 'explorer.exe'
+        run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('shortcut.ps1'),
+             '-Name', 'ManSci Help', '-Executable', explorer, '-Icon', icon, '-Arguments', '"' + str(help_file) + '"'])
+    else:
+        replace_mac_app('ManSci Help', 'mansci-python', icon_source,
+                        'exec /usr/bin/open ' + shlex.quote(str(help_file)), root)
+    print('PASS: ManSci Help installed on the Desktop and in the application menu.')
 
 def run(args, *, capture=False, env=None):
     try:
@@ -114,6 +165,7 @@ def install_core(conda, payload, ollama):
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
          'import sys; assert sys.version_info[:2] == (3,13); ' + '; '.join('import ' + m for m in PACKAGES)])
     prepare_model(ollama)
+    install_help(payload)
     marker.write_text(CORE_VERSION + '\n', encoding='utf-8')
     return run([conda, 'run', '-n', 'mansci-python', 'python', '-c', 'import sys; print(sys.executable)'], capture=True)
 
@@ -173,41 +225,9 @@ def install_tool(kind, source, conda, python, code, ollama):
         run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('shortcut.ps1'),
              '-Name', title, '-Executable', executable, '-Icon', target / (icon + '.ico')] + (['-AppId', app_id] if app_id else []))
     else:
-        import plistlib
         import shlex
-        for parent in (Path.home() / 'Applications', Path.home() / 'Desktop'):
-            parent.mkdir(parents=True, exist_ok=True)
-            app = parent / (title + '.app')
-            # Build outside Desktop/iCloud/File Provider. Updating an existing
-            # Desktop bundle in place can retain com.apple.macl/FinderInfo that
-            # cannot be cleared reliably and makes codesign reject the bundle.
-            staging = target / ('.' + title + '-' + str(time.time_ns()) + '.app')
-            (staging / 'Contents/MacOS').mkdir(parents=True)
-            (staging / 'Contents/Resources').mkdir(parents=True)
-            shutil.copyfile(source / 'icons' / (icon + '.icns'), staging / 'Contents/Resources' / (icon + '.icns'))
-            entry = staging / 'Contents/MacOS/launch'
-            entry.write_text('#!/bin/bash\nulimit -n 4096 2>/dev/null || true\nexec ' + shlex.quote(python) + ' ' + shlex.quote(str(target / 'launch.py')) + '\n')
-            entry.chmod(0o755)
-            with (staging / 'Contents/Info.plist').open('wb') as f:
-                plistlib.dump({'CFBundleName': title, 'CFBundleIdentifier': 'uk.ac.ucl.mansci.' + kind.lower(),
-                              'CFBundleExecutable': 'launch', 'CFBundlePackageType': 'APPL',
-                              'CFBundleIconFile': icon + '.icns', 'CFBundleVersion': VERSION}, f)
-            run(['/usr/bin/xattr', '-cr', staging])
-            run(['codesign', '--force', '--deep', '--sign', '-', staging])
-            backup = app.with_name('.' + app.name + '.replace-' + str(time.time_ns()))
-            try:
-                if app.exists() or app.is_symlink(): app.rename(backup)
-                staging.rename(app)
-            except Exception:
-                if not (app.exists() or app.is_symlink()) and (backup.exists() or backup.is_symlink()): backup.rename(app)
-                raise
-            finally:
-                if staging.exists(): shutil.rmtree(staging)
-            if backup.is_symlink() or backup.is_file(): backup.unlink()
-            elif backup.exists(): shutil.rmtree(backup)
-            app.touch()
-            register = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
-            if Path(register).exists(): run([register, '-f', app])
+        replace_mac_app(title, icon, source / 'icons' / (icon + '.icns'),
+                        'exec ' + shlex.quote(python) + ' ' + shlex.quote(str(target / 'launch.py')), target)
     print(f'PASS: {title} launcher created. Its files are in a permanent support folder.')
 
 def main():

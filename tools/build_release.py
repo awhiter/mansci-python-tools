@@ -49,6 +49,8 @@ Rerun after resolving the error; student work and existing model data are preser
 
 All tools share Documents/ManSci Code and mansci-python. Core supplies test.py,
 test.ipynb and a folder README without overwriting existing work.
+Core also installs **ManSci Help**, an offline FAQ on the Desktop and in the
+application menu. Use it for installation, launch, kernel, AI and log guidance.
 This is for staff testing, not yet approved for student rollout.
 ''')
     shutil.copy2(ROOT / 'DISTRIBUTION-GUIDE.md', folder / 'DISTRIBUTION-GUIDE.md')

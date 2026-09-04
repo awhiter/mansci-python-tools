@@ -63,6 +63,31 @@ class InstallerTests(unittest.TestCase):
             self.assertIn('pause', (p / (prefix + '-Windows.bat')).read_text())
             self.assertIn('Press Return', (p / (prefix + '-Mac.command')).read_text())
 
+    def test_windows_help_is_versioned_and_uses_quoted_local_html(self):
+        with tempfile.TemporaryDirectory(prefix='ManSci help ') as directory:
+            root = Path(directory)
+            fake_os = SimpleNamespace(name='nt', environ={'WINDIR': 'C:\\Windows'})
+            with patch.object(m, 'support', return_value=root), patch.object(m, 'os', fake_os), patch.object(m, 'run') as run:
+                m.install_help(ROOT / 'distributions/ManSci-Core/payload')
+            html = (root / 'Core/ManSci-Help.html').read_text()
+            self.assertIn(m.VERSION, html)
+            self.assertNotIn('{{VERSION}}', html)
+            args = run.call_args.args[0]
+            self.assertIn('ManSci Help', args)
+            self.assertEqual(args[args.index('-Arguments') + 1], '"' + str(root / 'Core/ManSci-Help.html') + '"')
+
+    def test_mac_help_is_a_fresh_signed_app_with_offline_target(self):
+        with tempfile.TemporaryDirectory(prefix='ManSci help ') as directory:
+            home = Path(directory); root = home / 'support'
+            with patch.object(m, 'support', return_value=root), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run') as run:
+                m.install_help(ROOT / 'distributions/ManSci-Core/payload')
+            for parent in ('Desktop', 'Applications'):
+                app = home / parent / 'ManSci Help.app'
+                launch = (app / 'Contents/MacOS/launch').read_text()
+                self.assertIn('/usr/bin/open', launch)
+                self.assertIn(str(root / 'Core/ManSci-Help.html'), launch)
+            self.assertTrue(any(call.args[0][0] == 'codesign' for call in run.call_args_list))
+
     def test_windows_launcher_uses_permanent_paths_with_spaces(self):
         with tempfile.TemporaryDirectory(prefix='ManSci test ') as directory:
             root = Path(directory)
