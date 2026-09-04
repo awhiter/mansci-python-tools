@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.11'
+VERSION = '2026.09.04.12'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -57,6 +57,7 @@ def replace_mac_app(title, icon, icon_source, command, staging_root):
 def install_help(payload):
     import shlex
     root = support() / 'Core'
+    root.mkdir(parents=True, exist_ok=True)
     help_file = root / 'ManSci-Help.html'
     help_file.write_text((payload / 'FAQ.html').read_text(encoding='utf-8').replace('{{VERSION}}', VERSION), encoding='utf-8')
     icon_source = payload / 'icons' / ('mansci-python.ico' if os.name == 'nt' else 'mansci-python.icns')

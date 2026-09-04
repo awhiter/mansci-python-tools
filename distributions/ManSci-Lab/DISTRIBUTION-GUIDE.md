@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.11 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.12 is public for staff testing, not yet approved for student rollout.
 
 Core installs an offline **ManSci Help** guide on the Desktop and in the Windows Start menu or Mac `~/Applications`. It covers installation, shared working practices, Mac and Windows launcher behaviour, kernels, local AI, reinstalling, logs and what to send staff. Its heading displays the installed distribution release. The installer does not pin it automatically.
 

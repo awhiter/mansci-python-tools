@@ -1,4 +1,8 @@
-# 2026.09.04.11 — Offline ManSci Help launcher / staff testing
+# 2026.09.04.12 — FAQ clarification / staff testing
+
+Clarifies the Mac FAQ entry about an empty VS Code window after red-close. It now gives only the relevant recovery choices—use the pinned ManSci launcher or open `Documents/ManSci Code` through File → Open Folder—and no longer suggests reinstalling as part of ordinary use. Software behaviour is unchanged from 2026.09.04.11.
+
+## Previous 2026.09.04.11 — Offline ManSci Help launcher / staff testing
 
 Core now installs **ManSci Help** on the Desktop and in the Windows Start menu or Mac `~/Applications`. It opens a local, responsive HTML FAQ in the default browser and works offline. The heading displays the installed release for support. No Dock/taskbar item is added automatically.
 
