@@ -1,4 +1,10 @@
-# 2026.09.04.7 — First-run security guidance / documentation update
+# 2026.09.04.8 — Mac launcher update fix / staff testing
+
+Fixes a Mac reinstall failure where Finder/download extended attributes on an existing generated `.app` launcher caused code signing to report “resource fork, Finder information, or similar detritus not allowed.” The installer now clears extended attributes only from each generated ManSci launcher immediately before signing; it does not touch student work or general application settings.
+
+The reported installation stopped at Spyder before reaching Lab, leaving the old 3 September Lab launcher installed. Download and extract the updated Complete ZIP, close all ManSci tools, approve the Mac installer as documented, and rerun it. A successful run updates all three launchers; no environment or model removal is required. Automated tests check that cleanup occurs before signing, but the native Mac window still requires hands-on testing.
+
+## Previous 2026.09.04.7 — First-run security guidance / documentation update
 
 All package READMEs now explain the expected macOS “Apple could not verify…” message and give the file-specific Privacy & Security → Open Anyway steps. The distribution guide explains why an unverified installer warning differs from malware detection, the role and limits of established/open-source components, trusted download sources, missing approval options and when to stop and contact staff. It links to Apple's guidance and never asks users to disable general security protections.
 

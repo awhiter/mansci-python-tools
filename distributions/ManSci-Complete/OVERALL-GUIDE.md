@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.7 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.8 is public for staff testing, not yet approved for student rollout.
 
 Windows Spyder now also has an explicit ManSci window identity and relaunch command. After upgrading from an older release, manually unpin its old Python/Spyder taskbar entry and pin the newly installed **ManSci Spyder** Start entry. The running window and shortcut use the standard Spyder icon. The installer never changes pins automatically.
 

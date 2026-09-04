@@ -99,7 +99,7 @@ class InstallerTests(unittest.TestCase):
         import plistlib
         with tempfile.TemporaryDirectory(prefix='ManSci test ') as directory:
             home = Path(directory)
-            with patch.object(m, 'support', return_value=home / 'support'), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run', return_value='{}'):
+            with patch.object(m, 'support', return_value=home / 'support'), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run', return_value='{}') as run:
                 for _ in range(2):
                     m.install_tool('Spyder', ROOT / 'distributions/ManSci-Spyder/payload',
                                    str(home / 'miniconda3/bin/conda'), str(home / 'env/bin/python'), '', '')
@@ -109,6 +109,10 @@ class InstallerTests(unittest.TestCase):
                 with (app / 'Contents/Info.plist').open('rb') as f:
                     self.assertEqual(plistlib.load(f)['CFBundleIconFile'], 'spyder.icns')
                 self.assertIn(str(home / 'support/Spyder/launch.py'), (app / 'Contents/MacOS/launch').read_text())
+            calls = [call.args[0] for call in run.call_args_list]
+            clean = next(i for i, args in enumerate(calls) if args[:2] == ['/usr/bin/xattr', '-cr'])
+            sign = next(i for i, args in enumerate(calls) if args and args[0] == 'codesign')
+            self.assertLess(clean, sign)
                 self.assertNotIn('conda', (app / 'Contents/MacOS/launch').read_text())
 
     def test_lab_browser_url_and_no_process_signal(self):

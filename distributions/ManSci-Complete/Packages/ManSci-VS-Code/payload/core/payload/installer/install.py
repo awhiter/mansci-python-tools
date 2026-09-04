@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.6'
+VERSION = '2026.09.04.8'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -191,6 +191,9 @@ def install_tool(kind, source, conda, python, code, ollama):
                 plistlib.dump({'CFBundleName': title, 'CFBundleIdentifier': 'uk.ac.ucl.mansci.' + kind.lower(),
                               'CFBundleExecutable': 'launch', 'CFBundlePackageType': 'APPL',
                               'CFBundleIconFile': icon + '.icns', 'CFBundleVersion': VERSION}, f)
+            # Finder/download metadata on an existing generated bundle can make
+            # codesign reject resource forks. Restrict cleanup to this launcher.
+            run(['/usr/bin/xattr', '-cr', app])
             run(['codesign', '--force', '--deep', '--sign', '-', app])
             app.touch()
             register = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
