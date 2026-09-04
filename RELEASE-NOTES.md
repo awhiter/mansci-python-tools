@@ -1,4 +1,10 @@
-# 2026.09.04.6 — Spyder taskbar relaunch fix / staff testing
+# 2026.09.04.7 — First-run security guidance / documentation update
+
+All package READMEs now explain the expected macOS “Apple could not verify…” message and give the file-specific Privacy & Security → Open Anyway steps. The distribution guide explains why an unverified installer warning differs from malware detection, the role and limits of established/open-source components, trusted download sources, missing approval options and when to stop and contact staff. It links to Apple's guidance and never asks users to disable general security protections.
+
+Windows guidance clarifies that these Mac approval steps do not apply there, but Windows may show its own security or permission prompts; these are not guarantees of safety. All five ZIPs and the Complete package's overall guide have been refreshed. Software, environments and launcher behaviour are unchanged from 2026.09.04.6; working installations do not need reinstalling for this documentation-only release. Staff-testing status is retained.
+
+## Previous 2026.09.04.6 — Spyder taskbar relaunch fix / staff testing
 
 Spyder now receives an explicit ManSci taskbar identity, standard Spyder icon and relaunch command, matching its shortcut. Previously its running window retained Python's identity, so pinning that window could leave a non-working Python pin after closing. This uses the same window-property mechanism already used for Lab, without changing Spyder's windowless Python host or kernel handling. Lab and Code behaviour is unchanged.
 

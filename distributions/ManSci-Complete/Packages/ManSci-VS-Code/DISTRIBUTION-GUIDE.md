@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.6 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.7 is public for staff testing, not yet approved for student rollout.
 
 Windows Spyder now also has an explicit ManSci window identity and relaunch command. After upgrading from an older release, manually unpin its old Python/Spyder taskbar entry and pin the newly installed **ManSci Spyder** Start entry. The running window and shortcut use the standard Spyder icon. The installer never changes pins automatically.
 
@@ -9,6 +9,26 @@ Windows Spyder now also has an explicit ManSci window identity and relaunch comm
 ManSci Complete installs Core, Spyder, JupyterLab and VS Code. Individual tool packages embed the same versioned Core and update it if needed. All tools share Python 3.13 in `mansci-python`, the Management Science Python kernel and `Documents/ManSci Code`. The common scientific packages include Statsmodels.
 
 Extract the ENTIRE ZIP to a local folder, not a network share or the Mac host's shared folder in a Windows VM. Close all ManSci tools before updating. Keep an internet connection and enough disk space for Python, applications and the roughly 2 GB Qwen model. Run Install-All-Windows.bat or Install-All-Mac.command for Complete; individual packages use Install-Windows.bat / Install-Mac.command.
+
+## Mac: “Apple could not verify…” when opening the installer
+
+Your Mac may say that Apple could not verify `Install-All-Mac.command` (or `Install-Mac.command`) is free of malware. **This message is expected for this distribution. It does not mean Apple has detected malware.** macOS is blocking the installer because it has not been submitted through Apple's Developer ID signing and notarisation process.
+
+ManSci sets up established Python tools, including the open-source Spyder and JupyterLab applications and Microsoft's Visual Studio Code, configured for a consistent Management Science environment and working folder. The installer source is available in the [ManSci GitHub repository](https://github.com/awhiter/mansci-python-tools). However, open source and familiar suppliers do not guarantee that a particular download is safe. **Only follow these steps for a distribution downloaded using the link supplied by your teaching team**, not unexpected files or downloads from other sources.
+
+1. Click **Done**, not **Move to Bin**, in the warning.
+2. Open the Apple menu → **System Settings → Privacy & Security**.
+3. Scroll to **Security**, find the message about the blocked ManSci installer and click **Open Anyway**.
+4. Authenticate with your Mac password or Touch ID if requested, then confirm **Open**.
+5. Follow the installer instructions. Keep its window open and watch for prompts; downloads and setup can take several minutes.
+
+This approves the specific installer; **do not disable your Mac's general security protections**. If Open Anyway is missing, try opening the installer once more and return to Privacy & Security. If it remains unavailable, especially on a university-managed Mac, contact the teaching team or IT support.
+
+**Stop if the warning explicitly says malware was detected or that the software will damage your computer.** That is a different warning: do not override it using these instructions. Contact the teaching team.
+
+These steps follow [Apple's guidance for opening downloaded software](https://support.apple.com/en-ie/102445).
+
+**Windows users:** Open Anyway applies only to macOS. Windows uses different security checks and may display its own installation or permission prompts. An administrator-permission prompt is not a guarantee that software is safe. Follow the Windows instructions and contact the teaching team about unexpected security warnings; we do not promise a warning-free Windows installation.
 
 ## Five guided stages
 
