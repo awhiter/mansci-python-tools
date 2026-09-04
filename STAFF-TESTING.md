@@ -2,6 +2,11 @@
 
 Record release, OS, architecture, VM/native, RAM/disk and log path for each test.
 
+- [ ] Existing taskbar pins/order remain unchanged by installation.
+- [ ] Each ManSci Start menu entry can be pinned/unpinned manually with its standard icon.
+- [ ] Each pin relaunches the teaching setup after closing the tool, rebooting and moving the extracted ZIP folder.
+- [ ] Explain separate running VS Code/browser buttons; do not pin those in place of the ManSci launcher.
+
 - [ ] Fresh Windows x64, Windows ARM VMware, Apple silicon Mac and Intel Mac.
 - [ ] Missing VS Code/Ollama: install offer or manual guidance BEFORE Python packages.
 - [ ] Missing Miniconda: consent, download, per-user installation and continuation.

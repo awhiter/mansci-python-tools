@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.3'
+VERSION = '2026.09.04.4'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -157,8 +157,12 @@ def install_tool(kind, source, conda, python, code, ollama):
         pythonw = Path(python).with_name('pythonw.exe')
         if not pythonw.is_file(): raise RuntimeError(f'Windowless Python is missing: {pythonw}')
         shutil.copy2(source / 'icons' / (icon + '.ico'), target / (icon + '.ico'))
+        (target / 'launcher-runtime.txt').write_text(str(pythonw) + '\n' + str(launch) + '\n', encoding='utf-8')
+        executable = target / (title + '.exe')
+        run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('build-windows-launcher.ps1'),
+             '-Output', executable, '-Icon', target / (icon + '.ico')])
         run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('shortcut.ps1'),
-             '-Name', title, '-Launcher', launch, '-Python', pythonw, '-Icon', target / (icon + '.ico'), '-Wrapper', target / 'hidden.vbs'])
+             '-Name', title, '-Executable', executable, '-Icon', target / (icon + '.ico')])
     else:
         import plistlib
         import shlex

@@ -47,11 +47,14 @@ class InstallerTests(unittest.TestCase):
         with patch.object(m, 'data_from_ollama', return_value={'models':[]}), patch.object(m, 'run', side_effect=RuntimeError('network failed')):
             with self.assertRaises(RuntimeError): m.prepare_model('/ollama')
 
-    def test_shortcut_uses_expanded_windows_path(self):
+    def test_shortcut_targets_executable_and_does_not_pin(self):
         text = (ROOT / 'installer/shortcut.ps1').read_text()
-        self.assertIn("Join-Path $env:WINDIR 'System32\\wscript.exe'", text)
+        self.assertIn('$target = $Executable', text)
+        self.assertIn("GetFolderPath('Programs')", text)
         self.assertNotIn("'$env:WINDIR", text)
         self.assertIn('$check.TargetPath', text)
+        for forbidden in ('InvokeVerb', 'Taskband', 'taskbarpin', 'LayoutModification'):
+            self.assertNotIn(forbidden, text)
 
     def test_all_entrypoints_pause(self):
         for kind in ('Core','Spyder','Lab','VS-Code','Complete'):
@@ -71,9 +74,19 @@ class InstallerTests(unittest.TestCase):
                                'C:\\Users\\Test User\\miniconda3\\Scripts\\conda.exe', str(python), '', '')
             self.assertFalse((root / 'Spyder/launch.bat').exists())
             args = run.call_args.args[0]
-            self.assertIn(root / 'Spyder/launch.py', args)
-            self.assertIn(python.with_name('pythonw.exe'), args)
+            self.assertIn(root / 'Spyder/ManSci Spyder.exe', args)
+            runtime = (root / 'Spyder/launcher-runtime.txt').read_text().splitlines()
+            self.assertEqual(runtime, [str(python.with_name('pythonw.exe')), str(root / 'Spyder/launch.py')])
+            self.assertTrue(any('build-windows-launcher.ps1' in str(call.args[0]) for call in run.call_args_list))
             self.assertTrue((root / 'Spyder/spyder.ico').is_file())
+
+    def test_compiled_launcher_is_windowless_and_has_icon(self):
+        build = (ROOT / 'installer/build-windows-launcher.ps1').read_text()
+        source = (ROOT / 'installer/WindowsLauncher.cs').read_text()
+        self.assertIn('/target:winexe', build)
+        self.assertIn('/win32icon:$Icon', build)
+        self.assertIn('start.CreateNoWindow = true', source)
+        self.assertIn('child.WaitForExit()', source)
 
     def test_mac_reinstall_preserves_real_app_bundles(self):
         import plistlib

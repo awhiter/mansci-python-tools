@@ -1,22 +1,25 @@
 param([Parameter(Mandatory=$true)][string]$Name,
-      [Parameter(Mandatory=$true)][string]$Launcher,
-      [Parameter(Mandatory=$true)][string]$Python,
-      [Parameter(Mandatory=$true)][string]$Wrapper,
+      [Parameter(Mandatory=$true)][string]$Executable,
       [Parameter(Mandatory=$true)][string]$Icon)
 $ErrorActionPreference = 'Stop'
-$target = Join-Path $env:WINDIR 'System32\wscript.exe'
-foreach ($file in @($target, $Launcher, $Python, $Wrapper, $Icon)) {
+$target = $Executable
+foreach ($file in @($target, $Icon)) {
     if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Launcher dependency missing: $file" }
 }
 $shell = New-Object -ComObject WScript.Shell
 $desktop = [Environment]::GetFolderPath('Desktop')
-$shortcutPath = Join-Path $desktop ($Name + '.lnk')
+$programs = Join-Path ([Environment]::GetFolderPath('Programs')) 'Management Science'
+New-Item -ItemType Directory -Force -Path $programs | Out-Null
+foreach ($folder in @($desktop, $programs)) {
+$shortcutPath = Join-Path $folder ($Name + '.lnk')
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $target
-$shortcut.Arguments = '"' + $Wrapper + '" "' + $Python + '" "' + $Launcher + '"'
-$shortcut.WorkingDirectory = Split-Path -Parent $Launcher
+$shortcut.Arguments = ''
+$shortcut.WorkingDirectory = Split-Path -Parent $Executable
 $shortcut.IconLocation = $Icon + ',0'
 $shortcut.Save()
 $check = $shell.CreateShortcut($shortcutPath)
 if ($check.TargetPath -ne $target -or $check.Arguments -ne $shortcut.Arguments) { throw 'Shortcut verification failed.' }
 Write-Host "PASS: $shortcutPath"
+}
+Write-Host 'Optional: find the ManSci entry in Start, right-click, then Pin to taskbar (or More > Pin to taskbar). Nothing has been pinned automatically.'

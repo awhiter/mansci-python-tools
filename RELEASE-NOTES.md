@@ -1,4 +1,12 @@
-# 2026.09.04.3 — Spyder Windows child-console hotfix / staff testing
+# 2026.09.04.4 — User-controlled Windows taskbar pins / staff testing
+
+All three tools now have dedicated windowless Windows launch executables with their standard icons, plus per-user Start menu entries. Users can pin/unpin these entries themselves. The installer never changes taskbar pins or policies. Pins retain the ManSci launch configuration and stable support-folder paths. Running VS Code/browser windows may appear separately: pin the ManSci Start menu entry, not their generic running-window buttons.
+
+Close the tools, extract the new ZIP and rerun the Complete installer (or the individual tool installers). Find each ManSci entry in Start, right-click and choose Pin to taskbar / More → Pin to taskbar. No Core/model removal is needed. Windows compiles the small launcher locally using its existing .NET Framework compiler; a missing/blocked compiler produces an explicit installation error. Mac launcher behaviour is unchanged.
+
+Automated tests include source compilation with a Windows Forms stub, not execution on Windows. Manual pin/unpin, icon and relaunch checks on Windows 11 are still required.
+
+## Retained Spyder hotfix from 2026.09.04.3
 
 Fixes a launcher regression from 2026.09.04.2: Spyder now retains its true pythonw.exe host identity. Jupyter Client uses this to set CREATE_NO_WINDOW for its kernel subprocesses; overriding it with python.exe prevented that safeguard. Spyder still selects python.exe from mansci-python for kernel execution. Lab and VS Code retain their separate executable handling.
 

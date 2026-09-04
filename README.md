@@ -19,6 +19,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - VS Code with an isolated teaching profile, Light+ theme, automatic interpreter/kernel configuration and local Continue assistant.
 - Ollama and Qwen2.5-Coder 3B installation checks.
 - Stable desktop launchers using the applications' standard icons.
+- Windows Start menu launchers with matching icons, optionally pinnable by the user; no automatic taskbar changes.
 
 The aim is to let students choose the most appropriate coding interface without changing environments or package versions. Python files, notebooks and data created in one tool remain available to the others.
 

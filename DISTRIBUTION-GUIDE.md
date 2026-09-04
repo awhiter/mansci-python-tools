@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.3 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.4 is public for staff testing, not yet approved for student rollout.
 
 ## Choose and start
 
@@ -46,6 +46,16 @@ Top-level installers pause on BOTH success and failure. Read the error before cl
 The precise path is printed at startup and on failure. Send the newest log to staff. Runtime logs, including ollama-service.log and launch.log, are in the per-user ManagementScience support folder's Logs directory. Fix the reported error and rerun; student work and existing model data are retained. Reopen Finder or sign out/in if standard desktop icons remain cached.
 
 ## Startup, browser, AI performance and Windows Security
+
+### Optional Windows taskbar pins — your choice
+
+The installer creates Desktop shortcuts and **Start → All apps → Management Science** entries named **ManSci Spyder**, **ManSci Lab** and **ManSci VS Code**. Each points to a dedicated windowless executable in a permanent support folder, with the same standard tool icon as its desktop launcher. The Windows .NET Framework compiler builds these small launchers locally during installation. The installer does not pin, unpin, reorder or alter existing taskbar items.
+
+To pin: open Start, search for the required **ManSci** entry, right-click it and select **Pin to taskbar** (or **More → Pin to taskbar**). Repeat only for the tools you want. Right-click a pinned item → **Unpin from taskbar** to remove it. If you previously pinned an ordinary Spyder, VS Code or browser entry, you may unpin it yourself and pin the new ManSci entry instead.
+
+Always pin the **ManSci Start menu entry**, not an ordinary running VS Code/browser icon. The ManSci pin is a launch button that restores the teaching setup. Windows may show a separate running-app button beside it: this update does not merge or rewrite third-party taskbar identities. In particular, JupyterLab's open window belongs to the browser, while its pinned launcher retains the Jupyter icon. Relaunching from a ManSci pin uses the same environment, profile and shared folder as the desktop shortcut. Existing taskbar pins are not silently migrated.
+
+After updating, close each tool and test opening it from the new pin. Staff should also test after reboot and after moving/removing the extracted distribution folder. These taskbar changes apply only to Windows; the Mac launchers are unchanged.
 
 Launchers now start the installed environment's Python directly, with its saved activation paths, rather than rerunning Conda each time. Windows uses windowless Python; closing Spyder ends its launcher process without leaving a terminal. Spyder opens the Files pane in the shared home. JupyterLab opens an HTTP URL in the default browser, not a temporary HTML file; tokens/authentication remain enabled. Treat local launch logs as private because a Jupyter startup log may contain its access token.
 
