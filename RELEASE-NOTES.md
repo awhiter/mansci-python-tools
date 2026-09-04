@@ -1,4 +1,12 @@
-# 2026.09.04.9 — Mac VS Code Dock reopen fix / staff testing
+# 2026.09.04.10 — Reliable Mac launcher replacement / staff testing
+
+The 2026.09.04.9 Complete installation did not reach VS Code on the reported Mac: it stopped signing the existing Lab desktop bundle, leaving VS Code at launcher 2026.09.04.8 and helper 0.2.0. Its Desktop folder is managed by Apple's File Provider and reapplied `com.apple.macl`/Finder metadata that recursive attribute cleanup could not reliably remove.
+
+Mac launchers are now built and signed as fresh bundles in the permanent local support directory, then moved into Applications/Desktop only after signing succeeds. The existing generated launcher remains in place if building or signing fails; replacement uses a rollback and removes only its temporary backup after success. Student work is untouched. The VS Code Dock-reopen implementation itself is unchanged.
+
+Quit all ManSci tools, install this Complete package, and require the final INSTALLATION COMPLETE message. Verify the installed ManSci VS Code bundle reports 2026.09.04.10 and its ManSci Startup extension reports 0.3.0, then repeat the red-close/Dock-icon test. No environment/model removal is needed.
+
+## Previous 2026.09.04.9 — Mac VS Code Dock reopen fix / staff testing
 
 Fixes the Mac behaviour where closing the ManSci VS Code window left the application active in the Dock—as is normal on macOS—but clicking that active icon opened an empty window. The isolated ManSci startup helper now detects that exact empty local-window case and reopens the current folder from `Documents/ManSci Code Home.txt` in the same window.
 

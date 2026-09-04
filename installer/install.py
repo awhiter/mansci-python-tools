@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.9'
+VERSION = '2026.09.04.10'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -176,25 +176,35 @@ def install_tool(kind, source, conda, python, code, ollama):
         import plistlib
         import shlex
         for parent in (Path.home() / 'Applications', Path.home() / 'Desktop'):
+            parent.mkdir(parents=True, exist_ok=True)
             app = parent / (title + '.app')
-            if app.is_symlink():
-                backup = app.with_name(app.name + '.previous-' + str(time.time_ns()))
-                app.rename(backup)
-                print(f'Preserved old launcher alias at {backup}')
-            (app / 'Contents/MacOS').mkdir(parents=True, exist_ok=True)
-            (app / 'Contents/Resources').mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source / 'icons' / (icon + '.icns'), app / 'Contents/Resources' / (icon + '.icns'))
-            entry = app / 'Contents/MacOS/launch'
+            # Build outside Desktop/iCloud/File Provider. Updating an existing
+            # Desktop bundle in place can retain com.apple.macl/FinderInfo that
+            # cannot be cleared reliably and makes codesign reject the bundle.
+            staging = target / ('.' + title + '-' + str(time.time_ns()) + '.app')
+            (staging / 'Contents/MacOS').mkdir(parents=True)
+            (staging / 'Contents/Resources').mkdir(parents=True)
+            shutil.copyfile(source / 'icons' / (icon + '.icns'), staging / 'Contents/Resources' / (icon + '.icns'))
+            entry = staging / 'Contents/MacOS/launch'
             entry.write_text('#!/bin/bash\nulimit -n 4096 2>/dev/null || true\nexec ' + shlex.quote(python) + ' ' + shlex.quote(str(target / 'launch.py')) + '\n')
             entry.chmod(0o755)
-            with (app / 'Contents/Info.plist').open('wb') as f:
+            with (staging / 'Contents/Info.plist').open('wb') as f:
                 plistlib.dump({'CFBundleName': title, 'CFBundleIdentifier': 'uk.ac.ucl.mansci.' + kind.lower(),
                               'CFBundleExecutable': 'launch', 'CFBundlePackageType': 'APPL',
                               'CFBundleIconFile': icon + '.icns', 'CFBundleVersion': VERSION}, f)
-            # Finder/download metadata on an existing generated bundle can make
-            # codesign reject resource forks. Restrict cleanup to this launcher.
-            run(['/usr/bin/xattr', '-cr', app])
-            run(['codesign', '--force', '--deep', '--sign', '-', app])
+            run(['/usr/bin/xattr', '-cr', staging])
+            run(['codesign', '--force', '--deep', '--sign', '-', staging])
+            backup = app.with_name('.' + app.name + '.replace-' + str(time.time_ns()))
+            try:
+                if app.exists() or app.is_symlink(): app.rename(backup)
+                staging.rename(app)
+            except Exception:
+                if not (app.exists() or app.is_symlink()) and (backup.exists() or backup.is_symlink()): backup.rename(app)
+                raise
+            finally:
+                if staging.exists(): shutil.rmtree(staging)
+            if backup.is_symlink() or backup.is_file(): backup.unlink()
+            elif backup.exists(): shutil.rmtree(backup)
             app.touch()
             register = '/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister'
             if Path(register).exists(): run([register, '-f', app])

@@ -114,6 +114,8 @@ class InstallerTests(unittest.TestCase):
             clean = next(i for i, args in enumerate(calls) if args[:2] == ['/usr/bin/xattr', '-cr'])
             sign = next(i for i, args in enumerate(calls) if args and args[0] == 'codesign')
             self.assertLess(clean, sign)
+            self.assertNotIn('/Desktop/', str(calls[clean][-1]))
+            self.assertNotIn('/Desktop/', str(calls[sign][-1]))
 
     def test_lab_browser_url_and_no_process_signal(self):
         spec = importlib.util.spec_from_file_location('student_lab', ROOT / 'distributions/ManSci-Lab/payload/student_lab.py')
