@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.4 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.5 is public for staff testing, not yet approved for student rollout.
 
 ## Choose and start
 
@@ -53,11 +53,13 @@ The installer creates Desktop shortcuts and **Start → All apps → Management 
 
 To pin: open Start, search for the required **ManSci** entry, right-click it and select **Pin to taskbar** (or **More → Pin to taskbar**). Repeat only for the tools you want. Right-click a pinned item → **Unpin from taskbar** to remove it. If you previously pinned an ordinary Spyder, VS Code or browser entry, you may unpin it yourself and pin the new ManSci entry instead.
 
-Always pin the **ManSci Start menu entry**, not an ordinary running VS Code/browser icon. The ManSci pin is a launch button that restores the teaching setup. Windows may show a separate running-app button beside it: this update does not merge or rewrite third-party taskbar identities. In particular, JupyterLab's open window belongs to the browser, while its pinned launcher retains the Jupyter icon. Relaunching from a ManSci pin uses the same environment, profile and shared folder as the desktop shortcut. Existing taskbar pins are not silently migrated.
+Always pin the **ManSci Start menu entry**, not an ordinary running VS Code icon. ManSci Lab now opens a dedicated application-style window on Windows and Mac. Launching it again requests focus on that same window, rather than opening another browser tab. Windows ManSci Code windows receive the same taskbar identity and relaunch details as their shortcut; ordinary VS Code profiles are left alone. Grouping can take a few seconds while Code starts. Windows may restrict bringing a window to the foreground. When upgrading, manually unpin old Lab/Code entries and pin their newly installed Start menu entries. Existing pins are not silently migrated.
 
-After updating, close each tool and test opening it from the new pin. Staff should also test after reboot and after moving/removing the extracted distribution folder. These taskbar changes apply only to Windows; the Mac launchers are unchanged.
+After updating, close each tool and test opening it from the new pin. Staff should also test after reboot and after moving/removing the extracted distribution folder. Taskbar grouping applies only to Windows. Lab's dedicated window applies on both platforms and requires Microsoft Edge WebView2 on Windows (checked by the installer) or native WebKit on Mac; the Python window package is installed automatically.
 
-Launchers now start the installed environment's Python directly, with its saved activation paths, rather than rerunning Conda each time. Windows uses windowless Python; closing Spyder ends its launcher process without leaving a terminal. Spyder opens the Files pane in the shared home. JupyterLab opens an HTTP URL in the default browser, not a temporary HTML file; tokens/authentication remain enabled. Treat local launch logs as private because a Jupyter startup log may contain its access token.
+Save notebooks before closing the Lab window. Closing the window leaves the local Jupyter server running so reopening is quick. To stop that server use JupyterLab's **File → Shut Down**, then close the window; relaunch to start it again. Old browser tabs from earlier releases can be closed manually. Authentication remains enabled; the window uses separate local web storage. Native window/taskbar behaviour must still be checked on staff machines before student rollout.
+
+Launchers start the installed environment's Python directly, with its saved activation paths, rather than rerunning Conda each time. Windows uses windowless Python; closing Spyder ends its launcher process without leaving a terminal. Spyder opens the Files pane in the shared home. JupyterLab loads its authenticated local HTTP URL in the dedicated window, not a temporary HTML file. Treat local launch logs as private because a Jupyter startup log may contain its access token.
 
 JupyterLab does not wait for Ollama to start. Reopening Lab checks the existing local server over HTTP. VS Code no longer scans/rewrites all notebooks at startup. The ManSci Startup helper explicitly selects the installed interpreter and, when a Python notebook is opened, its live kernel. Wait for the **Preparing ManSci kernel** status to finish before pressing Run. The helper uses Jupyter's exported but unstable `openNotebook` API, so Jupyter is pinned to 2025.9.1. If selection fails, it reports this instead of pretending success; send staff the **Output → ManSci Startup** messages. No notebook cells are executed automatically.
 

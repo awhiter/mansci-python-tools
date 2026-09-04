@@ -141,7 +141,7 @@ def install_local_persona(workspace: Path) -> None:
         shutil.copy2(source / name, target / name)
 
 
-def open_existing_server(runtime: Path, workspace: Path) -> bool:
+def running_server_url(runtime: Path, workspace: Path) -> str | None:
     """Reopen this distribution's live server instead of starting a duplicate."""
     for server_file in sorted(runtime.glob("jpserver-*.json"), reverse=True):
         try:
@@ -160,41 +160,24 @@ def open_existing_server(runtime: Path, workspace: Path) -> bool:
             target = f"{base_url}/lab"
             if token:
                 target += f"?token={token}"
-            print(f"ManSci Lab is already running. Opening {base_url}/lab")
-            webbrowser.open(target)
-            return True
+            return target
         except (FileNotFoundError, KeyError, ValueError, TypeError, OSError, json.JSONDecodeError):
             continue
+    return None
+
+
+def open_existing_server(runtime: Path, workspace: Path) -> bool:
+    """Legacy browser helper; managed launch uses the singleton desktop window."""
+    target = running_server_url(runtime, workspace)
+    if target:
+        webbrowser.open(target)
+        return True
     return False
 
 
 def launch() -> int:
-    workspace = documents_dir()
-    workspace.mkdir(parents=True, exist_ok=True)
-    install_local_persona(workspace)
-    write_private_kernelspec()
-    runtime = data_dir() / "jupyter-runtime"
-    runtime.mkdir(parents=True, exist_ok=True)
-    if open_existing_server(runtime, workspace):
-        return 0
-
-    env = os.environ.copy()
-    env.update(
-        {
-            "JUPYTER_CONFIG_DIR": str(Path(__file__).resolve().parent / "jupyter-config"),
-            "JUPYTER_DATA_DIR": str(data_dir() / "jupyter-data"),
-            "JUPYTER_RUNTIME_DIR": str(runtime),
-            "PYTHONNOUSERSITE": "1",
-        }
-    )
-    # Start AI in the background; opening a notebook must not wait for AI.
-    import threading
-    threading.Thread(target=start_ollama, daemon=True).start()
-    print("Starting ManSci Lab...")
-    options = {'creationflags': subprocess.CREATE_NO_WINDOW} if os.name == 'nt' else {}
-    return subprocess.call(
-        [sys.executable, "-m", "jupyterlab", f"--ServerApp.root_dir={workspace}"], env=env, **options
-    )
+    from lab_window import run
+    return run()
 
 
 def main() -> int:

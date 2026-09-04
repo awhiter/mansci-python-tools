@@ -19,6 +19,14 @@ function Find-Code {
 function Find-Ollama {
     return Locate 'ollama.exe' @("$env:LOCALAPPDATA\Programs\Ollama\ollama.exe", "$env:ProgramFiles\Ollama\ollama.exe")
 }
+function Has-WebView2 {
+    $id = '{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+    foreach ($path in @("HKCU:\Software\Microsoft\EdgeUpdate\Clients\$id", "HKLM:\Software\Microsoft\EdgeUpdate\Clients\$id", "HKLM:\Software\WOW6432Node\Microsoft\EdgeUpdate\Clients\$id")) {
+        $item = Get-ItemProperty -LiteralPath $path -ErrorAction SilentlyContinue
+        if ($item -and $item.pv -and $item.pv -ne '0.0.0.0') { return $true }
+    }
+    return $false
+}
 function Install-App([string]$id, [string]$label, [string]$url) {
     $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
     if (-not $winget -or -not (Agree "$label is missing. Download/install it with Windows Package Manager? Read and respond to any installer terms/prompts.")) {
@@ -53,6 +61,10 @@ try {
     $env:MANSCI_OLLAMA = Find-Ollama
     if (-not $env:MANSCI_OLLAMA) { Install-App 'Ollama.Ollama' 'Ollama' 'https://ollama.com/download/windows'; $env:MANSCI_OLLAMA = Find-Ollama }
     if (-not $env:MANSCI_OLLAMA) { throw 'Ollama was not found after installation. Restart this installer. If asked, choose local use; no sign-in is needed.' }
+    if ($Kind -in @('Complete','Lab') -and -not (Has-WebView2)) {
+        Install-App 'Microsoft.EdgeWebView2Runtime' 'Microsoft Edge WebView2 Runtime (for the Lab window)' 'https://developer.microsoft.com/microsoft-edge/webview2/'
+        if (-not (Has-WebView2)) { throw 'WebView2 Runtime is not available yet. Finish its installation and rerun before installing Lab.' }
+    }
     $saved = Join-Path $env:LOCALAPPDATA 'ManagementScience\Core\conda-path.txt'
     $candidates = @()
     if (Test-Path $saved) { $candidates += (Get-Content $saved -Raw).Trim() }

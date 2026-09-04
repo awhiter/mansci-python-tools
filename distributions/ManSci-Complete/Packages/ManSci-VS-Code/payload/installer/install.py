@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.4'
+VERSION = '2026.09.04.5'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
@@ -128,7 +128,7 @@ def install_tool(kind, source, conda, python, code, ollama):
     else:
         root = support() / kind
         target = root
-        names = ('student_lab.py',) if kind == 'Lab' else ('spyder_setup.py',)
+        names = ('student_lab.py', 'lab_window.py') if kind == 'Lab' else ('spyder_setup.py',)
         title, icon = ('ManSci Lab', 'jupyterlab') if kind == 'Lab' else ('ManSci Spyder', 'spyder')
     target.mkdir(parents=True, exist_ok=True)
     for name in names: shutil.copy2(source / name, target / name)
@@ -137,6 +137,11 @@ def install_tool(kind, source, conda, python, code, ollama):
              '--upgrade-strategy', 'only-if-needed', '-r', source / 'requirements-student.txt'])
         for directory in ('personas', 'jupyter-config'):
             shutil.copytree(source / directory, target / directory, dirs_exist_ok=True)
+        shutil.copy2(source / 'icons/jupyterlab.icns', target / 'jupyterlab.icns')
+        backend_check = ('import webview; from webview.platforms.winforms import is_chromium; '
+                         'assert is_chromium, "Install Microsoft Edge WebView2 Runtime and rerun"'
+                         if os.name == 'nt' else 'import webview, WebKit, Cocoa')
+        run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c', backend_check])
     if kind == 'VS-Code':
         for action in ('configure', 'install-extensions'):
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'vscode_setup.py', action,
@@ -159,10 +164,14 @@ def install_tool(kind, source, conda, python, code, ollama):
         shutil.copy2(source / 'icons' / (icon + '.ico'), target / (icon + '.ico'))
         (target / 'launcher-runtime.txt').write_text(str(pythonw) + '\n' + str(launch) + '\n', encoding='utf-8')
         executable = target / (title + '.exe')
+        app_id = {'Lab': 'uk.ac.ucl.mansci.Lab', 'VS-Code': 'uk.ac.ucl.mansci.Code'}.get(kind, '')
+        if app_id:
+            profile = str(root / 'user-data') if kind == 'VS-Code' else ''
+            (target / 'window-runtime.txt').write_text('\n'.join([kind, app_id, profile, str(target / (icon + '.ico')), title]) + '\n', encoding='utf-8')
         run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('build-windows-launcher.ps1'),
              '-Output', executable, '-Icon', target / (icon + '.ico')])
         run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('shortcut.ps1'),
-             '-Name', title, '-Executable', executable, '-Icon', target / (icon + '.ico')])
+             '-Name', title, '-Executable', executable, '-Icon', target / (icon + '.ico')] + (['-AppId', app_id] if app_id else []))
     else:
         import plistlib
         import shlex

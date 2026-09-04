@@ -1,4 +1,14 @@
-# 2026.09.04.4 — User-controlled Windows taskbar pins / staff testing
+# 2026.09.04.5 — Reusable Lab window and Code taskbar grouping / staff testing
+
+Lab now opens in its own native application-style window on Windows and Mac. Repeated launches request focus on that window rather than creating browser tabs. Closing the window preserves the notebook server; File → Shut Down stops it. The Windows installer checks WebView2, and installs the Python webview dependency automatically.
+
+Windows ManSci Code windows now receive their launcher's taskbar identity, icon and relaunch command. Only the exact isolated ManSci user-data profile is matched; ordinary VS Code remains untouched. Spyder's console-window hotfix is retained. No pins are changed automatically.
+
+Save work and close the tools, extract this release and rerun Complete (or Lab and VS Code individually). **Manually unpin the old Lab and Code entries, then pin their new ManSci Start menu entries.** No environment or model removal is needed.
+
+Automated IPC ownership/authentication, server reuse, Python regression, VS Code helper and source compilation/profile-matching tests pass. Native Windows COM/taskbar behaviour still requires VM testing. The Mac renderer smoke test is skipped where no graphical desktop is available; this is not a claim of end-to-end native UI verification. Use STAFF-TESTING.md before student rollout.
+
+## Previous 2026.09.04.4 — User-controlled Windows taskbar pins
 
 All three tools now have dedicated windowless Windows launch executables with their standard icons, plus per-user Start menu entries. Users can pin/unpin these entries themselves. The installer never changes taskbar pins or policies. Pins retain the ManSci launch configuration and stable support-folder paths. Running VS Code/browser windows may appear separately: pin the ManSci Start menu entry, not their generic running-window buttons.
 

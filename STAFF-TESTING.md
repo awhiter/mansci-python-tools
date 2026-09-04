@@ -5,7 +5,11 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Existing taskbar pins/order remain unchanged by installation.
 - [ ] Each ManSci Start menu entry can be pinned/unpinned manually with its standard icon.
 - [ ] Each pin relaunches the teaching setup after closing the tool, rebooting and moving the extracted ZIP folder.
-- [ ] Explain separate running VS Code/browser buttons; do not pin those in place of the ManSci launcher.
+- [ ] Manually replace old Lab/Code pins with new Start entries; Code groups under its ManSci pin after startup.
+- [ ] Ordinary VS Code opened alongside ManSci Code keeps its own identity and profile.
+- [ ] Repeated Lab launch focuses the existing native window without a second tab/window, including when minimised.
+- [ ] Lab window close/reopen reuses the server; File → Shut Down stops it and subsequent relaunch restarts it.
+- [ ] WebView2 missing/present checks and native window downloads, notebook editing, save, local chat and close confirmation work.
 
 - [ ] Fresh Windows x64, Windows ARM VMware, Apple silicon Mac and Intel Mac.
 - [ ] Missing VS Code/Ollama: install offer or manual guidance BEFORE Python packages.
@@ -22,7 +26,7 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] First notebook execution in VS Code needs no manual kernel selection.
 - [ ] Wait for Preparing ManSci kernel to finish; confirm ManSci Startup output reports the installed environment.
 - [ ] Cancel the VS Code inbound-network firewall prompt and verify local scripts/notebooks still run.
-- [ ] Lab opens the default browser without asking for an HTML file association; a second launch reuses the server.
+- [ ] Lab opens its dedicated window without asking for an HTML file association; a second launch reuses the window and server.
 - [ ] Compare cold/warm startup and first/second AI replies; record CPU/GPU use with ollama ps and memory pressure.
 - [ ] Spyder opens Files visibly and leaves no console while running or after closing.
 - [ ] Spyder Files pane and all tools follow ManSci Code Home.txt.
