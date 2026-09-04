@@ -53,29 +53,47 @@ class InstallerTests(unittest.TestCase):
     def test_windows_launcher_uses_permanent_paths_with_spaces(self):
         with tempfile.TemporaryDirectory(prefix='ManSci test ') as directory:
             root = Path(directory)
-            with patch.object(m, 'support', return_value=root), patch.object(m, 'os', SimpleNamespace(name='nt')), patch.object(m, 'run') as run:
+            python = root / 'env/python.exe'
+            python.parent.mkdir()
+            python.with_name('pythonw.exe').touch()
+            with patch.object(m, 'support', return_value=root), patch.object(m, 'os', SimpleNamespace(name='nt')), patch.object(m, 'run', return_value='{}') as run:
                 m.install_tool('Spyder', ROOT / 'distributions/ManSci-Spyder/payload',
-                               'C:\\Users\\Test User\\miniconda3\\Scripts\\conda.exe', '', '', '')
-            text = (root / 'Spyder/launch.bat').read_text()
-            self.assertIn('"C:\\Users\\Test User\\miniconda3\\Scripts\\conda.exe" run', text)
-            self.assertIn('"%~dp0launch.py"', text)
+                               'C:\\Users\\Test User\\miniconda3\\Scripts\\conda.exe', str(python), '', '')
+            self.assertFalse((root / 'Spyder/launch.bat').exists())
             args = run.call_args.args[0]
-            self.assertIn(root / 'Spyder/launch.bat', args)
+            self.assertIn(root / 'Spyder/launch.py', args)
+            self.assertIn(python.with_name('pythonw.exe'), args)
             self.assertTrue((root / 'Spyder/spyder.ico').is_file())
 
     def test_mac_reinstall_preserves_real_app_bundles(self):
         import plistlib
         with tempfile.TemporaryDirectory(prefix='ManSci test ') as directory:
             home = Path(directory)
-            with patch.object(m, 'support', return_value=home / 'support'), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run'):
+            with patch.object(m, 'support', return_value=home / 'support'), patch.object(m.Path, 'home', return_value=home), patch.object(m, 'run', return_value='{}'):
                 for _ in range(2):
                     m.install_tool('Spyder', ROOT / 'distributions/ManSci-Spyder/payload',
-                                   str(home / 'miniconda3/bin/conda'), '', '', '')
+                                   str(home / 'miniconda3/bin/conda'), str(home / 'env/bin/python'), '', '')
             for parent in ('Desktop', 'Applications'):
                 app = home / parent / 'ManSci Spyder.app'
                 self.assertFalse(app.is_symlink())
                 with (app / 'Contents/Info.plist').open('rb') as f:
                     self.assertEqual(plistlib.load(f)['CFBundleIconFile'], 'spyder.icns')
                 self.assertIn(str(home / 'support/Spyder/launch.py'), (app / 'Contents/MacOS/launch').read_text())
+                self.assertNotIn('conda', (app / 'Contents/MacOS/launch').read_text())
+
+    def test_lab_browser_url_and_no_process_signal(self):
+        spec = importlib.util.spec_from_file_location('student_lab', ROOT / 'distributions/ManSci-Lab/payload/student_lab.py')
+        lab = importlib.util.module_from_spec(spec); spec.loader.exec_module(lab)
+        from unittest.mock import MagicMock
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'jpserver-123.json').write_text(json.dumps({'pid':123,'root_dir':directory,'url':'http://127.0.0.1:8888/','token':'test'}))
+            response = MagicMock(); response.__enter__.return_value.status = 200
+            with patch.object(lab, 'urlopen', return_value=response), patch.object(lab.os, 'kill') as kill, patch.object(lab.webbrowser, 'open') as browser:
+                self.assertTrue(lab.open_existing_server(root, root))
+                kill.assert_not_called()
+                browser.assert_called_once_with('http://127.0.0.1:8888/lab?token=test')
+        config = (ROOT / 'distributions/ManSci-Lab/payload/jupyter-config/jupyter_server_config.py').read_text()
+        self.assertIn('use_redirect_file = False', config)
 
 if __name__ == '__main__': unittest.main()

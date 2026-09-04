@@ -1,5 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+# Some Terminal sessions inherit a 256-file soft limit, too low for VS Code.
+# This affects only this installer and its children, not system-wide limits.
+ulimit -n 4096 2>/dev/null || true
 PACKAGE="$1"; KIND="$2"
 LOGDIR="$HOME/Library/Logs/ManagementScience"
 mkdir -p "$LOGDIR"

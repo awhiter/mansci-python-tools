@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.1 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.2 is public for staff testing, not yet approved for student rollout.
 
 ## Choose and start
 
@@ -44,6 +44,18 @@ Top-level installers pause on BOTH success and failure. Read the error before cl
 - Mac: `~/Library/Logs/ManagementScience/install-<date-time>.log`. Use Finder → Go → Go to Folder.
 
 The precise path is printed at startup and on failure. Send the newest log to staff. Runtime logs, including ollama-service.log and launch.log, are in the per-user ManagementScience support folder's Logs directory. Fix the reported error and rerun; student work and existing model data are retained. Reopen Finder or sign out/in if standard desktop icons remain cached.
+
+## Startup, browser, AI performance and Windows Security
+
+Launchers now start the installed environment's Python directly, with its saved activation paths, rather than rerunning Conda each time. Windows uses windowless Python; closing Spyder ends its launcher process without leaving a terminal. Spyder opens the Files pane in the shared home. JupyterLab opens an HTTP URL in the default browser, not a temporary HTML file; tokens/authentication remain enabled. Treat local launch logs as private because a Jupyter startup log may contain its access token.
+
+JupyterLab does not wait for Ollama to start. Reopening Lab checks the existing local server over HTTP. VS Code no longer scans/rewrites all notebooks at startup. The ManSci Startup helper explicitly selects the installed interpreter and, when a Python notebook is opened, its live kernel. Wait for the **Preparing ManSci kernel** status to finish before pressing Run. The helper uses Jupyter's exported but unstable `openNotebook` API, so Jupyter is pinned to 2025.9.1. If selection fails, it reports this instead of pretending success; send staff the **Output → ManSci Startup** messages. No notebook cells are executed automatically.
+
+The local model uses an 8,192-token context allocation rather than 16,384, retains recent conversation history, and caps individual replies at 1,536 tokens. In Lab it is kept loaded for up to 15 minutes after use where memory permits. First use still loads the model; long conversations, concurrent AI requests and CPU-only inference can be slow. Use a new chat for an unrelated topic. If VS Code AI competes with typing/chat on a slow machine, turn off **Continue: Enable Tab Autocomplete**; chat and inline edits still work.
+
+For staff diagnosis, `ollama ps` shows whether a loaded model uses CPU or GPU. A Windows ARM VM may combine x64 Python emulation, limited RAM and no supported GPU path for Ollama; this must be measured, not assumed. Compare first and second prompts and check Activity Monitor/Task Manager for memory pressure. The Mac host's GPU capability does not establish GPU access inside Windows. See [Ollama hardware support](https://docs.ollama.com/gpu) and [FAQ](https://docs.ollama.com/faq).
+
+For the Windows Security prompt asking whether public/private networks may access **Visual Studio Code**, choose **Cancel** for this local-only teaching setup. We do not require incoming connections from other computers. The launcher-started Ollama service and JupyterLab are configured for localhost. The installer does not turn off the firewall, suppress security notifications or add public-network exceptions. Windows or institutional policies may still show a prompt; if local execution fails after cancelling, send staff the logs rather than broadly allowing network access. See [Microsoft's firewall guidance](https://support.microsoft.com/en-us/windows/security/firewall/risks-of-allowing-apps-through-windows-firewall).
 
 ## Validation limits
 

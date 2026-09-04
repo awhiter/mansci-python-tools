@@ -22,7 +22,7 @@ EXTENSIONS = (
     "ms-python.vscode-pylance",
     "ms-python.debugpy",
     "ms-python.vscode-python-envs",
-    "ms-toolsai.jupyter",
+    "ms-toolsai.jupyter@2025.9.1",
     "ms-python.black-formatter",
     "redhat.vscode-yaml",
     "continue.continue@1.2.11",
@@ -65,7 +65,7 @@ def settings(conda_executable: str) -> dict:
     return {
         "python.defaultInterpreterPath": sys.executable,
         "python.condaPath": conda_executable,
-        "python.useEnvironmentsExtension": True,
+        "python.useEnvironmentsExtension": False,
         "python.interpreter.infoVisibility": "always",
         "python-envs.defaultEnvManager": "ms-python.python:conda",
         "python-envs.defaultPackageManager": "ms-python.python:conda",
@@ -266,8 +266,8 @@ models:
       - apply
       - autocomplete
     defaultCompletionOptions:
-      contextLength: 16384
-      maxTokens: 2048
+      contextLength: 8192
+      maxTokens: 1536
       temperature: 0.1
     autocompleteOptions:
       useImports: true
@@ -337,7 +337,8 @@ def configure(conda_executable: str, source_dir: Path) -> None:
     notebook = workspace / "New ManSci Notebook.ipynb"
     if not notebook.exists():
         write_json(notebook, notebook_template())
-    ensure_notebook_kernels(workspace)
+    # Existing notebooks are not rewritten. The startup helper selects their
+    # live controller when opened, without modifying notebook contents.
 
     for name in ("STUDENT-GUIDE.md", "student-profile-check.py"):
         source = source_dir / name
@@ -416,6 +417,8 @@ def install_extensions(code_executable: str) -> None:
             print(f"Download attempt {attempt} failed; retrying shortly...")
             time.sleep(3)
     configure_activity_bar(support_dir())
+    helper = Path(__file__).with_name('mansci-startup.vsix')
+    subprocess.run(code_arguments(code_executable) + ['--install-extension', str(helper), '--force'], check=True)
 
 
 def launch(code_executable: str) -> None:
@@ -426,7 +429,7 @@ def launch(code_executable: str) -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     workspace = workspace_dir()
     workspace.mkdir(parents=True, exist_ok=True)
-    ensure_notebook_kernels(workspace)
+    # No recursive notebook scan on launch: large teaching folders were slow.
     env = os.environ.copy()
     env.update(
         {

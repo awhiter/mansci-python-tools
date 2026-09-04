@@ -67,8 +67,10 @@ class QwenLocalChatPersona(BasePersona):
                 {"role": "system", "content": self.system_prompt},
                 *self.conversation_messages(message),
             ],
-            num_ctx=16_384,
+            num_ctx=8_192,
+            max_tokens=1536,
+            temperature=0.1,
+            keep_alive="15m",
             stream=True,
         )
         await self.stream_message(stream)
-

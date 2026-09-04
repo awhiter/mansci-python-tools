@@ -11,7 +11,8 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.1'
+VERSION = '2026.09.04.2'
+CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
             'sympy', 'openpyxl', 'networkx', 'seaborn', 'requests', 'spyder', 'jupyterlab', 'ipykernel', 'jupytext')
@@ -49,7 +50,8 @@ def prepare_model(executable):
         logs.mkdir(parents=True, exist_ok=True)
         with (logs / 'ollama-service.log').open('a') as log:
             options = {'creationflags': subprocess.CREATE_NO_WINDOW} if os.name == 'nt' else {'start_new_session': True}
-            subprocess.Popen([executable, 'serve'], stdin=subprocess.DEVNULL, stdout=log, stderr=log, **options)
+            local_env = dict(os.environ, OLLAMA_HOST='127.0.0.1:11434')
+            subprocess.Popen([executable, 'serve'], stdin=subprocess.DEVNULL, stdout=log, stderr=log, env=local_env, **options)
         for _ in range(60):
             if data_from_ollama() is not None:
                 break
@@ -79,7 +81,7 @@ def install_core(conda, payload, ollama):
     (root / 'conda-path.txt').write_text(conda + '\n', encoding='utf-8')
     marker = root / 'version.txt'
     healthy = False
-    if marker.exists() and marker.read_text().strip() == VERSION:
+    if marker.exists() and marker.read_text().strip() == CORE_VERSION:
         try:
             run([conda, 'run', '-n', 'mansci-python', 'python', '-c',
                  'import sys; assert sys.version_info[:2] == (3,13); ' + '; '.join('import ' + m for m in PACKAGES)], capture=True)
@@ -112,7 +114,7 @@ def install_core(conda, payload, ollama):
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
          'import sys; assert sys.version_info[:2] == (3,13); ' + '; '.join('import ' + m for m in PACKAGES)])
     prepare_model(ollama)
-    marker.write_text(VERSION + '\n', encoding='utf-8')
+    marker.write_text(CORE_VERSION + '\n', encoding='utf-8')
     return run([conda, 'run', '-n', 'mansci-python', 'python', '-c', 'import sys; print(sys.executable)'], capture=True)
 
 def install_tool(kind, source, conda, python, code, ollama):
@@ -121,7 +123,7 @@ def install_tool(kind, source, conda, python, code, ollama):
         root = (Path.home() / 'Library/Application Support/ManagementScienceVSCode' if sys.platform == 'darwin'
                 else Path(os.environ['LOCALAPPDATA']) / 'ManagementScienceVSCode')
         target = root / 'launcher'
-        names = ('vscode_setup.py', 'STUDENT-GUIDE.md', 'student-profile-check.py')
+        names = ('vscode_setup.py', 'STUDENT-GUIDE.md', 'student-profile-check.py', 'mansci-startup.vsix')
         title, icon = 'ManSci VS Code', 'vscode'
     else:
         root = support() / kind
@@ -142,14 +144,21 @@ def install_tool(kind, source, conda, python, code, ollama):
     if kind == 'Spyder':
         run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'spyder_setup.py'])
     shutil.copy2(Path(__file__).with_name('launch.py'), target / 'launch.py')
-    (target / 'launch-config.json').write_text(json.dumps({'kind': kind, 'code': code, 'ollama': ollama}), encoding='utf-8')
+    # Capture only activation-related values, never the user's full environment
+    # (which may include credentials). Do this once at installation, not launch.
+    activation = json.loads(run([conda, 'run', '-n', 'mansci-python', 'python', '-c',
+        'import os,json; keys=("PATH","CONDA_PREFIX","CONDA_DEFAULT_ENV","CONDA_SHLVL"); '
+        'print(json.dumps({k:os.environ[k] for k in keys if k in os.environ}))'], capture=True))
+    (target / 'launch-config.json').write_text(json.dumps({'kind': kind, 'code': code, 'ollama': ollama,
+        'python': python, 'activation': activation}), encoding='utf-8')
     if os.name == 'nt':
         shutil.copy2(Path(__file__).with_name('hidden.vbs'), target / 'hidden.vbs')
-        launch = target / 'launch.bat'
-        launch.write_text('@echo off\r\n"' + conda + '" run --no-capture-output -n mansci-python python "%~dp0launch.py"\r\nexit /b %errorlevel%\r\n', encoding='utf-8')
+        launch = target / 'launch.py'
+        pythonw = Path(python).with_name('pythonw.exe')
+        if not pythonw.is_file(): raise RuntimeError(f'Windowless Python is missing: {pythonw}')
         shutil.copy2(source / 'icons' / (icon + '.ico'), target / (icon + '.ico'))
         run(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', Path(__file__).with_name('shortcut.ps1'),
-             '-Name', title, '-Launcher', launch, '-Icon', target / (icon + '.ico'), '-Wrapper', target / 'hidden.vbs'])
+             '-Name', title, '-Launcher', launch, '-Python', pythonw, '-Icon', target / (icon + '.ico'), '-Wrapper', target / 'hidden.vbs'])
     else:
         import plistlib
         import shlex
@@ -163,7 +172,7 @@ def install_tool(kind, source, conda, python, code, ollama):
             (app / 'Contents/Resources').mkdir(parents=True, exist_ok=True)
             shutil.copy2(source / 'icons' / (icon + '.icns'), app / 'Contents/Resources' / (icon + '.icns'))
             entry = app / 'Contents/MacOS/launch'
-            entry.write_text('#!/bin/bash\nexec ' + shlex.quote(conda) + ' run --no-capture-output -n mansci-python python ' + shlex.quote(str(target / 'launch.py')) + '\n')
+            entry.write_text('#!/bin/bash\nulimit -n 4096 2>/dev/null || true\nexec ' + shlex.quote(python) + ' ' + shlex.quote(str(target / 'launch.py')) + '\n')
             entry.chmod(0o755)
             with (app / 'Contents/Info.plist').open('wb') as f:
                 plistlib.dump({'CFBundleName': title, 'CFBundleIdentifier': 'uk.ac.ucl.mansci.' + kind.lower(),

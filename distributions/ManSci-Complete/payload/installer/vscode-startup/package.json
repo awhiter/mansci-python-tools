@@ -1,0 +1,11 @@
+{
+  "name": "startup",
+  "displayName": "ManSci Startup",
+  "publisher": "mansci",
+  "version": "0.2.0",
+  "description": "Select the installed teaching Python and notebook kernel.",
+  "engines": {"vscode": "^1.95.0"},
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished", "onNotebook:jupyter-notebook"],
+  "capabilities": {"untrustedWorkspaces": {"supported": false}}
+}

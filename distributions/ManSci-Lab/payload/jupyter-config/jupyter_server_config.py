@@ -5,5 +5,6 @@ c.KernelSpecManager.ensure_native_kernel = False
 c.KernelSpecManager.allowed_kernelspecs = {"mansci-python"}
 c.ServerApp.ip = "127.0.0.1"
 c.ServerApp.open_browser = True
+c.ServerApp.use_redirect_file = False
 c.ServerApp.allow_remote_access = False
 c.ServerApp.quit_button = True

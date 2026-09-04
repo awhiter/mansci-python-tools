@@ -12,7 +12,7 @@ import sys
 import time
 import webbrowser
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -78,7 +78,8 @@ def start_ollama() -> bool:
     executable = ollama_executable()
     if not executable:
         return False
-    kwargs: dict = {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+    kwargs: dict = {"stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL,
+                    "env": dict(os.environ, OLLAMA_HOST='127.0.0.1:11434')}
     if os.name == "nt":
         kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW  # type: ignore[attr-defined]
     subprocess.Popen([executable, "serve"], **kwargs)
@@ -147,10 +148,15 @@ def open_existing_server(runtime: Path, workspace: Path) -> bool:
             details = json.loads(server_file.read_text(encoding="utf-8"))
             if Path(details["root_dir"]).resolve() != workspace.resolve():
                 continue
-            pid = int(details["pid"])
-            os.kill(pid, 0)
             base_url = str(details["url"]).rstrip("/")
+            if urlsplit(base_url).hostname not in ('localhost', '127.0.0.1', '::1'):
+                continue
             token = quote(str(details.get("token", "")), safe="")
+            # os.kill(pid, 0) is NOT a safe process probe on Windows.
+            # Check the authenticated local HTTP endpoint instead.
+            with urlopen(f'{base_url}/api/status?token={token}', timeout=1) as response:
+                if response.status != 200:
+                    continue
             target = f"{base_url}/lab"
             if token:
                 target += f"?token={token}"
@@ -181,13 +187,13 @@ def launch() -> int:
             "PYTHONNOUSERSITE": "1",
         }
     )
-    if start_ollama():
-        print(f"Local AI service: ready ({LOCAL_MODEL})")
-    else:
-        print("WARNING: Local AI is unavailable. Run the Qwen setup launcher to repair it.")
+    # Start AI in the background; opening a notebook must not wait for AI.
+    import threading
+    threading.Thread(target=start_ollama, daemon=True).start()
     print("Starting ManSci Lab...")
+    options = {'creationflags': subprocess.CREATE_NO_WINDOW} if os.name == 'nt' else {}
     return subprocess.call(
-        [sys.executable, "-m", "jupyterlab", f"--ServerApp.root_dir={workspace}"], env=env
+        [sys.executable, "-m", "jupyterlab", f"--ServerApp.root_dir={workspace}"], env=env, **options
     )
 
 
