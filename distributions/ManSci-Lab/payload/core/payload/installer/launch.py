@@ -7,12 +7,16 @@ import sys
 import time
 from urllib.request import urlopen
 
+def runtime_executable(kind, configured, current):
+    # Jupyter Client detects pythonw here to apply CREATE_NO_WINDOW to Spyder's
+    # kernel processes. Spyder itself converts pythonw to python for kernel argv.
+    return current if kind == 'Spyder' else configured
+
 def main():
     here = Path(__file__).resolve().parent
     cfg = json.loads((here / 'launch-config.json').read_text(encoding='utf-8'))
     os.environ.update(cfg.get('activation', {}))
-    # pythonw hosts the Windows launcher; kernels and extensions need python.exe.
-    sys.executable = cfg.get('python', sys.executable)
+    sys.executable = runtime_executable(cfg['kind'], cfg.get('python', sys.executable), sys.executable)
     support = (Path.home() / 'Library/Application Support/ManagementScience' if sys.platform == 'darwin'
                else Path(os.environ['LOCALAPPDATA']) / 'ManagementScience')
     logs = support / 'Logs'; logs.mkdir(parents=True, exist_ok=True)

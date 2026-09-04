@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.04.2'
+VERSION = '2026.09.04.3'
 CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',

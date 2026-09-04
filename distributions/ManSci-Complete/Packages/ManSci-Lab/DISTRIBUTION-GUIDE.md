@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.04.2 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.04.3 is public for staff testing, not yet approved for student rollout.
 
 ## Choose and start
 

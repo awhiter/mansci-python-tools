@@ -12,6 +12,16 @@ spec = importlib.util.spec_from_file_location('installer', ROOT / 'installer/ins
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 
 class InstallerTests(unittest.TestCase):
+    def test_spyder_preserves_windowless_host_identity(self):
+        spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')
+        launch = importlib.util.module_from_spec(spec); spec.loader.exec_module(launch)
+        console = r'C:\Users\Student\env\python.exe'
+        windowless = r'C:\Users\Student\env\pythonw.exe'
+        self.assertEqual(launch.runtime_executable('Spyder', console, windowless), windowless)
+        for kind in ('Lab', 'VS-Code'):
+            self.assertEqual(launch.runtime_executable(kind, console, windowless), console)
+        self.assertEqual(launch.runtime_executable('Spyder', '/env/bin/python', '/env/bin/python'), '/env/bin/python')
+
     def test_core_routes(self):
         p = Path('/package with spaces')
         self.assertEqual(m.core_payload(p, 'Core'), p / 'payload')

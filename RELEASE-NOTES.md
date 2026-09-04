@@ -1,4 +1,10 @@
-# 2026.09.04.2 — Startup and notebook selection / staff testing
+# 2026.09.04.3 — Spyder Windows child-console hotfix / staff testing
+
+Fixes a launcher regression from 2026.09.04.2: Spyder now retains its true pythonw.exe host identity. Jupyter Client uses this to set CREATE_NO_WINDOW for its kernel subprocesses; overriding it with python.exe prevented that safeguard. Spyder still selects python.exe from mansci-python for kernel execution. Lab and VS Code retain their separate executable handling.
+
+A regression test covers Windows Spyder, Lab, VS Code and unchanged Mac identity. This has not yet been verified in a running Windows VM. Close Spyder normally, extract the new ZIP and rerun the Spyder or Complete installer. Do not repeatedly close the blank child consoles: that may interrupt a kernel and cause a restart.
+
+## Retained changes from 2026.09.04.2
 
 - Direct environment Python startup on Windows/Mac, without repeated Conda activation; activation paths captured once during installation.
 - Windowless Windows launcher and Spyder process; Files pane explicitly shown after layout restoration.
