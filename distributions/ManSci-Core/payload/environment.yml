@@ -19,3 +19,26 @@ dependencies:
   - seaborn
   - requests
   - pip
+  - pip:
+      # GenAI challenge prototyping and application toolkit.
+      - streamlit
+      - plotly
+      - openai>=1,<3
+      - ipywidgets
+      - voila
+      - gradio
+      - PuLP
+      - altair
+      - pydantic
+      - python-dotenv
+      - Pillow
+      - beautifulsoup4
+      - folium
+      - geopy
+      - joblib
+      - Faker
+      - python-docx
+      - reportlab
+      - qrcode
+      # Lets local JupyterLab expose student web apps safely.
+      - jupyter-server-proxy

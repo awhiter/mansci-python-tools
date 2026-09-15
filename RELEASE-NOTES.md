@@ -1,4 +1,10 @@
-# 2026.09.04.13 — Retire legacy Check launchers / staff testing
+# 2026.09.15.1 — GenAI challenge toolkit / staff testing
+
+Adds the Python packages selected for the MSIN0023 GenAI team challenge to the shared `mansci-python` environment. Existing scientific and teaching packages remain in place. The added toolkit covers rapid apps and dashboards, notebook interaction, GenAI/API use, optimisation, maps, synthetic data, web parsing, structured validation and document/report generation. `jupyter-server-proxy` is included so JupyterLab can expose local Streamlit and similar services through the existing server.
+
+The environment update is additive and uses pip dependency resolution inside the managed Conda environment. Reinstalling or updating an existing distribution preserves student work. This remains a staff-testing release; fresh Windows and Mac installation should be checked before student rollout.
+
+## Previous 2026.09.04.13 — Retire legacy Check launchers / staff testing
 
 The **ManSci Check** and **ManSci VS Code Check** desktop/application-menu launchers from older releases are now obsolete because **ManSci Help** provides the student-facing guidance. Installing this release removes only those exact legacy generated shortcuts/apps on Windows and Mac; it does not alter other desktop items or pins. The diagnostic Python scripts remain internal/available for staff-directed support, and the FAQ now names `student-profile-check.py` when its output is required.
 
