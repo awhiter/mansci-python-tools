@@ -4,7 +4,7 @@ Cross-platform teaching distributions for a consistent Management Science Python
 
 ## Download
 
-Staff testers should download **ManSci-Complete.zip** from the repository's [latest release](https://github.com/awhiter/mansci-python-tools/releases/latest). Separate Core, Spyder, JupyterLab and VS Code packages are also available there.
+Staff testers should download **ManSci-Complete.zip** from the repository's [latest release](https://github.com/awhiter/mansci-python-tools/releases/latest). Separate Core, Spyder, JupyterLab, VS Code and staff-only Azure-enabled Staff Lab packages are also available there.
 
 Do not download an installer from the source-code ZIP generated automatically by GitHub: use the named files attached under **Assets** on the release page.
 
@@ -17,6 +17,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - One shared coding home: `Documents/ManSci Code`.
 - Spyder with an isolated Light/Spyder configuration.
 - JupyterLab with the managed kernel and a local Qwen coding assistant.
+- A separate Staff Lab aligned with the student environment and the portable Jupyter AI/persona features used on the VM; Azure credentials are requested locally and kept out of the package.
 - VS Code with an isolated teaching profile, Light+ theme, automatic interpreter/kernel configuration and local Continue assistant.
 - Ollama and Qwen2.5-Coder 3B installation checks.
 - Stable desktop launchers using the applications' standard icons.

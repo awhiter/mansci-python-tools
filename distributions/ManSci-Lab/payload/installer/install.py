@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.15.2'
+VERSION = '2026.09.15.3'
 CORE_VERSION = '2026.09.15.2'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
@@ -190,6 +190,11 @@ def install_tool(kind, source, conda, python, code, ollama):
         target = root / 'launcher'
         names = ('vscode_setup.py', 'STUDENT-GUIDE.md', 'student-profile-check.py', 'mansci-startup.vsix')
         title, icon = 'ManSci VS Code', 'vscode'
+    elif kind == 'Staff-Lab':
+        root = support() / 'Staff-Lab'
+        target = root
+        names = ('staff_lab.py', 'lab_window.py', 'mansci_jupyter_ai_guard.py')
+        title, icon = 'ManSci Staff Lab', 'jupyterlab'
     else:
         root = support() / kind
         target = root
@@ -197,9 +202,10 @@ def install_tool(kind, source, conda, python, code, ollama):
         title, icon = ('ManSci Lab', 'jupyterlab') if kind == 'Lab' else ('ManSci Spyder', 'spyder')
     target.mkdir(parents=True, exist_ok=True)
     for name in names: shutil.copy2(source / name, target / name)
-    if kind == 'Lab':
+    if kind in ('Lab', 'Staff-Lab'):
+        requirements = 'requirements-staff.txt' if kind == 'Staff-Lab' else 'requirements-student.txt'
         run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-m', 'pip', 'install',
-             '--upgrade-strategy', 'only-if-needed', '-r', source / 'requirements-student.txt'])
+             '--upgrade-strategy', 'only-if-needed', '-r', source / requirements])
         for directory in ('personas', 'jupyter-config'):
             shutil.copytree(source / directory, target / directory, dirs_exist_ok=True)
         shutil.copy2(source / 'icons/jupyterlab.icns', target / 'jupyterlab.icns')
@@ -207,6 +213,8 @@ def install_tool(kind, source, conda, python, code, ollama):
                          'assert is_chromium, "Install Microsoft Edge WebView2 Runtime and rerun"'
                          if os.name == 'nt' else 'import webview, WebKit, Cocoa')
         run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c', backend_check])
+        if kind == 'Staff-Lab':
+            run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'staff_lab.py', 'ensure-configured'])
     if kind == 'VS-Code':
         for action in ('configure', 'install-extensions'):
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'vscode_setup.py', action,
@@ -229,7 +237,8 @@ def install_tool(kind, source, conda, python, code, ollama):
         shutil.copy2(source / 'icons' / (icon + '.ico'), target / (icon + '.ico'))
         (target / 'launcher-runtime.txt').write_text(str(pythonw) + '\n' + str(launch) + '\n', encoding='utf-8')
         executable = target / (title + '.exe')
-        app_id = {'Spyder': 'uk.ac.ucl.mansci.Spyder', 'Lab': 'uk.ac.ucl.mansci.Lab', 'VS-Code': 'uk.ac.ucl.mansci.Code'}.get(kind, '')
+        app_id = {'Spyder': 'uk.ac.ucl.mansci.Spyder', 'Lab': 'uk.ac.ucl.mansci.Lab',
+                  'Staff-Lab': 'uk.ac.ucl.mansci.StaffLab', 'VS-Code': 'uk.ac.ucl.mansci.Code'}.get(kind, '')
         if app_id:
             profile = str(root / 'user-data') if kind == 'VS-Code' else ''
             (target / 'window-runtime.txt').write_text('\n'.join([kind, app_id, profile, str(target / (icon + '.ico')), title]) + '\n', encoding='utf-8')
@@ -246,7 +255,7 @@ def install_tool(kind, source, conda, python, code, ollama):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--package', required=True, type=Path)
-    p.add_argument('--kind', required=True, choices=('Core', 'Spyder', 'Lab', 'VS-Code', 'Complete'))
+    p.add_argument('--kind', required=True, choices=('Core', 'Spyder', 'Lab', 'Staff-Lab', 'VS-Code', 'Complete'))
     p.add_argument('--conda', required=True)
     args = p.parse_args()
     stage = 'preflight'

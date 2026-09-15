@@ -57,8 +57,11 @@ def main():
                 mainwindow.MainWindow.post_visible_setup = show_files
                 from spyder.app.start import main as spyder_main
                 return spyder_main() or 0
-            if cfg['kind'] == 'Lab':
+            if cfg['kind'] in ('Lab', 'Staff-Lab'):
                 os.environ['PATH'] = str(Path(cfg['ollama']).parent) + os.pathsep + os.environ.get('PATH', '')
+                if cfg['kind'] == 'Staff-Lab':
+                    import staff_lab
+                    return staff_lab.launch()
                 import student_lab
                 return student_lab.launch()
             try:

@@ -21,7 +21,7 @@ class InstallerTests(unittest.TestCase):
             'jupyter_server_proxy',
         }
         self.assertTrue(required.issubset(set(m.PACKAGES)))
-        self.assertEqual(m.CORE_VERSION, m.VERSION)
+        self.assertEqual(m.CORE_VERSION, '2026.09.15.2')
 
     def test_spyder_preserves_windowless_host_identity(self):
         spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')
@@ -29,7 +29,7 @@ class InstallerTests(unittest.TestCase):
         console = r'C:\Users\Student\env\python.exe'
         windowless = r'C:\Users\Student\env\pythonw.exe'
         self.assertEqual(launch.runtime_executable('Spyder', console, windowless), windowless)
-        for kind in ('Lab', 'VS-Code'):
+        for kind in ('Lab', 'Staff-Lab', 'VS-Code'):
             self.assertEqual(launch.runtime_executable(kind, console, windowless), console)
         self.assertEqual(launch.runtime_executable('Spyder', '/env/bin/python', '/env/bin/python'), '/env/bin/python')
 
@@ -70,7 +70,7 @@ class InstallerTests(unittest.TestCase):
             self.assertNotIn(forbidden, text)
 
     def test_all_entrypoints_pause(self):
-        for kind in ('Core','Spyder','Lab','VS-Code','Complete'):
+        for kind in ('Core','Spyder','Lab','Staff-Lab','VS-Code','Complete'):
             p = ROOT / 'distributions' / ('ManSci-' + kind)
             prefix = 'Install-All' if kind == 'Complete' else 'Install'
             self.assertIn('pause', (p / (prefix + '-Windows.bat')).read_text())

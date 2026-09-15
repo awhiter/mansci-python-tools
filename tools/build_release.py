@@ -104,9 +104,24 @@ def main():
         shutil.rmtree(destination, ignore_errors=True)
         shutil.copytree(DIST / ('ManSci-' + kind), destination, dirs_exist_ok=True)
     shutil.copy2(ROOT / 'DISTRIBUTION-GUIDE.md', complete / 'OVERALL-GUIDE.md')
+    staff = DIST / 'ManSci-Staff-Lab'
+    entrypoints(staff, 'Staff-Lab')
+    (staff / 'README.md').write_text((ROOT / 'STAFF-LAB-README.md').read_text(encoding='utf-8'), encoding='utf-8')
+    (staff / 'DISTRIBUTION-GUIDE.md').unlink(missing_ok=True)
+    shutil.copy2(ROOT / 'STAFF-LAB-GUIDE.md', staff / 'STAFF-LAB-GUIDE.md')
+    shutil.rmtree(staff / 'payload/core', ignore_errors=True)
+    shutil.copytree(DIST / 'ManSci-Core', staff / 'payload/core')
+    support = staff / 'Support Tools'
+    shutil.rmtree(support, ignore_errors=True)
+    support.mkdir()
+    for name in ('reset-azure-key-mac.command', 'reset-azure-key-windows.bat',
+                 'repair-chat-mac.command', 'repair-chat-windows.bat'):
+        shutil.copy2(staff / 'payload' / name, support / name)
+    for script in support.glob('*.command'):
+        script.chmod(0o755)
     OUT.mkdir(exist_ok=True)
     sums = []
-    for kind in ('Complete','Core','Lab','Spyder','VS-Code'):
+    for kind in ('Complete','Core','Lab','Spyder','Staff-Lab','VS-Code'):
         folder = DIST / ('ManSci-' + kind)
         archive = OUT / (folder.name + '.zip')
         with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -117,6 +132,6 @@ def main():
         sums.append(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name)
     (ROOT / 'SHA256SUMS.txt').write_text('\n'.join(sums) + '\n')
     shutil.copy2(ROOT / 'SHA256SUMS.txt', OUT / 'SHA256SUMS.txt')
-    print('Built five archives in', OUT)
+    print('Built six archives in', OUT)
 
 if __name__ == '__main__': main()

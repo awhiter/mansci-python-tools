@@ -1,5 +1,5 @@
 param([Parameter(Mandatory=$true)][string]$PackageRoot,
-      [Parameter(Mandatory=$true)][ValidateSet('Core','Spyder','Lab','VS-Code','Complete')][string]$Kind)
+      [Parameter(Mandatory=$true)][ValidateSet('Core','Spyder','Lab','Staff-Lab','VS-Code','Complete')][string]$Kind)
 $ErrorActionPreference = 'Stop'
 $logDir = Join-Path $env:LOCALAPPDATA 'ManagementScience\Logs'
 New-Item -ItemType Directory -Force -Path $logDir | Out-Null
@@ -61,7 +61,7 @@ try {
     $env:MANSCI_OLLAMA = Find-Ollama
     if (-not $env:MANSCI_OLLAMA) { Install-App 'Ollama.Ollama' 'Ollama' 'https://ollama.com/download/windows'; $env:MANSCI_OLLAMA = Find-Ollama }
     if (-not $env:MANSCI_OLLAMA) { throw 'Ollama was not found after installation. Restart this installer. If asked, choose local use; no sign-in is needed.' }
-    if ($Kind -in @('Complete','Lab') -and -not (Has-WebView2)) {
+    if ($Kind -in @('Complete','Lab','Staff-Lab') -and -not (Has-WebView2)) {
         Install-App 'Microsoft.EdgeWebView2Runtime' 'Microsoft Edge WebView2 Runtime (for the Lab window)' 'https://developer.microsoft.com/microsoft-edge/webview2/'
         if (-not (Has-WebView2)) { throw 'WebView2 Runtime is not available yet. Finish its installation and rerun before installing Lab.' }
     }
