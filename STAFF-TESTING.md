@@ -45,8 +45,11 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Install ManSci Staff Lab from the current release on a clean profile and as an upgrade from the previous Staff Lab.
 - [ ] Confirm it uses the Management Science Python kernel and Documents/ManSci Code without changing student work.
 - [ ] Confirm the Azure endpoint/deployment test succeeds and the key is stored only in macOS Keychain or Windows Credential Manager.
-- [ ] Confirm ManSci Learning Assistant appears and follows the same learning, verification and secret-handling guidance as the VM persona.
-- [ ] Confirm Jupyter AI notebook tools, router, MCP components and command toolkit load without repeated-message or locked-database failures.
+- [ ] Confirm a new chat selects ManSci Learning Assistant automatically, shows its identity and enables the message box.
+- [ ] Upgrade while an older private Staff Lab server remains in the background; confirm the installer stops it and the next launch loads the new personas.
+- [ ] Confirm ManSci Learning Assistant follows the same learning, verification and secret-handling guidance as the VM persona.
+- [ ] Confirm Jupyter AI notebook, execution and JupyterLab tools and the router load without repeated-message or locked-database failures.
+- [ ] Confirm the standalone local MCP listener is disabled and no port-3001 collision appears in a fresh server log.
 - [ ] Confirm Qwen Local Chat remains available without Azure and is not configured as a tool-using assistant.
 - [ ] Confirm reset-key and repair-chat support tools operate on the installed support folder.
 - [ ] Compare the VM manifest, student environment.yml, Staff Lab requirements, user guides and Scenario Week environment sheet against DEPLOYMENT-SYNC.md.

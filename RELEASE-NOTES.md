@@ -1,4 +1,13 @@
-# 2026.09.15.4 — Synchronized deployment and teaching guidance / staff testing
+# 2026.09.15.5 — Staff Lab persona startup correction / staff testing
+
+Fixes a Staff Lab upgrade that could open a new chat without a usable persona. Staff Lab now selects ManSci Learning Assistant explicitly because Jupyter AI 3.2 retains an obsolete fallback persona ID. The installer also shuts down only the authenticated private Staff Lab server during an upgrade, ensuring newly installed personas and configuration load on the next launch.
+
+The unnecessary standalone local MCP listener is disabled to avoid its fixed-port collision. Jupyternaut's direct notebook, execution and JupyterLab tools remain enabled. The shared Python Core and VM package set are unchanged.
+
+Close the Staff Lab window, install this release, and wait for INSTALLATION COMPLETE. The installer stops the background Staff Lab server. On the next launch, create a chat and confirm ManSci Learning Assistant is selected and the message box is enabled.
+
+## Previous 2026.09.15.4 — Synchronized deployments, guidance and Scenario Week assets / staff testing
+
 
 Aligns the repository guides, Staff Lab acceptance checklist and Scenario Week teaching pack with the six current distributions and the JupyterHub VM. The release includes the student AI-chat environment context sheet and identifies which capabilities are shared, local-only or VM-only. A deployment synchronization record now defines the assets that must be reviewed together for future changes.
 

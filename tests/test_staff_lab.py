@@ -6,7 +6,7 @@ import sys
 import tempfile
 import types
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = ROOT / 'distributions/ManSci-Staff-Lab/payload'
@@ -44,6 +44,26 @@ class StaffLabTests(unittest.TestCase):
         ast.parse(persona)
         self.assertIn('ManSci Learning Assistant', persona)
         self.assertIn('test edge cases', persona)
+        config = (PAYLOAD / 'jupyter-config/jupyter_server_config.py').read_text()
+        self.assertIn('mansci_learning_persona::ManSciLearningAssistantPersona', config)
+        self.assertIn('c.PersonaManager.builtin_mcp_servers = []', config)
+        self.assertIn('{"jupyter_server_mcp": False}', config)
+
+    def test_upgrade_stops_only_authenticated_private_local_server(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / 'jupyter-runtime'; runtime.mkdir()
+            (runtime / 'jpserver-1.json').write_text(json.dumps({
+                'url': 'http://127.0.0.1:9999/', 'token': 'private token'
+            }))
+            response = MagicMock(); response.__enter__.return_value.status = 200
+            with patch.object(staff, 'data_dir', return_value=root), \
+                 patch.object(staff, 'urlopen', return_value=response) as opened, \
+                 patch.object(staff.time, 'sleep'):
+                staff.stop_private_server()
+            request = opened.call_args.args[0]
+            self.assertEqual(request.method, 'POST')
+            self.assertEqual(request.full_url, 'http://127.0.0.1:9999/api/shutdown?token=private%20token')
 
     def test_shared_home_pointer_is_honoured(self):
         with tempfile.TemporaryDirectory() as directory:

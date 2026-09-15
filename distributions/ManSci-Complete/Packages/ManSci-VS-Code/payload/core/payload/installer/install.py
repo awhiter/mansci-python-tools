@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.15.4'
+VERSION = '2026.09.15.5'
 CORE_VERSION = '2026.09.15.2'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
@@ -214,6 +214,7 @@ def install_tool(kind, source, conda, python, code, ollama):
                          if os.name == 'nt' else 'import webview, WebKit, Cocoa')
         run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c', backend_check])
         if kind == 'Staff-Lab':
+            run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'staff_lab.py', 'stop-server'])
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'staff_lab.py', 'ensure-configured'])
     if kind == 'VS-Code':
         for action in ('configure', 'install-extensions'):

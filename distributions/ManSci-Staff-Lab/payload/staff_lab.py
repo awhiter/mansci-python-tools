@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 from urllib.error import URLError
 from urllib.parse import quote, urlsplit
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import keyring
 from keyring.errors import KeyringError
@@ -332,6 +332,31 @@ def running_server_url(runtime: Path, workspace: Path) -> str | None:
     return None
 
 
+def stop_private_server() -> None:
+    """Stop only Staff Lab servers authenticated by their private runtime file."""
+    stopped = False
+    for runtime in (data_dir() / "jupyter-runtime", data_dir() / "runtime"):
+        for server_file in sorted(runtime.glob("jpserver-*.json")):
+            try:
+                details = json.loads(server_file.read_text(encoding="utf-8"))
+                base = str(details["url"]).rstrip("/")
+                if urlsplit(base).hostname not in ("localhost", "127.0.0.1", "::1"):
+                    continue
+                token = quote(str(details.get("token", "")), safe="")
+                request = Request(f"{base}/api/shutdown?token={token}", method="POST")
+                with urlopen(request, timeout=3) as response:
+                    if response.status not in (200, 202):
+                        continue
+                stopped = True
+            except (FileNotFoundError, KeyError, ValueError, TypeError, OSError, json.JSONDecodeError):
+                continue
+    if stopped:
+        print("Previous ManSci Staff Lab server stopped so updated personas and configuration will load.")
+        time.sleep(1)
+    else:
+        print("No running ManSci Staff Lab server needed to be stopped.")
+
+
 def launch() -> int:
     from lab_window import run
     return run()
@@ -373,7 +398,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "action",
-        choices=("launch", "configure", "ensure-configured", "forget-key", "setup-qwen", "repair-chat-memory", "status"),
+        choices=("launch", "configure", "ensure-configured", "stop-server", "forget-key", "setup-qwen", "repair-chat-memory", "status"),
         nargs="?",
         default="launch",
     )
@@ -387,6 +412,8 @@ def main() -> int:
         elif args.action == "ensure-configured":
             configure()
             print("Azure OpenAI staff configuration: PASS (key stored in the operating-system credential store).")
+        elif args.action == "stop-server":
+            stop_private_server()
         elif args.action == "forget-key":
             delete_key()
             print("The Azure key was removed from the operating-system credential store.")

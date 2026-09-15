@@ -26,3 +26,16 @@ c.ServerApp.ip = "127.0.0.1"
 c.ServerApp.open_browser = False
 c.ServerApp.allow_remote_access = False
 c.ServerApp.quit_button = True
+
+# Jupyter AI 3.2's packaged fallback still points to the retired jupyter_ai
+# persona ID. Select the local ManSci subclass explicitly so a new chat is
+# immediately usable.
+c.PersonaManager.default_persona_id = (
+    "jupyter-ai-personas::mansci_learning_persona::ManSciLearningAssistantPersona"
+)
+
+# Jupyternaut already has its notebook, execution and JupyterLab tools. The
+# separate MCP HTTP listener is unnecessary on a single-user local Staff Lab
+# and its fixed port can collide with another Jupyter process.
+c.PersonaManager.builtin_mcp_servers = []
+c.ServerApp.jpserver_extensions = {"jupyter_server_mcp": False}
