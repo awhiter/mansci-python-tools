@@ -1,6 +1,18 @@
 """Portable ManSci teaching persona aligned with the JupyterHub assistant."""
+from dataclasses import replace
+
 from jupyter_ai_jupyternaut.jupyternaut.jupyternaut import JUPYTERNAUT_AVATAR_PATH, JupyternautPersona
 from jupyter_ai_persona_manager import PersonaDefaults
+
+
+def message_with_attachment_instruction(message):
+    """Give an attachment-only turn a useful, non-empty user instruction."""
+    if not message.body.strip() and message.attachments:
+        return replace(
+            message,
+            body="Please read the attached material and use it as context for this conversation.",
+        )
+    return message
 
 
 class ManSciLearningAssistantPersona(JupyternautPersona):
@@ -12,6 +24,19 @@ class ManSciLearningAssistantPersona(JupyternautPersona):
         avatar_path=JUPYTERNAUT_AVATAR_PATH,
         system_prompt="You are the ManSci Learning Assistant.",
     )
+
+    async def get_tools(self):
+        """Keep direct Jupyter tools when no optional MCP servers are configured."""
+        if self.get_mcp_settings() is None:
+            from jupyter_ai_jupyternaut.jupyternaut.toolkits.code_execution import toolkit as exec_toolkit
+            from jupyter_ai_jupyternaut.jupyternaut.toolkits.jupyterlab import toolkit as jlab_toolkit
+            from jupyter_ai_jupyternaut.jupyternaut.toolkits.notebook import toolkit as nb_toolkit
+
+            return list(nb_toolkit) + list(jlab_toolkit) + list(exec_toolkit)
+        return await super().get_tools()
+
+    async def process_message(self, message):
+        return await super().process_message(message_with_attachment_instruction(message))
 
     def get_system_prompt(self, *args, **kwargs):
         base = super().get_system_prompt(*args, **kwargs)

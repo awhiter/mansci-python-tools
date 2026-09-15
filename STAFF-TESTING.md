@@ -50,6 +50,8 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Confirm ManSci Learning Assistant follows the same learning, verification and secret-handling guidance as the VM persona.
 - [ ] Confirm Jupyter AI notebook, execution and JupyterLab tools and the router load without repeated-message or locked-database failures.
 - [ ] Confirm the standalone local MCP listener is disabled and no port-3001 collision appears in a fresh server log.
+- [ ] Send an ordinary prompt with no MCP server configured; confirm the direct notebook, Python execution and JupyterLab tools load without a `NoneType`/`mcp_servers` error.
+- [ ] Send an attachment with no added text; confirm it is accepted as conversation context and does not fail before model invocation.
 - [ ] Confirm Qwen Local Chat remains available without Azure and is not configured as a tool-using assistant.
 - [ ] Confirm reset-key and repair-chat support tools operate on the installed support folder.
 - [ ] Compare the VM manifest, student environment.yml, Staff Lab requirements, user guides and Scenario Week environment sheet against DEPLOYMENT-SYNC.md.

@@ -30,7 +30,7 @@ The notebook home and sole Python kernel match the student tools:
 
 The previous staff package used `Documents/ManSci Staff Lab`. This installer does not delete or silently move that folder. Move any notebooks you still need into `Documents/ManSci Code` yourself so they appear with the rest of your programme work.
 
-**ManSci Learning Assistant** starts with the configured Azure deployment, can use its notebook-aware tools, and mirrors the VM’s teaching approach: it explains reasoning, uses graduated help where appropriate, and prompts users to test and question AI output. The updated Staff Lab includes the VM-compatible Jupyter AI router and direct notebook, execution and JupyterLab tools. Its separate local MCP HTTP listener is disabled because those tools do not require it and its fixed port can conflict with another Jupyter process. **Qwen Local Chat** is a separate, tool-free local assistant: it accepts raw pasted Python, retains bounded recent chat context and produces code blocks, but does not reliably edit or understand the current notebook automatically. Never select the raw 3B model as a tool-using assistant.
+**ManSci Learning Assistant** starts with the configured Azure deployment, can use its notebook-aware tools, and mirrors the VM’s teaching approach: it explains reasoning, uses graduated help where appropriate, and prompts users to test and question AI output. The updated Staff Lab includes the VM-compatible Jupyter AI router and direct notebook, execution and JupyterLab tools. Its separate local MCP HTTP listener is disabled because those tools do not require it and its fixed port can conflict with another Jupyter process. **Qwen Local Chat** is a separate, tool-free local assistant: it accepts raw pasted Python, retains bounded recent chat context and produces code blocks, but does not reliably edit or understand the current notebook automatically. Never select the raw 3B model as a tool-using assistant. The ManSci assistant accepts an attachment without additional text and treats it as context, although adding a specific question will produce a more directed response.
 
 Core also installs **ManSci Help** for the shared installation, platform, kernel, model and log FAQs.
 
@@ -49,6 +49,7 @@ Close Staff Lab before using either tool. The scripts operate on the permanent i
 - Windows installation logs: `%LOCALAPPDATA%\ManagementScience\Logs`.
 - Staff Lab server logs: the `logs` folder beneath `~/Library/Application Support/ManSci Staff Lab` on Mac or `%APPDATA%\ManSci Staff Lab` on Windows.
 - Azure failure: verify endpoint, exact deployment, API version, key/resource match, network access and Azure quota.
+- Chat reports `NoneType` or `mcp_servers`: install release 2026.09.15.6 or later; this corrects the no-MCP compatibility path while retaining the direct Jupyter tools.
 - Chat opens without a persona or has a disabled message box: close Staff Lab and rerun the current installer to completion. The installer stops the older background server; the next launch should select ManSci Learning Assistant.
 - No kernel: close Staff Lab and rerun the current installer to completion.
 - Qwen absent: verify Ollama is installed and the Qwen model stage passed; restart Staff Lab after installation.

@@ -1,4 +1,13 @@
-# 2026.09.15.5 — Staff Lab persona startup correction / staff testing
+# 2026.09.15.6 — Staff Lab prompt and attachment correction / staff testing
+
+Fixes the Jupyter AI 3.2 failure `NoneType has no attribute mcp_servers` when the ManSci Learning Assistant processes a message while the optional local MCP server list is empty. The persona now retains its direct notebook, Python execution and JupyterLab tools without assuming an MCP server exists.
+
+Attachment-only messages receive a short internal instruction to read the attachment as conversation context. Students and staff may still add a specific question when they want an immediate task performed.
+
+The JupyterHub VM has an active managed MCP server and does not enter this failure path, so no VM deployment change is required. The shared Python Core remains at 2026.09.15.2.
+
+## Previous 2026.09.15.5 — Staff Lab persona startup correction / staff testing
+
 
 Fixes a Staff Lab upgrade that could open a new chat without a usable persona. Staff Lab now selects ManSci Learning Assistant explicitly because Jupyter AI 3.2 retains an obsolete fallback persona ID. The installer also shuts down only the authenticated private Staff Lab server during an upgrade, ensuring newly installed personas and configuration load on the next launch.
 
