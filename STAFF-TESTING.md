@@ -39,4 +39,16 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Light themes, standard icons and local chat/context work.
 - [ ] Reinstall from another extracted folder preserves work, chats and launchers.
 
+
+## Staff Lab and deployment alignment
+
+- [ ] Install ManSci Staff Lab from the current release on a clean profile and as an upgrade from the previous Staff Lab.
+- [ ] Confirm it uses the Management Science Python kernel and Documents/ManSci Code without changing student work.
+- [ ] Confirm the Azure endpoint/deployment test succeeds and the key is stored only in macOS Keychain or Windows Credential Manager.
+- [ ] Confirm ManSci Learning Assistant appears and follows the same learning, verification and secret-handling guidance as the VM persona.
+- [ ] Confirm Jupyter AI notebook tools, router, MCP components and command toolkit load without repeated-message or locked-database failures.
+- [ ] Confirm Qwen Local Chat remains available without Azure and is not configured as a tool-using assistant.
+- [ ] Confirm reset-key and repair-chat support tools operate on the installed support folder.
+- [ ] Compare the VM manifest, student environment.yml, Staff Lab requirements, user guides and Scenario Week environment sheet against DEPLOYMENT-SYNC.md.
+
 Do not approve student rollout until relevant platform results are recorded and failures resolved. Do not put credentials or sensitive student data in issue reports.

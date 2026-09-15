@@ -1,3 +1,13 @@
+# 2026.09.15.4 — Synchronized deployment and teaching guidance / staff testing
+
+Aligns the repository guides, Staff Lab acceptance checklist and Scenario Week teaching pack with the six current distributions and the JupyterHub VM. The release includes the student AI-chat environment context sheet and identifies which capabilities are shared, local-only or VM-only. A deployment synchronization record now defines the assets that must be reviewed together for future changes.
+
+The shared Python Core remains at 2026.09.15.2 because its challenge package set is unchanged. Staff Lab retains the VM-compatible Jupyter AI components introduced in 2026.09.15.3. No VM software change is required for this release.
+
+## Previous 2026.09.15.3 — Staff Lab alignment / staff testing
+
+Adds the Azure-enabled Staff Lab as a sixth formal download. It uses the current student Core and adds the portable Jupyter AI 3.2 router, persona, tools, MCP and command-toolkit components used on the VM. The ManSci Learning Assistant mirrors the VM teaching approach. VM account management, centrally managed teaching folders and Copy to My Work remain server-only.
+
 # 2026.09.15.2 — Ensure existing environments receive the GenAI toolkit / staff testing
 
 Fixes the Complete and individual installers incorrectly reusing an older `mansci-python` environment after the GenAI toolkit was added. The internal Core version is now incremented, forcing an environment update on existing installations, and the runtime health check now imports every challenge package before reporting success.
@@ -102,4 +112,4 @@ Close all ManSci apps, extract the new ZIP and rerun its installer. Current heal
 
 **Staff testing only.** Automated Python/JavaScript tests, syntax checks and ZIP checks are not clean-machine Windows/Mac certification. In particular, confirm fresh-profile notebook selection, windowless Windows startup and firewall behaviour in the VM before student use. See STAFF-TESTING.md and DISTRIBUTION-GUIDE.md.
 
-Download ManSci-Complete.zip for all tools, or individual packages. SHA256SUMS.txt covers all five ZIPs.
+Download ManSci-Complete.zip for all tools, or individual packages. SHA256SUMS.txt covers the five distributions published by that historical release.

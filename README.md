@@ -56,4 +56,4 @@ SHA-256 checksums are provided in [`SHA256SUMS.txt`](SHA256SUMS.txt) and attache
 
 This is a **public staff-testing distribution**, not yet approved for students. Read [STAFF-TESTING.md](STAFF-TESTING.md). Automated checks have not certified fresh Windows/Mac installation. AI output must be reviewed and tested.
 
-Maintainers: run `python tools/build_release.py` to synchronise embedded Core/helper copies and build five ZIPs/checksums under release-assets. Edit shared installer logic in installer/, not its generated copies.
+Maintainers: run `python tools/build_release.py` to synchronise embedded Core/helper copies and build six ZIPs/checksums under release-assets. Edit shared installer logic in installer/, not its generated copies.

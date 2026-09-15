@@ -1,0 +1,45 @@
+name: mansci-python
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.13
+  - jupyterlab
+  - ipykernel
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - scikit-learn
+  - sympy
+  - openpyxl
+  - networkx
+  - seaborn
+  - requests
+  - pip
+  - jupyterhub=5.5.1
+  - pip:
+      - jupyter-ai
+      - langchain-openai
+      - streamlit
+      - plotly
+      - openai>=1,<3
+      - ipywidgets
+      - voila
+      - gradio
+      - PuLP
+      - statsmodels
+      - altair
+      - pydantic
+      - python-dotenv
+      - Pillow
+      - beautifulsoup4
+      - folium
+      - geopy
+      - joblib
+      - Faker
+      - python-docx
+      - reportlab
+      - qrcode
+      - jupyter-server-proxy
