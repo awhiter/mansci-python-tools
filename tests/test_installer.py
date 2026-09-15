@@ -12,6 +12,17 @@ spec = importlib.util.spec_from_file_location('installer', ROOT / 'installer/ins
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 
 class InstallerTests(unittest.TestCase):
+
+    def test_genai_toolkit_is_part_of_core_health_check(self):
+        required = {
+            'streamlit', 'plotly', 'openai', 'ipywidgets', 'voila', 'gradio',
+            'pulp', 'altair', 'pydantic', 'dotenv', 'PIL', 'bs4', 'folium',
+            'geopy', 'joblib', 'faker', 'docx', 'reportlab', 'qrcode',
+            'jupyter_server_proxy',
+        }
+        self.assertTrue(required.issubset(set(m.PACKAGES)))
+        self.assertEqual(m.CORE_VERSION, m.VERSION)
+
     def test_spyder_preserves_windowless_host_identity(self):
         spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')
         launch = importlib.util.module_from_spec(spec); spec.loader.exec_module(launch)

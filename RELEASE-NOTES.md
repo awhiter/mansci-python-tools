@@ -1,4 +1,10 @@
-# 2026.09.15.1 — GenAI challenge toolkit / staff testing
+# 2026.09.15.2 — Ensure existing environments receive the GenAI toolkit / staff testing
+
+Fixes the Complete and individual installers incorrectly reusing an older `mansci-python` environment after the GenAI toolkit was added. The internal Core version is now incremented, forcing an environment update on existing installations, and the runtime health check now imports every challenge package before reporting success.
+
+Close all ManSci tools before installing this correction. Rerun the Complete installer; it will update the existing environment without deleting student work. After installation, start fresh Spyder and Jupyter kernels.
+
+## Previous 2026.09.15.1 — GenAI challenge toolkit / staff testing
 
 Adds the Python packages selected for the MSIN0023 GenAI team challenge to the shared `mansci-python` environment. Existing scientific and teaching packages remain in place. The added toolkit covers rapid apps and dashboards, notebook interaction, GenAI/API use, optimisation, maps, synthetic data, web parsing, structured validation and document/report generation. `jupyter-server-proxy` is included so JupyterLab can expose local Streamlit and similar services through the existing server.
 

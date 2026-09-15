@@ -11,11 +11,17 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.15.1'
-CORE_VERSION = '2026.09.04.1'  # Teaching packages are unchanged in this launcher update.
+VERSION = '2026.09.15.2'
+CORE_VERSION = '2026.09.15.2'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
-PACKAGES = ('numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn',
-            'sympy', 'openpyxl', 'networkx', 'seaborn', 'requests', 'spyder', 'jupyterlab', 'ipykernel', 'jupytext')
+PACKAGES = (
+    'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn', 'sympy',
+    'openpyxl', 'networkx', 'seaborn', 'requests', 'spyder', 'jupyterlab',
+    'ipykernel', 'jupytext', 'streamlit', 'plotly', 'openai', 'ipywidgets',
+    'voila', 'gradio', 'pulp', 'altair', 'pydantic', 'dotenv', 'PIL', 'bs4',
+    'folium', 'geopy', 'joblib', 'faker', 'docx', 'reportlab', 'qrcode',
+    'jupyter_server_proxy',
+)
 
 def support():
     return (Path.home() / 'Library/Application Support/ManagementScience' if sys.platform == 'darwin'
