@@ -25,6 +25,13 @@ class ManSciLearningAssistantPersona(JupyternautPersona):
         system_prompt="You are the ManSci Learning Assistant.",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # jupyter-ai-jupyternaut 0.1.0b1 still reads the former attribute name
+        # once when creating its conversation-memory thread ID. Persona Manager
+        # 0.2 exposes the same chat object as ``chat``.
+        self.ychat = self.chat
+
     async def get_tools(self):
         """Keep direct Jupyter tools when no optional MCP servers are configured."""
         if self.get_mcp_settings() is None:

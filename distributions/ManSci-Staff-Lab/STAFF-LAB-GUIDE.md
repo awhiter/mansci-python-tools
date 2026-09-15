@@ -49,6 +49,7 @@ Close Staff Lab before using either tool. The scripts operate on the permanent i
 - Windows installation logs: `%LOCALAPPDATA%\ManagementScience\Logs`.
 - Staff Lab server logs: the `logs` folder beneath `~/Library/Application Support/ManSci Staff Lab` on Mac or `%APPDATA%\ManSci Staff Lab` on Windows.
 - Azure failure: verify endpoint, exact deployment, API version, key/resource match, network access and Azure quota.
+- Chat reports that the ManSci persona has no `ychat` attribute: install release 2026.09.15.7 or later.
 - Chat reports `NoneType` or `mcp_servers`: install release 2026.09.15.6 or later; this corrects the no-MCP compatibility path while retaining the direct Jupyter tools.
 - Chat opens without a persona or has a disabled message box: close Staff Lab and rerun the current installer to completion. The installer stops the older background server; the next launch should select ManSci Learning Assistant.
 - No kernel: close Staff Lab and rerun the current installer to completion.

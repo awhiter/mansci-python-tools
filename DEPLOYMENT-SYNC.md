@@ -1,13 +1,13 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.15.6**
+Current coordinated release: **2026.09.15.7**
 Shared Python Core: **2026.09.15.2**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
 
 | Area | Canonical asset | Current relationship |
 |---|---|---|
-| JupyterHub VM Python | `mansci-python-server.yml` and deployed `mansci-python` environment | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. |
+| JupyterHub VM Python | `mansci-python-server.yml` and deployed `mansci-python` environment | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.1 is deployed. |
 | Student local tools | `distributions/ManSci-Core/payload/environment.yml` | Canonical cross-platform Python package set used by Core, Lab, Spyder, VS Code and Complete. |
 | Staff Lab | `distributions/ManSci-Staff-Lab` | Embeds the current Core and adds Azure configuration, ManSci Learning Assistant and VM-compatible portable Jupyter AI components. |
 | GitHub downloads | Six ZIPs plus `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source. |

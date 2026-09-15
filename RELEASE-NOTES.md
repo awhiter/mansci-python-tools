@@ -1,10 +1,17 @@
-# 2026.09.15.6 — Staff Lab prompt and attachment correction / staff testing
+# 2026.09.15.7 — Jupyter AI chat-object compatibility correction / staff testing
+
+Fixes the Jupyter AI beta failure `ManSciLearningAssistantPersona object has no attribute ychat`. Persona Manager 0.2 exposes the chat object as `chat`, while Jupyternaut 0.1.0b1 still reads its former `ychat` name once when constructing the conversation-memory thread ID. The ManSci persona now supplies a narrow compatibility alias to the same object.
+
+This follows the 2026.09.15.6 no-MCP correction: ordinary and attachment-only turns can now proceed through attachment processing, direct-tool creation and conversation-memory setup. The VM persona has been audited for the same compatibility issue.
+
+## Previous 2026.09.15.6 — Staff Lab prompt and attachment correction / staff testing
+
 
 Fixes the Jupyter AI 3.2 failure `NoneType has no attribute mcp_servers` when the ManSci Learning Assistant processes a message while the optional local MCP server list is empty. The persona now retains its direct notebook, Python execution and JupyterLab tools without assuming an MCP server exists.
 
 Attachment-only messages receive a short internal instruction to read the attachment as conversation context. Students and staff may still add a specific question when they want an immediate task performed.
 
-The JupyterHub VM has an active managed MCP server and does not enter this failure path, so no VM deployment change is required. The shared Python Core remains at 2026.09.15.2.
+The JupyterHub VM persona package was updated to 1.0.1 with the same compatibility alias. Its active student server was not interrupted and will load the correction at its next normal server start. The shared Python Core remains at 2026.09.15.2.
 
 ## Previous 2026.09.15.5 — Staff Lab persona startup correction / staff testing
 
