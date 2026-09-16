@@ -125,6 +125,21 @@ def _display_link(url: str, path: Path, kind: str) -> None:
         print("Open:", url)
 
 
+def _app_command(path: Path, kind: str, port: int) -> list[str]:
+    """Build the managed launch command for a supported application type."""
+    if kind == "streamlit":
+        return [sys.executable, "-m", "streamlit", "run", path.name,
+                "--server.address", "127.0.0.1", "--server.port", str(port),
+                "--server.headless", "true", "--browser.gatherUsageStats", "false"]
+    if kind == "flask":
+        # The Flask CLI supplies our port even when a student script contains a
+        # conventional ``app.run(debug=True)`` under its __main__ guard.
+        return [sys.executable, "-m", "flask", "--app", path.name, "run",
+                "--host", "127.0.0.1", "--port", str(port),
+                "--no-debugger", "--no-reload"]
+    return [sys.executable, path.name]
+
+
 def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int | None = None):
     """Start a saved app from its project folder and show its proxied link.
 
@@ -148,12 +163,7 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
     app_port = int(port or _free_port())
     env = dict(os.environ, MANSCI_APP_PORT=str(app_port), PORT=str(app_port),
                GRADIO_SERVER_PORT=str(app_port), GRADIO_SERVER_NAME="127.0.0.1")
-    if kind == "streamlit":
-        command = [sys.executable, "-m", "streamlit", "run", path.name,
-                   "--server.address", "127.0.0.1", "--server.port", str(app_port),
-                   "--server.headless", "true", "--browser.gatherUsageStats", "false"]
-    else:
-        command = [sys.executable, path.name]
+    command = _app_command(path, kind, app_port)
     log_dir = Path(tempfile.gettempdir()) / "mansci-app-logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{path.stem}-{app_port}.log"
@@ -180,11 +190,18 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
         tail = log_path.read_text(encoding="utf-8", errors="replace")[-4000:]
         _PROCESSES.pop(key, None)
         raise RuntimeError(f"The app stopped during startup.\n\n{tail}")
-    url = _url(app_port)
-    print(f"The process is still starting. Log: {log_path}")
-    _display_link(url, path, kind)
-    return {"file": str(path), "kind": kind, "port": app_port, "url": url,
-            "pid": process.pid, "log": str(log_path)}
+    process.terminate()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        process.kill()
+    _PROCESSES.pop(key, None)
+    tail = log_path.read_text(encoding="utf-8", errors="replace")[-4000:]
+    raise RuntimeError(
+        f"The {kind} app did not open its assigned port {app_port}, so no app link "
+        f"was created. Check that the file starts a {kind} application.\n"
+        f"Log: {log_path}\n\n{tail}"
+    )
 
 
 def stop_app(file_path: str | os.PathLike | None = None) -> int:

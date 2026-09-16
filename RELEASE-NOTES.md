@@ -1,3 +1,9 @@
+# 2026.09.16.3 — Flask proxy-port launch correction / staff testing
+
+Fixes Flask links that returned a Jupyter proxy 500 response when a conventional student script used `app.run(debug=True)`. The runner now invokes the Flask CLI with its allocated loopback port and disables the debug reloader, so the source file does not need ManSci-specific port code.
+
+The runner no longer displays a link when an application fails to listen on its assigned port. It terminates the failed process and raises an actionable error containing the log path and recent log output. Tests cover the managed Flask command and the no-link timeout behaviour.
+
 # 2026.09.16.2 — Flask and Dash environment correction / staff testing
 
 Adds Flask and Dash explicitly to the shared VM and local `mansci-python` environments. This corrects the mismatch in 2026.09.16.1, whose runner and persona advertised those application types while neither package was installed. Installer health checks, VM manifest, external-chat context, guides and tests now verify the same framework set.

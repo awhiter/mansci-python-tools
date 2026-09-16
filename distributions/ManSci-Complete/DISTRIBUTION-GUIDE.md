@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.16.2 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.16.3 is public for staff testing, not yet approved for student rollout.
 
 Core installs an offline **ManSci Help** guide on the Desktop and in the Windows Start menu or Mac `~/Applications`. It covers installation, shared working practices, Mac and Windows launcher behaviour, kernels, local AI, reinstalling, logs and what to send staff. Its heading displays the installed distribution release. The installer does not pin it automatically.
 
@@ -103,4 +103,4 @@ Automated Python/configuration/package checks do not replace clean-machine tests
 
 ## Running Python files and browser applications from ManSci Lab
 
-For an ordinary saved script, run `%run "relative/path.py"` in a notebook or IPython console. For browser applications, use the installed course helper, for example `from mansci_tools import run_app` followed by `run_app("party.py", kind="streamlit")`. It resolves the shared coding folder, starts from the project folder and provides the appropriate Jupyter proxy link. Use `stop_app("party.py")` to stop it. Terminal commands remain useful supplementary knowledge; change into the project folder first so relative files work.
+For an ordinary saved script, run `%run "relative/path.py"` in a notebook or IPython console. For browser applications, use the installed course helper, for example `from mansci_tools import run_app` followed by `run_app("party.py", kind="streamlit")`. It resolves the shared coding folder, starts from the project folder and provides the appropriate Jupyter proxy link. For Flask it supplies the allocated port through the standard Flask command, so a conventional file ending in `app.run(debug=True)` does not need ManSci-specific changes. Use `stop_app("party.py")` to stop it. Terminal commands remain useful supplementary knowledge; change into the project folder first so relative files work.

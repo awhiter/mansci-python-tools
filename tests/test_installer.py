@@ -21,7 +21,7 @@ class InstallerTests(unittest.TestCase):
             'jupyter_server_proxy', 'mansci_tools',
         }
         self.assertTrue(required.issubset(set(m.PACKAGES)))
-        self.assertEqual(m.CORE_VERSION, '2026.09.16.2')
+        self.assertEqual(m.CORE_VERSION, '2026.09.16.3')
 
     def test_spyder_preserves_windowless_host_identity(self):
         spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')

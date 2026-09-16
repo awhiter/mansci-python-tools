@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-CORE_VERSION = "2026.09.16.2"
+CORE_VERSION = "2026.09.16.3"
 
 
 def support_dir() -> Path:

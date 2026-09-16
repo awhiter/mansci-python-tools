@@ -1,7 +1,7 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.16.2**
-Shared Python Core: **2026.09.16.2**
+Current coordinated release: **2026.09.16.3**
+Shared Python Core: **2026.09.16.3**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
 

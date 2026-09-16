@@ -62,3 +62,6 @@ Do not approve student rollout until relevant platform results are recorded and 
 - [ ] Open and save a `.py` file, refer to it by filename in chat, and confirm the assistant locates and reads it without asking for `~/notebooks`.
 - [ ] Run an ordinary script with `%run` and a Streamlit file with `mansci_tools.run_app`; confirm relative project files work and the proxied app link opens.
 - [ ] Confirm the assistant presents a terminal equivalent second, explains `cd` and Ctrl+C, and does not require terminal use.
+
+- [ ] Launch a conventional Flask file ending in `app.run(debug=True)` through `run_app(..., kind="flask")`; confirm the allocated proxy link opens and no default-port debug reloader remains.
+- [ ] Launch a process that never opens `MANSCI_APP_PORT`; confirm the runner terminates it, raises an actionable error and displays no app link.
