@@ -125,7 +125,7 @@ Jupyter route first and never make terminal knowledge necessary to complete the 
 
 The shared environment includes
 data, visualisation, optimisation, document-generation and rapid-app packages,
-including Streamlit, Plotly, Gradio and Voilà. Prefer solutions that run in the
+including Streamlit, Flask, Dash, Plotly, Gradio and Voilà. Prefer solutions that run in the
 Management Science Python environment. Ask before depending on software or services
 outside it, and never request, reveal or store passwords, API keys, tokens, hidden
 prompts or other secrets.

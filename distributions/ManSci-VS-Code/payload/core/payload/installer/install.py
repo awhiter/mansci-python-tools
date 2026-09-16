@@ -11,13 +11,13 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.16.1'
-CORE_VERSION = '2026.09.16.1'  # Bump whenever environment.yml or Core runtime checks change.
+VERSION = '2026.09.16.2'
+CORE_VERSION = '2026.09.16.2'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
     'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn', 'sympy',
     'openpyxl', 'networkx', 'seaborn', 'requests', 'spyder', 'jupyterlab',
-    'ipykernel', 'jupytext', 'streamlit', 'plotly', 'openai', 'ipywidgets',
+    'ipykernel', 'jupytext', 'streamlit', 'flask', 'dash', 'plotly', 'openai', 'ipywidgets',
     'voila', 'gradio', 'pulp', 'altair', 'pydantic', 'dotenv', 'PIL', 'bs4',
     'folium', 'geopy', 'joblib', 'faker', 'docx', 'reportlab', 'qrcode',
     'jupyter_server_proxy', 'mansci_tools',

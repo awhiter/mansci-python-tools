@@ -1,7 +1,7 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.16.1**
-Shared Python Core: **2026.09.16.1**
+Current coordinated release: **2026.09.16.2**
+Shared Python Core: **2026.09.16.2**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
 
@@ -17,7 +17,7 @@ Review this record before proposing or approving a change. Do not change a liste
 
 ## Capability boundaries
 
-Shared across VM and local Core: the `mansci_tools` notebook/console runner, Python 3.13, Management Science Python kernel and the documented challenge modules including Streamlit, Gradio, Voilà and jupyter-server-proxy.
+Shared across VM and local Core: the `mansci_tools` notebook/console runner, Python 3.13, Management Science Python kernel and the documented challenge modules including Streamlit, Flask, Dash, Gradio, Voilà and jupyter-server-proxy.
 
 Staff Lab and VM: ManSci Learning Assistant and the compatible Jupyter AI tool/router components. Staff Lab supplies Azure settings locally and keeps the key in the operating-system credential store.
 

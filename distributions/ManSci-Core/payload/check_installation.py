@@ -26,6 +26,8 @@ PACKAGES = {
     "NetworkX": ("networkx", "networkx"),
     "seaborn": ("seaborn", "seaborn"),
     "Requests": ("requests", "requests"),
+    "Flask": ("flask", "Flask"),
+    "Dash": ("dash", "dash"),
 }
 
 

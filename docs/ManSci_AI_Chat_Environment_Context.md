@@ -47,6 +47,8 @@ The following packages are installed and intended to be available in both the VM
 | Purpose | Package | Import name |
 |---|---|---|
 | Rapid browser applications | Streamlit | `streamlit` |
+| Lightweight web applications | Flask | `flask` |
+| Analytical dashboards | Dash | `dash` |
 | Tabular data | pandas | `pandas` |
 | Numerical computing | NumPy | `numpy` |
 | Interactive charts | Plotly | `plotly` |
@@ -90,7 +92,7 @@ When helping the student:
 2. Prefer the packages listed above and the Python standard library.
 3. Do not tell the student to run `pip install`, `conda install` or operating-system package commands unless they explicitly ask about adding software and understand that centrally managed VM environments cannot be changed by students.
 4. Keep examples runnable in a Jupyter notebook unless the task genuinely calls for an application script such as `app.py`.
-5. Separate computational logic from the interface. A Streamlit or Gradio interface should call ordinary testable Python functions.
+5. Separate computational logic from the interface. A Streamlit, Flask, Dash or Gradio interface should call ordinary testable Python functions.
 6. Give complete import statements and identify any required data files and expected folder layout.
 7. Use relative paths within the student's working project. Do not invent VM-specific absolute paths.
 8. If code uses files, assume the notebook or script is run from the relevant folder under `My Work` on the VM or `Documents/ManSci Code` locally. When a student mentions an open/current `.py` file, explain that the file must be saved before a chat tool can reliably read it. On the VM, relative paths are interpreted from the visible `~/notebooks` workspace.

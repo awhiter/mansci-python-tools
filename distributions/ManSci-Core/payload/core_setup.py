@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-CORE_VERSION = "2026.09.16.1"
+CORE_VERSION = "2026.09.16.2"
 
 
 def support_dir() -> Path:
@@ -113,7 +113,7 @@ def main() -> int:
         initialise()
         return 0
     modules = ("numpy", "pandas", "scipy", "statsmodels", "matplotlib", "sklearn", "sympy",
-               "openpyxl", "networkx", "seaborn", "requests", "spyder", "jupyterlab", "mansci_tools")
+               "openpyxl", "networkx", "seaborn", "requests", "spyder", "jupyterlab", "mansci_tools", "flask", "dash")
     failed = False
     print("Python:", sys.executable)
     print("Version:", platform.python_version())

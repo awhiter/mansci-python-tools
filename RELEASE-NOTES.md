@@ -1,3 +1,9 @@
+# 2026.09.16.2 — Flask and Dash environment correction / staff testing
+
+Adds Flask and Dash explicitly to the shared VM and local `mansci-python` environments. This corrects the mismatch in 2026.09.16.1, whose runner and persona advertised those application types while neither package was installed. Installer health checks, VM manifest, external-chat context, guides and tests now verify the same framework set.
+
+The VM runner has been tested with small Flask and Dash applications using project-relative paths, automatic ports and the authenticated JupyterHub proxy route. Streamlit remains the recommended rapid interface, with Gradio and Voilà also available.
+
 # 2026.09.16.1 — workspace-aware files and notebook application runner / staff testing
 
 Adds the shared `mansci_tools` runner for ordinary Python scripts and browser applications. Students can run saved scripts and apps from a notebook or IPython console without learning Linux paths or terminal process management first. The runner resolves VM `~/notebooks` and local `Documents/ManSci Code` paths, starts in the project folder, allocates a port, supplies the authenticated Jupyter proxy link and provides stop/status controls.

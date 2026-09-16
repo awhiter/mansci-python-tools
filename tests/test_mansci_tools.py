@@ -40,4 +40,10 @@ class ManSciToolsTests(unittest.TestCase):
             if old is None: os.environ.pop("JUPYTERHUB_SERVICE_PREFIX", None)
             else: os.environ["JUPYTERHUB_SERVICE_PREFIX"] = old
 
+    def test_named_frameworks_are_required_by_the_installer(self):
+        installer = (ROOT / "installer/install.py").read_text()
+        for module in ("streamlit", "gradio", "dash", "flask"):
+            self.assertIn(f"'{module}'", installer)
+            self.assertEqual(m.APP_MODULES[module], module)
+
 if __name__ == "__main__": unittest.main()

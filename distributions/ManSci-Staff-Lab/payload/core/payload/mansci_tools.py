@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import atexit
+import importlib.util
 import os
 from pathlib import Path
 import runpy
@@ -13,6 +14,14 @@ import time
 from urllib.parse import quote
 
 __all__ = ["resolve_path", "run_script", "run_app", "stop_app", "app_status"]
+
+APP_MODULES = {
+    "streamlit": "streamlit",
+    "gradio": "gradio",
+    "dash": "dash",
+    "flask": "flask",
+    "python": None,
+}
 
 _PROCESSES: dict[str, subprocess.Popen] = {}
 _LOGS: dict[str, Path] = {}
@@ -127,8 +136,14 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
     if path.suffix.lower() != ".py":
         raise ValueError("run_app expects a saved .py file.")
     kind = kind.lower().strip()
-    if kind not in {"streamlit", "gradio", "dash", "flask", "python"}:
+    if kind not in APP_MODULES:
         raise ValueError("kind must be streamlit, gradio, dash, flask or python.")
+    required_module = APP_MODULES[kind]
+    if required_module and importlib.util.find_spec(required_module) is None:
+        raise ModuleNotFoundError(
+            f"{kind.title()} is not installed in this Python environment. "
+            "Use the Management Science Python kernel or contact the teaching team."
+        )
     stop_app(path)
     app_port = int(port or _free_port())
     env = dict(os.environ, MANSCI_APP_PORT=str(app_port), PORT=str(app_port),
