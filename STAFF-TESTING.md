@@ -58,3 +58,7 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Compare the VM manifest, student environment.yml, Staff Lab requirements, user guides and Scenario Week environment sheet against DEPLOYMENT-SYNC.md.
 
 Do not approve student rollout until relevant platform results are recorded and failures resolved. Do not put credentials or sensitive student data in issue reports.
+
+- [ ] Open and save a `.py` file, refer to it by filename in chat, and confirm the assistant locates and reads it without asking for `~/notebooks`.
+- [ ] Run an ordinary script with `%run` and a Streamlit file with `mansci_tools.run_app`; confirm relative project files work and the proxied app link opens.
+- [ ] Confirm the assistant presents a terminal equivalent second, explains `cd` and Ctrl+C, and does not require terminal use.

@@ -47,6 +47,8 @@ class StaffLabTests(unittest.TestCase):
         self.assertIn('if self.get_mcp_settings() is None:', persona)
         self.assertIn('message_with_attachment_instruction(message)', persona)
         self.assertIn('self.ychat = self.chat', persona)
+        self.assertIn('read_workspace_text', persona)
+        self.assertIn('Run in ManSci Lab', persona)
         config = (PAYLOAD / 'jupyter-config/jupyter_server_config.py').read_text()
         self.assertIn('mansci_learning_persona::ManSciLearningAssistantPersona', config)
         self.assertIn('c.PersonaManager.builtin_mcp_servers = []', config)

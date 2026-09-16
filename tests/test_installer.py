@@ -18,10 +18,10 @@ class InstallerTests(unittest.TestCase):
             'streamlit', 'plotly', 'openai', 'ipywidgets', 'voila', 'gradio',
             'pulp', 'altair', 'pydantic', 'dotenv', 'PIL', 'bs4', 'folium',
             'geopy', 'joblib', 'faker', 'docx', 'reportlab', 'qrcode',
-            'jupyter_server_proxy',
+            'jupyter_server_proxy', 'mansci_tools',
         }
         self.assertTrue(required.issubset(set(m.PACKAGES)))
-        self.assertEqual(m.CORE_VERSION, '2026.09.15.2')
+        self.assertEqual(m.CORE_VERSION, '2026.09.16.1')
 
     def test_spyder_preserves_windowless_host_identity(self):
         spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')

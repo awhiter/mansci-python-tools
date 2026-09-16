@@ -44,6 +44,12 @@ code{background:#eef2f7;padding:.1rem .3rem;border-radius:4px}a{color:#0369a1}fo
 <p>If a kernel/interpreter is missing, close the tool and rerun its latest installer to completion. Do not create another similarly named environment. Staff may ask you to run <code>student-profile-check.py</code> from the shared folder.</p>
 </section>
 
+
+<section class="card" id="running"><h2>Running scripts and browser applications</h2>
+<p>In ManSci Lab, run an ordinary saved script with <code>%run "relative/path.py"</code>. For a browser application, use <code>from mansci_tools import run_app</code> and then, for example, <code>run_app("party.py", kind="streamlit")</code>. The runner starts from the file's project folder and provides the correct app link. Use <code>stop_app("party.py")</code> when finished.</p>
+<p>The conventional terminal command is useful supplementary knowledge. Change into the project folder with <code>cd</code>, run the framework command, and use Ctrl+C to stop it. The notebook route avoids requiring terminal or Linux path knowledge.</p>
+</section>
+
 <section class="card" id="ai"><h2>Local AI assistant</h2>
 <p>Qwen2.5-Coder 3B runs locally through Ollama. It needs no shared key or account. The first response can be slow—especially in a VM or with limited memory—and a small model can misunderstand context or produce incorrect code. Review and test everything it suggests.</p>
 <ul><li>Give explicit context: say Python, describe the required input/output, and paste the relevant code when necessary.</li><li>In VS Code use the ManSci-configured Continue interface, not GitHub Copilot sign-in.</li><li>In Lab choose the configured local persona/model. Recent chat context is retained, but the model does not automatically understand every open notebook cell.</li></ul>

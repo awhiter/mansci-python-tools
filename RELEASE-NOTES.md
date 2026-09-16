@@ -1,3 +1,9 @@
+# 2026.09.16.1 — workspace-aware files and notebook application runner / staff testing
+
+Adds the shared `mansci_tools` runner for ordinary Python scripts and browser applications. Students can run saved scripts and apps from a notebook or IPython console without learning Linux paths or terminal process management first. The runner resolves VM `~/notebooks` and local `Documents/ManSci Code` paths, starts in the project folder, allocates a port, supplies the authenticated Jupyter proxy link and provides stop/status controls.
+
+The ManSci Learning Assistant can now find and read saved text and `.py` files within the visible workspace. Its guidance explains that open editor tabs must be saved, provides the Jupyter route first and adds the normal terminal command as supplementary learning, including the project-folder `cd` and Ctrl+C. VM, local distributions, guides and Scenario Week launch guidance are synchronized. The VM ManSci Learning Assistant package is now 1.0.2; the existing active server was not interrupted and will load the persona changes at its next normal start.
+
 # 2026.09.15.7 — Jupyter AI chat-object compatibility correction / staff testing
 
 Fixes the Jupyter AI beta failure `ManSciLearningAssistantPersona object has no attribute ychat`. Persona Manager 0.2 exposes the chat object as `chat`, while Jupyternaut 0.1.0b1 still reads its former `ychat` name once when constructing the conversation-memory thread ID. The ManSci persona now supplies a narrow compatibility alias to the same object.

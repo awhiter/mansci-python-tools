@@ -62,3 +62,7 @@ When requesting support, provide OS/architecture, whether it is a VM, exact acti
 ## What is deliberately VM-only
 
 Linux user accounts, enrolment-specific folders, centrally managed teaching materials and **Copy to My Work** depend on the JupyterHub server and are not installed on staff computers. Staff Lab carries across the shared Python environment, supported Jupyter AI components and learning-assistant guidance that work safely on a local computer.
+
+## Files and application launching
+
+The ManSci Learning Assistant can locate and read saved text and `.py` files within the visible Jupyter workspace. An open editor tab is not automatically attached to chat, and unsaved changes must be saved first. It should provide a notebook or IPython-console route first: `%run` for ordinary scripts and `mansci_tools.run_app(...)` for supported server applications. It then gives the conventional terminal command as supplementary learning.

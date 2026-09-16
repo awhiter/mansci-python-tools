@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-CORE_VERSION = "2026.09.04.1"
+CORE_VERSION = "2026.09.16.1"
 
 
 def support_dir() -> Path:
@@ -52,7 +52,16 @@ def notebook() -> dict:
     }
 
 
+def install_mansci_tools() -> None:
+    """Install the small course runner into the active environment."""
+    import sysconfig
+    source = Path(__file__).with_name("mansci_tools.py")
+    target = Path(sysconfig.get_paths()["purelib"]) / "mansci_tools.py"
+    shutil.copy2(source, target)
+
+
 def initialise() -> None:
+    install_mansci_tools()
     home = home_dir()
     home.mkdir(parents=True, exist_ok=True)
     files = {
@@ -104,7 +113,7 @@ def main() -> int:
         initialise()
         return 0
     modules = ("numpy", "pandas", "scipy", "statsmodels", "matplotlib", "sklearn", "sympy",
-               "openpyxl", "networkx", "seaborn", "requests", "spyder", "jupyterlab")
+               "openpyxl", "networkx", "seaborn", "requests", "spyder", "jupyterlab", "mansci_tools")
     failed = False
     print("Python:", sys.executable)
     print("Version:", platform.python_version())

@@ -1,8 +1,53 @@
 """Portable ManSci teaching persona aligned with the JupyterHub assistant."""
 from dataclasses import replace
+from pathlib import Path
+from urllib.parse import unquote
 
 from jupyter_ai_jupyternaut.jupyternaut.jupyternaut import JUPYTERNAUT_AVATAR_PATH, JupyternautPersona
 from jupyter_ai_persona_manager import PersonaDefaults
+
+
+def _workspace_root() -> Path:
+    from jupyter_ai_jupyternaut.jupyternaut.toolkits.utils import get_serverapp
+    return Path(get_serverapp().root_dir).resolve()
+
+
+def _workspace_path(file_path: str) -> Path:
+    """Resolve common Jupyter and Linux path forms inside the visible workspace."""
+    raw = unquote(file_path.strip()).replace("\\", "/")
+    if raw.startswith("~/notebooks/"):
+        raw = raw[len("~/notebooks/"):]
+    elif raw.startswith("notebooks/"):
+        raw = raw[len("notebooks/"):]
+    elif raw.startswith("/"):
+        raw = raw[1:]
+    candidate = (_workspace_root() / raw).resolve()
+    if candidate != _workspace_root() and _workspace_root() not in candidate.parents:
+        raise ValueError("The requested path is outside the Jupyter workspace.")
+    return candidate
+
+
+async def find_workspace_files(filename: str) -> list[str]:
+    """Find saved files by name beneath the visible JupyterLab workspace."""
+    name = Path(filename).name
+    if not name or name in {".", ".."}:
+        raise ValueError("Enter a filename such as party.py.")
+    root = _workspace_root()
+    return [str(path.relative_to(root)) for path in root.rglob(name) if path.is_file()][:20]
+
+
+async def read_workspace_text(file_path: str, max_characters: int = 50000) -> str:
+    """Read a saved text/code file inside the visible JupyterLab workspace."""
+    path = _workspace_path(file_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"No saved file was found at {file_path!r}.")
+    if path.stat().st_size > 2_000_000:
+        raise ValueError("This file is too large to read safely in chat.")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("This is not a UTF-8 text file.") from exc
+    return text[:max(1000, min(int(max_characters), 100000))]
 
 
 def message_with_attachment_instruction(message):
@@ -39,8 +84,10 @@ class ManSciLearningAssistantPersona(JupyternautPersona):
             from jupyter_ai_jupyternaut.jupyternaut.toolkits.jupyterlab import toolkit as jlab_toolkit
             from jupyter_ai_jupyternaut.jupyternaut.toolkits.notebook import toolkit as nb_toolkit
 
-            return list(nb_toolkit) + list(jlab_toolkit) + list(exec_toolkit)
-        return await super().get_tools()
+            tools = list(nb_toolkit) + list(jlab_toolkit) + list(exec_toolkit)
+        else:
+            tools = list(await super().get_tools())
+        return tools + [find_workspace_files, read_workspace_text]
 
     async def process_message(self, message):
         return await super().process_message(message_with_attachment_instruction(message))
@@ -61,7 +108,22 @@ important limitations explicit. Never imply that AI-generated code or claims are
 necessarily correct. Encourage appropriate acknowledgement and a concise record of
 significant AI contributions.
 
-The usual working folder is Documents/ManSci Code. The shared environment includes
+In the local Staff Lab, the visible Jupyter workspace is Documents/ManSci Code.
+Resolve relative filenames from that workspace. When a user refers to an open/current
+file or gives only a filename, use the open-documents and workspace-file tools before
+asking them to find a path. JupyterLab does not automatically attach an editor tab to
+chat: read the saved file with read_workspace_text. If it has unsaved changes, ask the
+user to save it first.
+
+For every generated solution, provide a short **Run in ManSci Lab** section. Use
+`%run "relative/path.py"` for an ordinary script. For a server application, prefer a
+notebook or IPython-console cell using `from mansci_tools import run_app`, for example
+`run_app("party.py", kind="streamlit")`. For generated Flask, Dash or similar server code, read the port from `MANSCI_APP_PORT` (falling back to `PORT`) and bind only to 127.0.0.1 so the runner can proxy it. Then provide a brief **Terminal equivalent**
+as supplementary learning, including the `cd` into the project folder, the normal
+framework command, what `cd` means, and how to stop the process with Ctrl+C. Keep the
+Jupyter route first and never make terminal knowledge necessary to complete the task.
+
+The shared environment includes
 data, visualisation, optimisation, document-generation and rapid-app packages,
 including Streamlit, Plotly, Gradio and Voilà. Prefer solutions that run in the
 Management Science Python environment. Ask before depending on software or services
