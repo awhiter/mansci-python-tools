@@ -1,3 +1,9 @@
+# 2026.09.17.1 — Suppress unnecessary Dash build prompt / staff testing
+
+Disables Dash's optional `@plotly/dash-jupyterlab` interface extension at the managed-environment level and removes its source-build archive. Dash 4 installed this archive automatically, causing JupyterLab to recommend an interface build at login even though ManSci applications run through the supported `mansci_tools.run_app` and Jupyter proxy route.
+
+Dash itself remains installed and available. The installer applies the setting without rebuilding JupyterLab, and the VM and local Core use the same configuration. Students should no longer be asked to build centrally managed JupyterLab application assets.
+
 # 2026.09.16.3 — Flask proxy-port launch correction / staff testing
 
 Fixes Flask links that returned a Jupyter proxy 500 response when a conventional student script used `app.run(debug=True)`. The runner now invokes the Flask CLI with its allocated loopback port and disables the debug reloader, so the source file does not need ManSci-specific port code.

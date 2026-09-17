@@ -11,8 +11,8 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.16.3'
-CORE_VERSION = '2026.09.16.3'  # Bump whenever environment.yml or Core runtime checks change.
+VERSION = '2026.09.17.1'
+CORE_VERSION = '2026.09.17.1'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
     'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn', 'sympy',
@@ -139,6 +139,15 @@ def core_payload(package, kind):
     if kind == 'Core': return package / 'payload'
     return package / 'payload/core/payload'
 
+def configure_jupyterlab(conda):
+    """Keep optional Dash integration from requesting a user-managed Lab build."""
+    run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'jupyter',
+         'labextension', 'disable', '--level=sys_prefix', '--no-build',
+         '@plotly/dash-jupyterlab'])
+    run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
+         'import sys; from pathlib import Path; '
+         '(Path(sys.prefix)/"share/jupyter/lab/extensions/dash-jupyterlab.tgz").unlink(missing_ok=True)'])
+
 def install_core(conda, payload, ollama):
     root = support() / 'Core'
     root.mkdir(parents=True, exist_ok=True)
@@ -174,6 +183,7 @@ def install_core(conda, payload, ollama):
     else:
         print('[2/5] Core is current; no new channel operation or acceptance is needed.')
         print('[3/5] PASS: reusing the verified mansci-python environment.')
+    configure_jupyterlab(conda)
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', payload / 'core_setup.py', 'initialise'])
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
          'import sys; assert sys.version_info[:2] == (3,13); ' + '; '.join('import ' + m for m in PACKAGES)])

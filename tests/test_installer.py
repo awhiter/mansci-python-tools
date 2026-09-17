@@ -21,7 +21,21 @@ class InstallerTests(unittest.TestCase):
             'jupyter_server_proxy', 'mansci_tools',
         }
         self.assertTrue(required.issubset(set(m.PACKAGES)))
-        self.assertEqual(m.CORE_VERSION, '2026.09.16.3')
+        self.assertEqual(m.CORE_VERSION, '2026.09.17.1')
+
+    def test_dash_labextension_is_disabled_without_a_build(self):
+        with patch.object(m, 'run') as run:
+            m.configure_jupyterlab('/conda')
+        self.assertEqual(run.call_count, 2)
+        self.assertEqual(run.call_args_list[0].args[0], [
+            '/conda', 'run', '--no-capture-output', '-n', 'mansci-python', 'jupyter',
+            'labextension', 'disable', '--level=sys_prefix', '--no-build',
+            '@plotly/dash-jupyterlab',
+        ])
+        removal = run.call_args_list[1].args[0]
+        self.assertEqual(removal[:7], ['/conda', 'run', '--no-capture-output', '-n',
+                                      'mansci-python', 'python', '-c'])
+        self.assertIn('dash-jupyterlab.tgz', removal[7])
 
     def test_spyder_preserves_windowless_host_identity(self):
         spec = importlib.util.spec_from_file_location('managed_launch', ROOT / 'installer/launch.py')
