@@ -7,7 +7,7 @@ Review this record before proposing or approving a change. Do not change a liste
 
 | Area | Canonical asset | Current relationship |
 |---|---|---|
-| JupyterHub VM Python | `mansci-python-server.yml` and deployed `mansci-python` environment | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.2 and the shared `mansci_tools` runner are deployed. |
+| JupyterHub VM Python and proxy | `mansci-python-server.yml`, `nginx-jupyterhub-upload.conf` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.2 and the shared `mansci_tools` runner are deployed. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. |
 | Student local tools | `distributions/ManSci-Core/payload/environment.yml` | Canonical cross-platform Python package set used by Core, Lab, Spyder, VS Code and Complete. |
 | Staff Lab | `distributions/ManSci-Staff-Lab` | Embeds the current Core and adds Azure configuration, ManSci Learning Assistant and VM-compatible portable Jupyter AI components. |
 | GitHub downloads | Six ZIPs plus `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source. |
@@ -22,6 +22,8 @@ Shared across VM and local Core: the `mansci_tools` notebook/console runner, Pyt
 Staff Lab and VM: ManSci Learning Assistant and the compatible Jupyter AI tool/router components. Staff Lab supplies Azure settings locally and keeps the key in the operating-system credential store.
 
 VM only: JupyterHub accounts, enrolment-specific folders, centrally managed Teaching Materials and Copy to My Work.
+
+The VM HTTPS server block must include `client_max_body_size 250m;`. Validate the complete Nginx configuration before reloading it. JupyterLab uploads use JSON/base64 encoding, so the maximum original file size is lower than the HTTP request-body limit.
 
 Local only: desktop launchers, optional Spyder and VS Code, Ollama/Qwen local chat, and direct localhost application windows.
 
