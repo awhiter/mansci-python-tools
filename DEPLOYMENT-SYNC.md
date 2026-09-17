@@ -7,7 +7,7 @@ Review this record before proposing or approving a change. Do not change a liste
 
 | Area | Canonical asset | Current relationship |
 |---|---|---|
-| JupyterHub VM Python and proxy | `mansci-python-server.yml`, `nginx-jupyterhub-upload.conf` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.2 and the shared `mansci_tools` runner are deployed. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. |
+| JupyterHub VM Python, operating system and proxy | `mansci-python-server.yml`, `ubuntu-packages.txt`, `nginx-jupyterhub-upload.conf` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.2 and the shared `mansci_tools` runner are deployed. The documented module-lead archive workflow is supported by Ubuntu `unzip`. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. |
 | Student local tools | `distributions/ManSci-Core/payload/environment.yml` | Canonical cross-platform Python package set used by Core, Lab, Spyder, VS Code and Complete. |
 | Staff Lab | `distributions/ManSci-Staff-Lab` | Embeds the current Core and adds Azure configuration, ManSci Learning Assistant and VM-compatible portable Jupyter AI components. |
 | GitHub downloads | Six ZIPs plus `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source. |
