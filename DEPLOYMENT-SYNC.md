@@ -1,13 +1,13 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.17.1**
+Current coordinated release: **2026.09.17.2**
 Shared Python Core: **2026.09.17.1**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
 
 | Area | Canonical asset | Current relationship |
 |---|---|---|
-| JupyterHub VM Python, operating system and proxy | `mansci-python-server.yml`, `ubuntu-packages.txt`, `nginx-jupyterhub-upload.conf` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.2 and the shared `mansci_tools` runner are deployed. The documented module-lead archive workflow is supported by Ubuntu `unzip`. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. |
+| JupyterHub VM Python, operating system and proxy | `mansci-python-server.yml`, `ubuntu-packages.txt`, `nginx-jupyterhub-upload.conf`, `mansci-enrol/`, `mansci-learning-assistant/` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant package 1.0.3 and the shared `mansci_tools` runner are deployed. The documented module-lead archive workflow is supported by Ubuntu `unzip`. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. |
 | Student local tools | `distributions/ManSci-Core/payload/environment.yml` | Canonical cross-platform Python package set used by Core, Lab, Spyder, VS Code and Complete. |
 | Staff Lab | `distributions/ManSci-Staff-Lab` | Embeds the current Core and adds Azure configuration, ManSci Learning Assistant and VM-compatible portable Jupyter AI components. |
 | GitHub downloads | Six ZIPs plus `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source. |
@@ -20,6 +20,8 @@ Review this record before proposing or approving a change. Do not change a liste
 Shared across VM and local Core: the `mansci_tools` notebook/console runner, Python 3.13, Management Science Python kernel and the documented challenge modules including Streamlit, Flask, Dash, Gradio, Voilà and jupyter-server-proxy. Dash's optional source-built JupyterLab interface extension is centrally disabled because the supported application runner does not require it.
 
 Staff Lab and VM: ManSci Learning Assistant and the compatible Jupyter AI tool/router components. Staff Lab supplies Azure settings locally and keeps the key in the operating-system credential store.
+
+Both personas require verification of ManSci-specific commands, capabilities and observed results. Unverified claims and illustrative output must be labelled. The VM additionally documents authorised `mansci-enrol MODULE --list` and `--count` operations for module leads.
 
 VM only: JupyterHub accounts, enrolment-specific folders, centrally managed Teaching Materials and Copy to My Work.
 

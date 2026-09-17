@@ -32,6 +32,8 @@ The previous staff package used `Documents/ManSci Staff Lab`. This installer doe
 
 **ManSci Learning Assistant** starts with the configured Azure deployment, can use its notebook-aware tools, and mirrors the VM’s teaching approach: it explains reasoning, uses graduated help where appropriate, and prompts users to test and question AI output. The updated Staff Lab includes the VM-compatible Jupyter AI router and direct notebook, execution and JupyterLab tools. Its separate local MCP HTTP listener is disabled because those tools do not require it and its fixed port can conflict with another Jupyter process. **Qwen Local Chat** is a separate, tool-free local assistant: it accepts raw pasted Python, retains bounded recent chat context and produces code blocks, but does not reliably edit or understand the current notebook automatically. Never select the raw 3B model as a tool-using assistant. The ManSci assistant accepts an attachment without additional text and treats it as context, although adding a specific question will produce a more directed response.
 
+The persona must verify ManSci-specific commands, files, capabilities and observed results from explicit guidance or an available inspection tool. It must label unverified claims and hypothetical output rather than inventing flags, counts or successful test results. VM-only administration commands are not available in local Staff Lab.
+
 Core also installs **ManSci Help** for the shared installation, platform, kernel, model and log FAQs.
 
 ## Staff support tools

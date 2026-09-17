@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mansci-learning-assistant"
+version = "1.0.3"
+description = "Management Science teaching persona for Jupyter AI"
+requires-python = ">=3.11"
+dependencies = ["jupyter-ai-jupyternaut"]
+
+[project.entry-points."jupyter_ai.personas"]
+mansci = "mansci_learning_assistant.persona:ManSciLearningAssistantPersona"
+
+[tool.setuptools]
+packages = ["mansci_learning_assistant"]
+
+[tool.setuptools.package-dir]
+mansci_learning_assistant = "."

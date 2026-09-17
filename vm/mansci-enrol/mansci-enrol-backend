@@ -1,0 +1,234 @@
+#!/opt/miniforge3/envs/mansci-python/bin/python
+from __future__ import annotations
+
+import fcntl
+import getpass
+import grp
+import os
+import pwd
+import re
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+MODULES_FILE = Path("/etc/mansci/modules.conf")
+ENROLMENTS_DIR = Path("/etc/mansci/enrolments")
+TEACHING_ROOT = Path("/srv/mansci/teaching")
+ADMIN_USERS = {"mansci-build"}
+USERNAME_RE = re.compile(r"^[a-z][a-z0-9_-]{1,31}$")
+RESERVED_USERS = {"root", "nobody", "postgres", "litellm"}
+
+
+class EnrolError(RuntimeError):
+    pass
+
+
+@dataclass(frozen=True)
+class Module:
+    code: str
+    directory: str
+    display_name: str
+    staff_group: str
+    lead_account: str
+
+
+def load_modules() -> dict[str, Module]:
+    modules: dict[str, Module] = {}
+    for number, raw in enumerate(MODULES_FILE.read_text().splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        fields = [field.strip() for field in raw.split("|")]
+        if len(fields) != 5 or not all(fields):
+            raise EnrolError(f"Invalid module definition on line {number}.")
+        module = Module(*fields)
+        modules[module.code.upper()] = module
+    return modules
+
+
+def invoking_user() -> str:
+    user = os.environ.get("SUDO_USER")
+    if not user or user == "root":
+        raise EnrolError("Run this command through sudo from an authorised account.")
+    return user
+
+
+def authorise(user: str, module: Module) -> None:
+    if user not in ADMIN_USERS and user != module.lead_account:
+        raise EnrolError(
+            f"{user} is not authorised to enrol students on {module.code}."
+        )
+
+
+def parse_usernames(lines: list[str]) -> list[str]:
+    result: list[str] = []
+    seen: set[str] = set()
+    for raw in lines:
+        username = raw.strip().removesuffix("\r")
+        if not username or username.startswith("#"):
+            continue
+        if not USERNAME_RE.fullmatch(username) or username in RESERVED_USERS:
+            raise EnrolError(f"Invalid student username: {username!r}")
+        if username not in seen:
+            seen.add(username)
+            result.append(username)
+    if not result:
+        raise EnrolError("No valid student usernames were supplied.")
+    return result
+
+
+def existing_regular_account(username: str) -> pwd.struct_passwd | None:
+    try:
+        account = pwd.getpwnam(username)
+    except KeyError:
+        return None
+    if account.pw_uid < 1000:
+        raise EnrolError(f"Refusing to enrol system account: {username}")
+    return account
+
+
+def prompt_password(new_users: list[str]) -> str | None:
+    if not new_users:
+        return None
+    print("New accounts required: " + ", ".join(new_users))
+    first = getpass.getpass("Initial password for new account(s): ")
+    second = getpass.getpass("Confirm initial password: ")
+    if not first:
+        raise EnrolError("The initial password cannot be empty.")
+    if first != second:
+        raise EnrolError("The passwords do not match.")
+    return first
+
+
+def create_account(username: str, password: str) -> pwd.struct_passwd:
+    subprocess.run(
+        ["useradd", "--create-home", "--shell", "/bin/bash", username], check=True
+    )
+    try:
+        subprocess.run(
+            ["chpasswd"], input=f"{username}:{password}\n", text=True, check=True
+        )
+    except Exception:
+        subprocess.run(["userdel", "--remove", username], check=False)
+        raise
+    account = pwd.getpwnam(username)
+    os.chmod(account.pw_dir, 0o750)
+    return account
+
+
+def safe_directory(path: Path, owner: str, group: str, mode: int) -> None:
+    if path.is_symlink() or (path.exists() and not path.is_dir()):
+        raise EnrolError(f"Unexpected object at {path}")
+    path.mkdir(parents=True, exist_ok=True)
+    os.chown(path, pwd.getpwnam(owner).pw_uid, grp.getgrnam(group).gr_gid)
+    os.chmod(path, mode)
+
+
+def configure_workspace(username: str, module: Module) -> None:
+    account = pwd.getpwnam(username)
+    primary_group = grp.getgrgid(account.pw_gid).gr_name
+    home = Path(account.pw_dir)
+    notebooks = home / "notebooks"
+    teaching = notebooks / "Teaching Materials"
+    my_work = notebooks / "My Work"
+    module_source = TEACHING_ROOT / module.directory
+
+    if not module_source.is_dir():
+        raise EnrolError(f"Teaching directory does not exist for {module.code}.")
+    safe_directory(notebooks, username, primary_group, 0o700)
+    safe_directory(teaching, "root", "root", 0o755)
+    safe_directory(my_work, username, primary_group, 0o700)
+
+    teaching_link = teaching / module.display_name
+    if teaching_link.is_symlink():
+        if Path(os.readlink(teaching_link)) != module_source:
+            raise EnrolError(f"Unexpected existing link at {teaching_link}")
+    elif teaching_link.exists():
+        raise EnrolError(f"{teaching_link} exists and is not the expected link.")
+    else:
+        teaching_link.symlink_to(module_source)
+        os.lchown(teaching_link, account.pw_uid, account.pw_gid)
+
+    safe_directory(my_work / module.display_name, username, primary_group, 0o700)
+
+
+def record_enrolments(module: Module, usernames: list[str]) -> None:
+    ENROLMENTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = ENROLMENTS_DIR / f"{module.code.lower()}_students.txt"
+    with path.open("a+", encoding="utf-8") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        handle.seek(0)
+        existing = {
+            line.strip() for line in handle if line.strip() and not line.lstrip().startswith("#")
+        }
+        for username in usernames:
+            if username not in existing:
+                handle.write(username + "\n")
+                existing.add(username)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.chown(path, 0, 0)
+    os.chmod(path, 0o644)
+
+
+def enrolled_usernames(module: Module) -> list[str]:
+    path = ENROLMENTS_DIR / f"{module.code.lower()}_students.txt"
+    try:
+        return sorted({
+            line.strip() for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        })
+    except FileNotFoundError:
+        return []
+
+
+def main() -> int:
+    try:
+        if os.geteuid() != 0:
+            raise EnrolError("This protected helper must run as root.")
+        if len(sys.argv) not in (2, 3):
+            raise EnrolError("Usage: mansci-enrol MODULE USERNAME|--file FILE|--list|--count")
+        modules = load_modules()
+        code = sys.argv[1].upper()
+        if code not in modules:
+            raise EnrolError(f"Unknown module: {code}")
+        module = modules[code]
+        caller = invoking_user()
+        authorise(caller, module)
+        if len(sys.argv) == 3:
+            mode = sys.argv[2]
+            usernames = enrolled_usernames(module)
+            if mode == "--list":
+                print("\n".join(usernames))
+            elif mode == "--count":
+                print(len(usernames))
+            else:
+                raise EnrolError(f"Unknown option: {mode}")
+            return 0
+        usernames = parse_usernames(sys.stdin.read().splitlines())
+
+        accounts = {username: existing_regular_account(username) for username in usernames}
+        new_users = [username for username, account in accounts.items() if account is None]
+        password = prompt_password(new_users)
+
+        for username in usernames:
+            created = accounts[username] is None
+            if created:
+                assert password is not None
+                create_account(username, password)
+            configure_workspace(username, module)
+            print(
+                f"{username}: {'account created and ' if created else ''}enrolled in "
+                f"{module.code} {module.display_name.removeprefix(module.code).strip()}"
+            )
+        record_enrolments(module, usernames)
+        print(f"Completed: {len(usernames)} student(s).")
+        return 0
+    except (EnrolError, EOFError, OSError, subprocess.CalledProcessError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

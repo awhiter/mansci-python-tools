@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BACKEND=/usr/local/libexec/mansci-enrol-backend
+
+usage() {
+    echo "Usage:" >&2
+    echo "  mansci-enrol MODULE UCL_USERNAME" >&2
+    echo "  mansci-enrol MODULE --file STUDENT_LIST.txt" >&2
+    echo "  mansci-enrol MODULE --list" >&2
+    echo "  mansci-enrol MODULE --count" >&2
+    exit 2
+}
+
+[[ $# -eq 2 || $# -eq 3 ]] || usage
+module="$1"
+
+if [[ $# -eq 2 && ( "$2" == "--list" || "$2" == "--count" ) ]]; then
+    sudo "$BACKEND" "$module" "$2"
+elif [[ $# -eq 2 ]]; then
+    username="$2"
+    printf '%s\n' "$username" | sudo "$BACKEND" "$module"
+elif [[ "$2" == "--file" && -f "$3" ]]; then
+    sudo "$BACKEND" "$module" < "$3"
+else
+    usage
+fi

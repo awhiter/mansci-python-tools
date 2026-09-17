@@ -1,3 +1,9 @@
+# 2026.09.17.2 — Verified persona guidance and enrolment reporting / staff testing
+
+Adds authorised read-only `mansci-enrol MODULE --list` and `mansci-enrol MODULE --count` commands to the JupyterHub VM, with matching built-in help and module-lead guidance. This replaces the need to inspect the protected enrolment record directly.
+
+The VM and Staff Lab ManSci Learning Assistant personas now explicitly prohibit invented commands, options, files, installed capabilities, counts, test outcomes and observed output. They must use explicit ManSci guidance or available inspection tools, label unverified claims, and distinguish hypothetical examples from real results. The student external-chat context carries the same accuracy rules. Shared Python Core remains 2026.09.17.1 because its package set is unchanged.
+
 # 2026.09.17.1 — Suppress unnecessary Dash build prompt / staff testing
 
 Disables Dash's optional `@plotly/dash-jupyterlab` interface extension at the managed-environment level and removes its source-build archive. Dash 4 installed this archive automatically, causing JupyterLab to recommend an interface build at login even though ManSci applications run through the supported `mansci_tools.run_app` and Jupyter proxy route.
