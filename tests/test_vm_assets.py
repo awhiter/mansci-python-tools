@@ -23,6 +23,8 @@ class VMAssetTests(unittest.TestCase):
         self.assertIn("Never invent a command", persona)
         self.assertIn("mansci-enrol MODULE --list", persona)
         self.assertIn("illustrative output as hypothetical", persona)
+        self.assertIn("QR contains no credential", persona)
+        self.assertIn("Do not", persona)
 
 
 if __name__ == "__main__":

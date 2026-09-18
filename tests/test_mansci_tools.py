@@ -41,6 +41,29 @@ class ManSciToolsTests(unittest.TestCase):
             if old is None: os.environ.pop("JUPYTERHUB_SERVICE_PREFIX", None)
             else: os.environ["JUPYTERHUB_SERVICE_PREFIX"] = old
 
+    def test_phone_url_is_vm_only_and_contains_no_credentials(self):
+        with patch.dict(os.environ, {
+            "JUPYTERHUB_SERVICE_PREFIX": "/user/student1/",
+            "MANSCI_PUBLIC_BASE_URL": "https://example.test/",
+        }, clear=True):
+            url = m._phone_url("/user/student1/proxy/8123/")
+        self.assertEqual(url, "https://example.test/user/student1/proxy/8123/")
+        self.assertNotIn("token", url)
+        with patch.dict(os.environ, {"MANSCI_PUBLIC_BASE_URL": "https://example.test"}, clear=True):
+            self.assertIsNone(m._phone_url("/proxy/8123/"))
+
+    def test_phone_url_requires_https(self):
+        with patch.dict(os.environ, {
+            "JUPYTERHUB_SERVICE_PREFIX": "/user/student1/",
+            "MANSCI_PUBLIC_BASE_URL": "http://example.test",
+        }, clear=True):
+            self.assertIsNone(m._phone_url("/user/student1/proxy/8123/"))
+
+    def test_app_logs_use_a_per_user_directory(self):
+        source = (ROOT / "distributions/ManSci-Core/payload/mansci_tools.py").read_text()
+        self.assertIn('f"mansci-app-logs-{user_id}"', source)
+        self.assertNotIn('/ "mansci-app-logs"', source)
+
     def test_named_frameworks_are_required_by_the_installer(self):
         installer = (ROOT / "installer/install.py").read_text()
         for module in ("streamlit", "gradio", "dash", "flask"):

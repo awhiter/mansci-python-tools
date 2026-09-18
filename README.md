@@ -13,6 +13,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - A shared Conda environment named `mansci-python`, using Python 3.13.
 - NumPy, pandas, SciPy, Statsmodels, Matplotlib, scikit-learn, SymPy, openpyxl, NetworkX, Seaborn and Requests.
 - A GenAI challenge toolkit including Streamlit, Flask, Dash, Plotly, OpenAI, ipywidgets, Voilà, Gradio, PuLP, Altair, Pydantic, dotenv, Pillow, Beautiful Soup, Folium, geopy, Joblib, Faker, python-docx, ReportLab and qrcode.
+- Authenticated VM phone previews: `run_app()` displays a QR code for the student's own proxied application without putting credentials in the URL. Local installations remain loopback-only.
 - One **Management Science Python** Jupyter kernel.
 - One shared coding home: `Documents/ManSci Code`.
 - Spyder with an isolated Light/Spyder configuration.

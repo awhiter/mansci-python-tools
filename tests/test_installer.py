@@ -21,7 +21,7 @@ class InstallerTests(unittest.TestCase):
             'jupyter_server_proxy', 'mansci_tools',
         }
         self.assertTrue(required.issubset(set(m.PACKAGES)))
-        self.assertEqual(m.CORE_VERSION, '2026.09.17.1')
+        self.assertEqual(m.CORE_VERSION, '2026.09.18.1')
 
     def test_dash_labextension_is_disabled_without_a_build(self):
         with patch.object(m, 'run') as run:

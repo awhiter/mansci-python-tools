@@ -1,3 +1,11 @@
+# 2026.09.18.1 — Authenticated VM phone previews / staff testing
+
+On the JupyterHub VM, `mansci_tools.run_app()` now displays a full authenticated HTTPS link and QR code for opening a student's prototype on their phone. The code contains no password or access token. The phone uses the student's normal ManSci VM sign-in, and the app remains available only while the VM server and application process run.
+
+Local ManSci installations remain bound to loopback and do not display a phone QR code. Persona guidance, user documentation, external-chat context and Scenario Week teaching assets distinguish the VM workflow from local use and prohibit public tunnels, token-bearing links and external binding. Tests verify that phone URLs require both JupyterHub context and an HTTPS public base URL.
+
+Application logs now use a private per-user temporary directory. This prevents the first VM account that launches an app from making the shared log folder unwritable for other students.
+
 # 2026.09.17.2 — Verified persona guidance and enrolment reporting / staff testing
 
 Adds authorised read-only `mansci-enrol MODULE --list` and `mansci-enrol MODULE --count` commands to the JupyterHub VM, with matching built-in help and module-lead guidance. This replaces the need to inspect the protected enrolment record directly.

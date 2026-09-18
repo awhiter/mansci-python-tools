@@ -68,3 +68,5 @@ Linux user accounts, enrolment-specific folders, centrally managed teaching mate
 ## Files and application launching
 
 The ManSci Learning Assistant can locate and read saved text and `.py` files within the visible Jupyter workspace. An open editor tab is not automatically attached to chat, and unsaved changes must be saved first. It should provide a notebook or IPython-console route first: `%run` for ordinary scripts and `mansci_tools.run_app(...)` for supported server applications. It then gives the conventional terminal command as supplementary learning.
+
+On the JupyterHub VM, `run_app()` also displays an authenticated phone link and QR code. The student signs into the VM on the phone if asked; the code contains no credential, and the app remains available only while the VM server and app process run. Staff Lab and other local installations remain loopback-only and therefore do not display a phone QR code.

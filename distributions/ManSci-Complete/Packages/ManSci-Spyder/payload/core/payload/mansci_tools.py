@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import atexit
+import base64
+from html import escape
 import importlib.util
+from io import BytesIO
 import os
 from pathlib import Path
 import runpy
@@ -116,13 +119,57 @@ def _url(port: int) -> str:
     return f"/proxy/{port}/"
 
 
-def _display_link(url: str, path: Path, kind: str) -> None:
+def _phone_url(url: str) -> str | None:
+    """Return the authenticated external VM URL, never a local loopback URL."""
+    if not os.environ.get("JUPYTERHUB_SERVICE_PREFIX"):
+        return None
+    base = os.environ.get("MANSCI_PUBLIC_BASE_URL", "").strip().rstrip("/")
+    if not base.startswith("https://"):
+        return None
+    return base + url
+
+
+def _qr_data_uri(url: str) -> str:
+    import qrcode
+    image = qrcode.make(url)
+    data = BytesIO()
+    image.save(data, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(data.getvalue()).decode("ascii")
+
+
+def _display_link(url: str, path: Path, kind: str, phone_url: str | None = None) -> None:
     try:
         from IPython.display import HTML, display
         label = f"Open {kind.title()} app: {path.name}"
-        display(HTML(f'<p><a href="{quote(url, safe=":/?=&%")}" target="_blank"><strong>{label}</strong></a></p>'))
+        parts = [
+            '<div style="border:1px solid #d9d9d9;border-radius:8px;padding:14px;max-width:680px">',
+            f'<p style="margin-top:0"><a href="{quote(url, safe=":/?=&%")}" target="_blank"><strong>{escape(label)}</strong></a></p>',
+        ]
+        if phone_url:
+            safe_phone_url = escape(phone_url, quote=True)
+            try:
+                qr = _qr_data_uri(phone_url)
+                parts.append(
+                    f'<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">'
+                    f'<img src="{qr}" alt="QR code for the authenticated phone preview" '
+                    f'style="width:180px;height:180px;image-rendering:pixelated">'
+                    f'<div><strong>Open on your phone</strong><p>Scan this code, then sign into the ManSci VM '
+                    f'with your own account if asked.</p><p><a href="{safe_phone_url}" target="_blank">'
+                    f'{safe_phone_url}</a></p><p>The link contains no password or access token. The app remains '
+                    f'available only while your VM server and this app process are running.</p></div></div>'
+                )
+            except Exception:
+                parts.append(
+                    f'<p><strong>Open on your phone:</strong> <a href="{safe_phone_url}" target="_blank">'
+                    f'{safe_phone_url}</a></p><p>Sign into the ManSci VM with your own account if asked.</p>'
+                )
+        parts.append('</div>')
+        display(HTML("".join(parts)))
     except Exception:
         print("Open:", url)
+        if phone_url:
+            print("Open on your phone:", phone_url)
+            print("Sign into the ManSci VM with your own account if asked.")
 
 
 def _app_command(path: Path, kind: str, port: int) -> list[str]:
@@ -164,8 +211,11 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
     env = dict(os.environ, MANSCI_APP_PORT=str(app_port), PORT=str(app_port),
                GRADIO_SERVER_PORT=str(app_port), GRADIO_SERVER_NAME="127.0.0.1")
     command = _app_command(path, kind, app_port)
-    log_dir = Path(tempfile.gettempdir()) / "mansci-app-logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
+    # A shared fixed folder lets the first VM user prevent other accounts from
+    # writing logs. Keep each user's app logs private and independently writable.
+    user_id = os.getuid() if hasattr(os, "getuid") else os.getpid()
+    log_dir = Path(tempfile.gettempdir()) / f"mansci-app-logs-{user_id}"
+    log_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
     log_path = log_dir / f"{path.stem}-{app_port}.log"
     log = log_path.open("w", encoding="utf-8")
     process = subprocess.Popen(command, cwd=path.parent, env=env, stdin=subprocess.DEVNULL,
@@ -179,11 +229,12 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
         try:
             with socket.create_connection(("127.0.0.1", app_port), timeout=.25):
                 url = _url(app_port)
+                phone_url = _phone_url(url)
                 print(f"Started {kind} from {path.parent}")
-                _display_link(url, path, kind)
+                _display_link(url, path, kind, phone_url)
                 print(f"Stop it later with: stop_app({path.name!r})")
                 return {"file": str(path), "kind": kind, "port": app_port, "url": url,
-                        "pid": process.pid, "log": str(log_path)}
+                        "phone_url": phone_url, "pid": process.pid, "log": str(log_path)}
         except OSError:
             time.sleep(.2)
     if process.poll() is not None:

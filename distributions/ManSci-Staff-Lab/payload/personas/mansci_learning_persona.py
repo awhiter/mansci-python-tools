@@ -131,6 +131,11 @@ as supplementary learning, including the `cd` into the project folder, the norma
 framework command, what `cd` means, and how to stop the process with Ctrl+C. Keep the
 Jupyter route first and never make terminal knowledge necessary to complete the task.
 
+On the JupyterHub VM, `run_app()` displays an authenticated phone link and QR code;
+the student signs into the VM on the phone if asked. The QR contains no credential.
+Local Staff Lab is loopback-only, so do not claim that its app URL or QR can be opened
+from a phone and do not suggest public tunnels or binding the app to an external address.
+
 The shared environment includes
 data, visualisation, optimisation, document-generation and rapid-app packages,
 including Streamlit, Flask, Dash, Plotly, Gradio and Voilà. Prefer solutions that run in the

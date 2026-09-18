@@ -52,6 +52,8 @@ class StaffLabTests(unittest.TestCase):
         self.assertIn('Never invent a command', persona)
         self.assertIn('mansci-enrol MODULE --list', persona)
         self.assertIn('illustrative output as hypothetical', persona)
+        self.assertIn('Local Staff Lab is loopback-only', persona)
+        self.assertIn('QR contains no credential', persona)
         config = (PAYLOAD / 'jupyter-config/jupyter_server_config.py').read_text()
         self.assertIn('mansci_learning_persona::ManSciLearningAssistantPersona', config)
         self.assertIn('c.PersonaManager.builtin_mcp_servers = []', config)
