@@ -1,3 +1,9 @@
+# 2026.09.18.4 — Classroom sharing authorization and browser-session correction / staff testing
+
+Fixes the 403 responses that prevented ordinary notebook servers from registering classroom shares and prevented other signed-in VM users from opening them. JupyterHub now grants the sharing service's narrow access scope to standard users and single-user server tokens while retaining their existing default scopes. The service also registers JupyterHub's OAuth callback route, correcting the subsequent 404 after a viewer successfully signed in. Existing active server tokens receive the same scope during deployment, so users do not need to restart their Jupyter servers.
+
+After JupyterHub authenticates a viewer, the sharing service now uses one short-lived signed session for the app page and all of its assets. This prevents Streamlit's parallel JavaScript and stylesheet requests from each starting a separate OAuth exchange, which previously left the browser with a blank page.
+
 # 2026.09.18.3 — VM classroom app sharing / staff testing
 
 Adds a VM-only authenticated sharing route for applications launched with `run_app()`. The QR code now lets any holder of a valid account on the same ManSci VM sign in with their own credentials and interact with the presenter's running prototype. Shares use opaque temporary identifiers, validate that the loopback application port belongs to the presenting account, contain no credential, and expire when the application stops or becomes stale.

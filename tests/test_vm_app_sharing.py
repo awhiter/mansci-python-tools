@@ -36,6 +36,33 @@ class VmAppSharingTests(unittest.TestCase):
         source = (ROOT / "distributions/ManSci-Core/payload/mansci_tools.py").read_text()
         self.assertNotIn("mansci-app-share", source)
 
+    def test_hub_grants_narrow_service_scope_to_users_and_servers(self):
+        source = (ROOT / "vm/mansci-app-share/jupyterhub-service.py").read_text()
+        self.assertGreaterEqual(
+            source.count('"access:services!service=mansci-app-share"'), 3
+        )
+        self.assertIn('"name": "user"', source)
+        self.assertIn('"name": "server"', source)
+        self.assertIn("c.Spawner.server_token_scopes", source)
+
+    def test_service_registers_jupyterhub_oauth_callback(self):
+        source = (ROOT / "vm/mansci-app-share/service.py").read_text()
+        self.assertIn("HubOAuthCallbackHandler", source)
+        self.assertIn('prefix + r"/oauth_callback"', source)
+
+    def test_classroom_assets_use_one_signed_service_session(self):
+        source = (ROOT / "vm/mansci-app-share/service.py").read_text()
+        self.assertIn("class ClassroomOAuthCallbackHandler", source)
+        self.assertIn("self.hub_auth.set_cookie(self, token)", source)
+        self.assertLess(
+            source.index("CLASSROOM_COOKIE,", source.index("class ClassroomOAuthCallbackHandler")),
+            source.index("self.redirect(next_url", source.index("class ClassroomOAuthCallbackHandler")),
+        )
+        self.assertIn("class ClassroomHandler(HubOAuthenticated", source)
+        self.assertIn("class ShareHandler(ClassroomHandler)", source)
+        self.assertIn("CLASSROOM_COOKIE", source)
+        self.assertIn('samesite="Lax"', source)
+
 
 if __name__ == "__main__":
     unittest.main()

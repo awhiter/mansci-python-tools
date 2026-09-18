@@ -9,13 +9,14 @@ import re
 import secrets
 import time
 
-from jupyterhub.services.auth import HubOAuthenticated
+from jupyterhub.services.auth import HubOAuthenticated, HubOAuthCallbackHandler
 from tornado import web
 from tornado.ioloop import IOLoop, PeriodicCallback
 
 SERVICE_PREFIX = os.environ.get(
     "JUPYTERHUB_SERVICE_PREFIX", "/services/mansci-app-share/"
 ).rstrip("/") + "/"
+CLASSROOM_COOKIE = "mansci-app-share-session"
 LISTEN_PORT = int(os.environ.get("MANSCI_APP_SHARE_PORT", "8999"))
 MAX_AGE = 12 * 60 * 60
 REGISTRY: dict[str, dict] = {}
@@ -59,6 +60,66 @@ class AuthenticatedHandler(HubOAuthenticated, web.RequestHandler):
     pass
 
 
+class ClassroomOAuthCallbackHandler(HubOAuthCallbackHandler):
+    """Complete standard Hub OAuth, then set the local session before redirect."""
+
+    async def get(self):
+        error = self.get_argument("error", False)
+        if error:
+            raise web.HTTPError(
+                400, self.get_argument("error_description", error)
+            )
+        code = self.get_argument("code", False)
+        if not code:
+            raise web.HTTPError(400, "OAuth callback made without a token")
+        state = self.get_argument("state", None)
+        if state is None:
+            raise web.HTTPError(400, "OAuth state is missing. Try logging in again.")
+        cookie_name = self.hub_auth.get_state_cookie_name(state)
+        cookie_state = self.get_secure_cookie(cookie_name)
+        if cookie_state:
+            self.hub_auth.clear_oauth_state_cookies(self)
+        elif self.current_user:
+            self.hub_auth.clear_oauth_state_cookies(self)
+            self.redirect(self.hub_auth.get_next_url(state))
+            return
+        if isinstance(cookie_state, bytes):
+            cookie_state = cookie_state.decode("ascii", "replace")
+        if state != cookie_state:
+            raise web.HTTPError(403, "OAuth state does not match. Try logging in again.")
+        next_url = self.hub_auth.get_next_url(cookie_state)
+        self.hub_auth.clear_oauth_state(cookie_state)
+        self.hub_auth.clear_oauth_state_cookies(self)
+        token = await self.hub_auth.token_for_code(code, sync=False)
+        session_id = self.hub_auth.get_session_id(self)
+        user = await self.hub_auth.user_for_token(
+            token, session_id=session_id, sync=False
+        )
+        if user is None:
+            raise web.HTTPError(500, "OAuth callback failed to identify a user")
+        self.hub_auth.set_cookie(self, token)
+        self.set_secure_cookie(
+            CLASSROOM_COOKIE,
+            "authenticated",
+            path=SERVICE_PREFIX,
+            secure=True,
+            httponly=True,
+            samesite="Lax",
+            expires_days=0.5,
+        )
+        self.redirect(next_url or self.hub_auth.base_url)
+
+
+class ClassroomHandler(HubOAuthenticated, web.RequestHandler):
+    """Authenticate app assets with the service-local signed session."""
+
+    def get_current_user(self):
+        value = self.get_secure_cookie(CLASSROOM_COOKIE)
+        if not value:
+            return None
+        return {"authenticated": True}
+
+
 class RegisterHandler(AuthenticatedHandler):
     @web.authenticated
     def post(self):
@@ -92,7 +153,7 @@ class UnregisterHandler(AuthenticatedHandler):
         self.set_status(204)
 
 
-class ShareHandler(AuthenticatedHandler):
+class ShareHandler(ClassroomHandler):
     @web.authenticated
     def _serve(self, token: str, remainder: str = ""):
         entry = REGISTRY.get(token)
@@ -128,6 +189,7 @@ def main():
     app = web.Application([
         (r"/api/register", RegisterHandler),
         (r"/api/share/([^/]+)", UnregisterHandler),
+        (prefix + r"/oauth_callback", ClassroomOAuthCallbackHandler),
         (prefix + r"/s/([^/]+)/(.*)", ShareHandler),
     ], cookie_secret=secrets.token_bytes(32))
     app.listen(LISTEN_PORT, address="127.0.0.1")
