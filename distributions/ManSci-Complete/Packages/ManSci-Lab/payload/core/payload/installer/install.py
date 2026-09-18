@@ -11,8 +11,8 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.18.1'
-CORE_VERSION = '2026.09.18.1'  # Bump whenever environment.yml or Core runtime checks change.
+VERSION = '2026.09.18.2'
+CORE_VERSION = '2026.09.18.2'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
     'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn', 'sympy',

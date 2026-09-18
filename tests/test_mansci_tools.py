@@ -4,6 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("mansci_tools_tested", ROOT / "distributions/ManSci-Core/payload/mansci_tools.py")
@@ -47,7 +48,11 @@ class ManSciToolsTests(unittest.TestCase):
             "MANSCI_PUBLIC_BASE_URL": "https://example.test/",
         }, clear=True):
             url = m._phone_url("/user/student1/proxy/8123/")
-        self.assertEqual(url, "https://example.test/user/student1/proxy/8123/")
+        self.assertEqual(
+            url,
+            "https://example.test/hub/login?next=%2Fuser%2Fstudent1%2Fproxy%2F8123%2F",
+        )
+        self.assertEqual(parse_qs(urlsplit(url).query)["next"], ["/user/student1/proxy/8123/"])
         self.assertNotIn("token", url)
         with patch.dict(os.environ, {"MANSCI_PUBLIC_BASE_URL": "https://example.test"}, clear=True):
             self.assertIsNone(m._phone_url("/proxy/8123/"))

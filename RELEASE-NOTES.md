@@ -1,3 +1,9 @@
+# 2026.09.18.2 — Preserve phone prototype route through sign-in / staff testing
+
+Fixes the VM phone QR route introduced in 2026.09.18.1. A phone without an existing JupyterHub session could complete sign-in and then open the full JupyterLab interface because the application proxy destination was lost during authentication. The QR code now enters through JupyterHub's login handler and carries the exact per-user proxy path as its encoded post-login destination.
+
+The normal notebook link remains unchanged for the already-authenticated desktop session. Phone access still requires the student's own VM sign-in, contains no password or access token, and lasts only while the student's server and app process are running.
+
 # 2026.09.18.1 — Authenticated VM phone previews / staff testing
 
 On the JupyterHub VM, `mansci_tools.run_app()` now displays a full authenticated HTTPS link and QR code for opening a student's prototype on their phone. The code contains no password or access token. The phone uses the student's normal ManSci VM sign-in, and the app remains available only while the VM server and application process run.

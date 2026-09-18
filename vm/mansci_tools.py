@@ -120,13 +120,17 @@ def _url(port: int) -> str:
 
 
 def _phone_url(url: str) -> str | None:
-    """Return the authenticated external VM URL, never a local loopback URL."""
+    """Return a VM login URL that preserves the app route after authentication."""
     if not os.environ.get("JUPYTERHUB_SERVICE_PREFIX"):
         return None
     base = os.environ.get("MANSCI_PUBLIC_BASE_URL", "").strip().rstrip("/")
     if not base.startswith("https://"):
         return None
-    return base + url
+    # A phone usually has no existing Hub session. Linking straight to the
+    # single-user proxy starts its OAuth flow, which can lose the original app
+    # route and leave a newly authenticated user at JupyterLab. Enter through
+    # the Hub login handler and carry the proxy route explicitly as ``next``.
+    return f"{base}/hub/login?next={quote(url, safe='')}"
 
 
 def _qr_data_uri(url: str) -> str:
