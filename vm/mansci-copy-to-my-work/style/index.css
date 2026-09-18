@@ -1,0 +1,16 @@
+.mansci-teaching-readonly .jp-NotebookPanel-toolbar {
+  border-bottom: 3px solid var(--jp-warn-color1);
+}
+
+.mansci-teaching-readonly .jp-NotebookPanel-toolbar::after {
+  align-self: center;
+  color: var(--jp-warn-color1);
+  content: 'View only — copy to My Work before editing or running';
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.mansci-teaching-readonly .jp-NotebookPanel-toolbar .jp-Toolbar-item:not(.mansci-copy-open-button) {
+  opacity: 0.45;
+  pointer-events: none;
+}

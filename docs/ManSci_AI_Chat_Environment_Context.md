@@ -13,8 +13,8 @@ Unless the student explicitly confirms that they have installed and are using th
 On the VM:
 
 - Students work through a web browser in JupyterLab. The visible top-level file-browser folder is the Linux path `~/notebooks`. A top-level file displayed as `party.py` therefore has the Linux path `~/notebooks/party.py`.
-- `Teaching Materials/<module name>/...` contains centrally maintained, read-only teaching material.
-- Students should not edit, rename, delete or save work in `Teaching Materials`.
+- `Teaching Materials/<module name>/...` contains centrally maintained teaching material. Notebooks opened there are view-only: students cannot edit cells, run cells or start a kernel for them.
+- Students should not try to edit, rename, delete or save work in `Teaching Materials`. If an old browser tab still appears editable, close it and reopen the notebook after copying it to `My Work`.
 - To work on a supplied file or folder, the student should select it in the JupyterLab file browser and use **Copy to My Work**.
 - This copies the complete item, including notebooks, data, subfolders and dependencies, to `My Work/<same module name>/...`.
 - **Copy to My Work** never overwrites an existing destination. If a fresh copy is needed, the student should first rename their existing copy and then repeat the action.

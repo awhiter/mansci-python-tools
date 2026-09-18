@@ -1,3 +1,9 @@
+# 2026.09.18.5 — View-only Teaching Materials notebooks / staff testing
+
+Notebooks opened directly beneath `Teaching Materials` on the JupyterHub VM now display a clear view-only notice, disable editing and execution, prevent a kernel from starting, and provide a prominent **Copy to My Work** action. This stops a student from creating an apparently changed “ghost” notebook in JupyterLab's collaborative in-memory document after the protected source correctly rejects a save.
+
+The underlying teaching file was never altered. JupyterLab's collaboration service retained the student's unsaved document separately from the kernel, so shutting down the kernel did not remove it. The VM now also releases an inactive collaboration document promptly. The affected `student2` server was restarted to clear its existing in-memory copy. Persona and external-chat guidance now describe the enforced workflow. Local ManSci distributions are unchanged because Teaching Materials and Copy to My Work are VM-only features.
+
 # 2026.09.18.4 — Classroom sharing authorization and browser-session correction / staff testing
 
 Fixes the 403 responses that prevented ordinary notebook servers from registering classroom shares and prevented other signed-in VM users from opening them. JupyterHub now grants the sharing service's narrow access scope to standard users and single-user server tokens while retaining their existing default scopes. The service also registers JupyterHub's OAuth callback route, correcting the subsequent 404 after a viewer successfully signed in. Existing active server tokens receive the same scope during deployment, so users do not need to restart their Jupyter servers.
