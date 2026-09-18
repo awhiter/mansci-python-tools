@@ -1,3 +1,9 @@
+# 2026.09.18.6 — Teaching Materials extension activation correction / staff testing
+
+Corrects the deployment of the view-only Teaching Materials extension from 2026.09.18.5. The deployment had retained version 0.1.1 as a backup inside JupyterLab's live extension search directory. JupyterLab treated that backup as another installed copy, selected its old manifest and requested an obsolete JavaScript file that returned 404, so the view-only interface never appeared.
+
+The legacy backup now resides outside JupyterLab's search path. JupyterLab reports version 0.2.0 as enabled and valid, and the `student2` server has been stopped so its next start loads the corrected manifest. The deployment script prevents a legacy backup from causing the same conflict in future. Local ManSci distributions remain unchanged.
+
 # 2026.09.18.5 — View-only Teaching Materials notebooks / staff testing
 
 Notebooks opened directly beneath `Teaching Materials` on the JupyterHub VM now display a clear view-only notice, disable editing and execution, prevent a kernel from starting, and provide a prominent **Copy to My Work** action. This stops a student from creating an apparently changed “ghost” notebook in JupyterLab's collaborative in-memory document after the protected source correctly rejects a save.

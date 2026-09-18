@@ -22,3 +22,9 @@ def test_persona_describes_enforced_copy_workflow():
     persona = (ROOT / "vm/mansci-learning-assistant/persona.py").read_text()
     assert "Notebooks opened there are view-only" in persona
     assert "cannot edit cells, run cells, or start a kernel" in persona
+
+
+def test_installer_keeps_extension_backups_outside_scan_path():
+    installer = (ROOT / "vm/mansci-copy-to-my-work/install-vm.sh").read_text()
+    assert "/var/backups/mansci-jupyterlab-extensions" in installer
+    assert "LEGACY_BACKUP" in installer

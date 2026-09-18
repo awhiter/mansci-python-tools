@@ -5,8 +5,15 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
 SOURCE_DIR=$(cd "$(dirname "$0")" && pwd)
 SITE_PACKAGES=$($ENV_PREFIX/bin/python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
 LABEXT_DIR=$ENV_PREFIX/share/jupyter/labextensions/@mansci/copy-to-my-work
+LEGACY_BACKUP=$ENV_PREFIX/share/jupyter/labextensions/@mansci/copy-to-my-work.backup-0.1.1
 
 install -d "$SITE_PACKAGES/mansci_copy_to_my_work" "$LABEXT_DIR" /etc/jupyter
+# JupyterLab scans every directory beneath an extension scope. A backup left
+# beside the live package can therefore override the current manifest.
+if [[ -d "$LEGACY_BACKUP" ]]; then
+  install -d /var/backups/mansci-jupyterlab-extensions
+  mv "$LEGACY_BACKUP" /var/backups/mansci-jupyterlab-extensions/
+fi
 install -m 0644 "$SOURCE_DIR/mansci_copy_to_my_work/__init__.py" "$SITE_PACKAGES/mansci_copy_to_my_work/__init__.py"
 install -m 0644 "$SOURCE_DIR/mansci_copy_to_my_work/handlers.py" "$SITE_PACKAGES/mansci_copy_to_my_work/handlers.py"
 rm -rf "$LABEXT_DIR/static"

@@ -1,6 +1,6 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.18.5 (VM Teaching Materials notebook protection)**
+Current coordinated release: **2026.09.18.6 (VM Teaching Materials extension activation correction)**
 Shared Python Core: **2026.09.18.2**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
