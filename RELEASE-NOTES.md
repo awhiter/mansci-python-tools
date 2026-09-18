@@ -1,3 +1,9 @@
+# 2026.09.18.3 — VM classroom app sharing / staff testing
+
+Adds a VM-only authenticated sharing route for applications launched with `run_app()`. The QR code now lets any holder of a valid account on the same ManSci VM sign in with their own credentials and interact with the presenter's running prototype. Shares use opaque temporary identifiers, validate that the loopback application port belongs to the presenting account, contain no credential, and expire when the application stops or becomes stale.
+
+The displayed stopping instruction now imports `stop_app` explicitly, so it works even when the original notebook cell imported only `run_app`. Persona and student guidance use the same complete import pattern. Local ManSci distributions and their loopback-only behaviour are unchanged; no local installer release is required.
+
 # 2026.09.18.2 — Preserve phone prototype route through sign-in / staff testing
 
 Fixes the VM phone QR route introduced in 2026.09.18.1. A phone without an existing JupyterHub session could complete sign-in and then open the full JupyterLab interface because the application proxy destination was lost during authentication. The QR code now enters through JupyterHub's login handler and carries the exact per-user proxy path as its encoded post-login destination.

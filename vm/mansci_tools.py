@@ -15,6 +15,7 @@ import sys
 import tempfile
 import time
 from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 __all__ = ["resolve_path", "run_script", "run_app", "stop_app", "app_status"]
 
@@ -28,6 +29,7 @@ APP_MODULES = {
 
 _PROCESSES: dict[str, subprocess.Popen] = {}
 _LOGS: dict[str, Path] = {}
+_SHARES: dict[str, str] = {}
 
 
 def _roots() -> list[Path]:
@@ -133,6 +135,40 @@ def _phone_url(url: str) -> str | None:
     return f"{base}/hub/login?next={quote(url, safe='')}"
 
 
+def _share_request(path: str, *, method: str = "GET", data: dict | None = None) -> dict | None:
+    """Call the VM-only sharing service as the current JupyterHub user."""
+    api_token = os.environ.get("JUPYTERHUB_API_TOKEN", "")
+    if not os.environ.get("JUPYTERHUB_SERVICE_PREFIX") or not api_token:
+        return None
+    body = None if data is None else __import__("json").dumps(data).encode("utf-8")
+    request = Request(
+        "http://127.0.0.1:8999" + path,
+        data=body,
+        method=method,
+        headers={"Authorization": f"token {api_token}", "Content-Type": "application/json"},
+    )
+    with urlopen(request, timeout=4) as response:
+        raw = response.read()
+    return __import__("json").loads(raw) if raw else {}
+
+
+def _register_share(port: int) -> tuple[str | None, str | None]:
+    try:
+        result = _share_request("/api/register", method="POST", data={"port": port})
+        if result and result.get("token") and result.get("path"):
+            return str(result["token"]), str(result["path"])
+    except Exception as exc:
+        print(f"Classroom phone sharing is temporarily unavailable: {exc}")
+    return None, None
+
+
+def _unregister_share(token: str) -> None:
+    try:
+        _share_request(f"/api/share/{quote(token, safe='')}", method="DELETE")
+    except Exception:
+        pass
+
+
 def _qr_data_uri(url: str) -> str:
     import qrcode
     image = qrcode.make(url)
@@ -141,7 +177,13 @@ def _qr_data_uri(url: str) -> str:
     return "data:image/png;base64," + base64.b64encode(data.getvalue()).decode("ascii")
 
 
-def _display_link(url: str, path: Path, kind: str, phone_url: str | None = None) -> None:
+def _display_link(
+    url: str,
+    path: Path,
+    kind: str,
+    phone_url: str | None = None,
+    classroom_shared: bool = False,
+) -> None:
     try:
         from IPython.display import HTML, display
         label = f"Open {kind.title()} app: {path.name}"
@@ -151,14 +193,20 @@ def _display_link(url: str, path: Path, kind: str, phone_url: str | None = None)
         ]
         if phone_url:
             safe_phone_url = escape(phone_url, quote=True)
+            heading = "Share with the class" if classroom_shared else "Open on your phone"
+            guidance = (
+                "Anyone with an account on this ManSci VM can scan this code and sign in with "
+                "their own account."
+                if classroom_shared else
+                "Scan this code, then sign into the ManSci VM with your own account if asked."
+            )
             try:
                 qr = _qr_data_uri(phone_url)
                 parts.append(
                     f'<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">'
                     f'<img src="{qr}" alt="QR code for the authenticated phone preview" '
                     f'style="width:180px;height:180px;image-rendering:pixelated">'
-                    f'<div><strong>Open on your phone</strong><p>Scan this code, then sign into the ManSci VM '
-                    f'with your own account if asked.</p><p><a href="{safe_phone_url}" target="_blank">'
+                    f'<div><strong>{heading}</strong><p>{guidance}</p><p><a href="{safe_phone_url}" target="_blank">'
                     f'{safe_phone_url}</a></p><p>The link contains no password or access token. The app remains '
                     f'available only while your VM server and this app process are running.</p></div></div>'
                 )
@@ -233,12 +281,19 @@ def run_app(file_path: str | os.PathLike, kind: str = "streamlit", *, port: int 
         try:
             with socket.create_connection(("127.0.0.1", app_port), timeout=.25):
                 url = _url(app_port)
-                phone_url = _phone_url(url)
+                share_token, share_path = _register_share(app_port)
+                phone_url = _phone_url(share_path or url)
+                if share_token:
+                    _SHARES[key] = share_token
                 print(f"Started {kind} from {path.parent}")
-                _display_link(url, path, kind, phone_url)
-                print(f"Stop it later with: stop_app({path.name!r})")
+                _display_link(url, path, kind, phone_url, classroom_shared=bool(share_token))
+                print(
+                    "Stop it later with: "
+                    f"from mansci_tools import stop_app; stop_app({path.name!r})"
+                )
                 return {"file": str(path), "kind": kind, "port": app_port, "url": url,
-                        "phone_url": phone_url, "pid": process.pid, "log": str(log_path)}
+                        "phone_url": phone_url, "shared_with_vm_accounts": bool(share_token),
+                        "pid": process.pid, "log": str(log_path)}
         except OSError:
             time.sleep(.2)
     if process.poll() is not None:
@@ -264,6 +319,9 @@ def stop_app(file_path: str | os.PathLike | None = None) -> int:
     keys = list(_PROCESSES) if file_path is None else [str(resolve_path(file_path))]
     stopped = 0
     for key in keys:
+        share_token = _SHARES.pop(key, None)
+        if share_token:
+            _unregister_share(share_token)
         process = _PROCESSES.pop(key, None)
         if process and process.poll() is None:
             process.terminate()
