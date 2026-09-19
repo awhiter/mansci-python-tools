@@ -56,6 +56,11 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] Confirm Qwen Local Chat remains available without Azure and is not configured as a tool-using assistant.
 - [ ] Confirm reset-key and repair-chat support tools operate on the installed support folder.
 - [ ] Compare the VM manifest, student environment.yml, Staff Lab requirements, user guides and Scenario Week environment sheet against DEPLOYMENT-SYNC.md.
+- [ ] On the VM, confirm notebook and text-file RTC providers are disabled and locked; restart a user server with an open browser tab and confirm stale content cannot overwrite the server file.
+- [ ] As a module lead, run a code cell in the restored central teaching notebook and confirm the standard JupyterLab executor starts the Management Science Python kernel normally.
+- [ ] As a module lead, edit and save a central teaching notebook; confirm the previous version appears beneath `/srv/mansci/teaching-backups/<module>/versions` and the saved notebook reopens correctly.
+- [ ] As a student, confirm a Teaching Materials notebook remains view-only and **Copy to My Work** opens an editable conventional notebook in `My Work`.
+- [ ] Confirm the ManSci Learning Assistant can still locate a saved notebook or `.py` file and provide guidance after RTC document providers are disabled.
 
 Do not approve student rollout until relevant platform results are recorded and failures resolved. Do not put credentials or sensitive student data in issue reports.
 

@@ -1,3 +1,13 @@
+# 2026.09.19.1 — Notebook recovery and conventional document saving / staff testing
+
+Responds to a central MSIN0023 notebook being replaced by a stale browser state. The server log showed the module-lead browser reconnecting with “divergent history” at 09:22:41 UTC; one second later the collaborative provider replaced the current notebook with a single blank cell. This was automatic collaboration behaviour rather than an intentional user deletion or save.
+
+The damaged file, uploaded original, central checkpoint and best recovery candidate are preserved in a restricted incident folder. The most recent available copy—32 cells from `student2`'s `My Work`—has been restored. No exact server-side copy of the later 22:57 version survived.
+
+Notebook and text-file collaborative providers are now disabled and locked on the VM. These components arrived transitively with the beta Jupyternaut package used by the ManSci Learning Assistant; they were not required for a teaching collaboration workflow. JupyterLab returns to conventional file saving. Both collaboration packages' server-side cell executors are disabled and JupyterLab's standard executor is explicitly restored, so execution travels directly over the kernel channel without requiring a collaborative document room. Teaching Materials remain view-only for students, while module-lead accounts retain normal editing and execution access to the central source notebooks. The former 15-second collaboration-room setting has been removed. Before a central teaching file is replaced, Jupyter now stores a distinct prior version under `/srv/mansci/teaching-backups`, retaining up to 50 versions per file. Local ManSci distributions remain unchanged pending separate compatibility review of Staff Lab.
+
+The Teaching Materials protection is now applied before JupyterLab begins kernel selection, removing the empty kernel prompt previously shown to students. **Copy to My Work** restores normal kernel preferences on the new notebook and waits for its configured kernel to be ready, so its cells can run immediately without a manual kernel restart.
+
 # 2026.09.18.6 — Teaching Materials extension activation correction / staff testing
 
 Corrects the deployment of the view-only Teaching Materials extension from 2026.09.18.5. The deployment had retained version 0.1.1 as a backup inside JupyterLab's live extension search directory. JupyterLab treated that backup as another installed copy, selected its old manifest and requested an obsolete JavaScript file that returned 404, so the view-only interface never appeared.

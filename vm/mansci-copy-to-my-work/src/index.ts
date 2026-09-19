@@ -10,6 +10,11 @@ import '../style/index.css';
 const COPY_COMMAND = 'mansci:copy-to-my-work';
 const TEACHING_PREFIX = 'Teaching Materials/';
 
+function isModuleLead(): boolean {
+  const match = PageConfig.getBaseUrl().match(/\/user\/([^/]+)\//);
+  return !!match && decodeURIComponent(match[1]).endsWith('_lead');
+}
+
 async function message(title: string, body: string): Promise<void> {
   await showDialog({ title, body, buttons: [Dialog.okButton()] });
 }
@@ -36,14 +41,51 @@ async function copyPath(source: string): Promise<string> {
   return result.destination as string;
 }
 
+async function prepareEditableCopy(panel: NotebookPanel): Promise<void> {
+  const sessionContext = panel.sessionContext as any;
+  sessionContext.kernelPreference = {
+    ...(sessionContext.kernelPreference || {}),
+    canStart: true,
+    shouldStart: true,
+    autoStartDefault: true
+  };
+  await panel.context.ready;
+  if (panel.content.model) {
+    panel.content.model.readOnly = false;
+  }
+  await sessionContext.ready;
+  if (sessionContext.hasNoKernel) {
+    await sessionContext.startKernel();
+  }
+  if (sessionContext.session?.kernel) {
+    await sessionContext.session.kernel.info;
+  }
+}
+
 async function protectTeachingNotebook(
   app: JupyterFrontEnd,
   panel: NotebookPanel
 ): Promise<void> {
-  await panel.context.ready;
   if (!panel.context.path.startsWith(TEACHING_PREFIX)) {
     return;
   }
+  // Module leads own and maintain the centrally managed source material.
+  // The view-only workflow applies to student accounts only.
+  if (isModuleLead()) {
+    return;
+  }
+
+  // Apply this before waiting for the document model. Otherwise JupyterLab can
+  // begin its normal kernel-selection flow while the protected file opens.
+  const sessionContext = panel.sessionContext as any;
+  sessionContext.kernelPreference = {
+    ...(sessionContext.kernelPreference || {}),
+    canStart: false,
+    shouldStart: false,
+    autoStartDefault: false
+  };
+
+  await panel.context.ready;
 
   if (panel.content.model) {
     panel.content.model.readOnly = true;
@@ -52,13 +94,6 @@ async function protectTeachingNotebook(
   panel.title.caption =
     'View-only Teaching Material — use Copy to My Work before editing or running';
 
-  const sessionContext = panel.sessionContext as any;
-  sessionContext.kernelPreference = {
-    ...(sessionContext.kernelPreference || {}),
-    canStart: false,
-    shouldStart: false,
-    autoStartDefault: false
-  };
   await sessionContext.ready;
   if (sessionContext.session) {
     await sessionContext.shutdown();
@@ -70,7 +105,12 @@ async function protectTeachingNotebook(
     onClick: async () => {
       try {
         const destination = await copyPath(panel.context.path);
-        await app.commands.execute('docmanager:open', { path: destination });
+        const copied = await app.commands.execute('docmanager:open', {
+          path: destination
+        });
+        if (copied instanceof NotebookPanel) {
+          await prepareEditableCopy(copied);
+        }
       } catch (error) {
         await message(
           'Copy to My Work',

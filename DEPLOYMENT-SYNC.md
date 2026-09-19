@@ -1,13 +1,13 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.18.6 (VM Teaching Materials extension activation correction)**
+Current coordinated release: **2026.09.19.1 (VM notebook recovery and conventional document saving)**
 Shared Python Core: **2026.09.18.2**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
 
 | Area | Canonical asset | Current relationship |
 |---|---|---|
-| JupyterHub VM Python, operating system and proxy | `mansci-python-server.yml`, `ubuntu-packages.txt`, `nginx-jupyterhub-upload.conf`, `jupyterhub-phone-preview.py`, `mansci-app-share/`, `mansci-enrol/`, `mansci-learning-assistant/`, `mansci-copy-to-my-work/`, `jupyter_server_config.py` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant and the VM `mansci_tools` runner are deployed. Teaching Materials notebooks open in a view-only state and direct students to Copy to My Work. The documented module-lead archive workflow is supported by Ubuntu `unzip`. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. VM `run_app()` output includes an authenticated classroom URL and credential-free QR code usable by any VM account while the app runs. |
+| JupyterHub VM Python, operating system and proxy | `mansci-python-server.yml`, `ubuntu-packages.txt`, `nginx-jupyterhub-upload.conf`, `jupyterhub-phone-preview.py`, `mansci-app-share/`, `mansci-enrol/`, `mansci-learning-assistant/`, `mansci-copy-to-my-work/`, `jupyter_server_config.py`, `disable-rtc-document-providers.sh` and the deployed services | Same student/challenge Python modules as local Core; also includes server Jupyter AI and JupyterHub services. ManSci Learning Assistant and the VM `mansci_tools` runner are deployed. Teaching Materials notebooks open in a view-only state and direct students to Copy to My Work. Notebook and text files use conventional Jupyter saving rather than the unsafe real-time collaborative provider. Central teaching files receive versioned pre-save backups. The documented module-lead archive workflow is supported by Ubuntu `unzip`. The HTTPS proxy permits request bodies up to 250 MB for teaching materials and ordinary course data. VM `run_app()` output includes an authenticated classroom URL and credential-free QR code usable by any VM account while the app runs. |
 | Student local tools | `distributions/ManSci-Core/payload/environment.yml` | Canonical cross-platform Python package set used by Core, Lab, Spyder, VS Code and Complete. |
 | Staff Lab | `distributions/ManSci-Staff-Lab` | Embeds the current Core and adds Azure configuration, ManSci Learning Assistant and VM-compatible portable Jupyter AI components. |
 | GitHub downloads | Six ZIPs plus `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source. |
@@ -27,7 +27,7 @@ Staff Lab and VM: ManSci Learning Assistant and the compatible Jupyter AI tool/r
 
 Both personas require verification of ManSci-specific commands, capabilities and observed results. Unverified claims and illustrative output must be labelled. The VM additionally documents authorised `mansci-enrol MODULE --list` and `--count` operations for module leads.
 
-VM only: JupyterHub accounts, enrolment-specific folders, centrally managed view-only Teaching Materials notebooks and Copy to My Work. The collaboration document cache is released shortly after its last viewer closes it so an unsuccessful save cannot leave a long-lived in-memory version.
+VM only: JupyterHub accounts, enrolment-specific folders, centrally managed view-only Teaching Materials notebooks and Copy to My Work. The notebook and text-file collaborative providers are disabled and locked because a stale browser history can replace a current server file after reconnecting. Conventional saves of central teaching files first preserve the existing file beneath `/srv/mansci/teaching-backups`; up to 50 distinct prior versions are retained per file.
 
 The VM HTTPS server block must include `client_max_body_size 250m;`. Validate the complete Nginx configuration before reloading it. JupyterLab uploads use JSON/base64 encoding, so the maximum original file size is lower than the HTTP request-body limit.
 

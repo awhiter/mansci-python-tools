@@ -20,4 +20,4 @@ rm -rf "$LABEXT_DIR/static"
 cp -a "$SOURCE_DIR/mansci_copy_to_my_work/labextension/." "$LABEXT_DIR/"
 install -m 0644 "$SOURCE_DIR/../jupyter_server_config.py" /etc/jupyter/jupyter_server_config.py
 
-echo "Installed ManSci Copy to My Work 0.2.0. Restart affected user servers to clear existing collaboration rooms."
+echo "Installed ManSci Copy to My Work 0.2.2. Restart affected user servers to load the current access rules."
