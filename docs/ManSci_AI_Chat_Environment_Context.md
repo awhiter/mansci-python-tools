@@ -19,6 +19,9 @@ On the VM:
 - This copies the complete item, including notebooks, data, subfolders and dependencies, to `My Work/<same module name>/...`.
 - **Copy to My Work** never overwrites an existing destination. If a fresh copy is needed, the student should first rename their existing copy and then repeat the action.
 - Students may edit and save normally in `My Work`.
+- `Team Exchange/<module name>/<team name>/...` is the VM's copy-based team file-sharing area. A student uses **Team Exchange: Create, Join or View Team** in JupyterLab to create a named team or join one with its short code. MSIN0023 teams currently allow up to six students, and students can leave and join a different team if allocations change.
+- To contribute work, the student selects one file or folder inside that module's `My Work` folder and uses **Copy to Team Exchange**. The VM creates a dated, sender-labelled snapshot and never overwrites an existing contribution.
+- Team Exchange snapshots are view-only. A student must use **Copy to My Work** before editing or running one. Treat Team Exchange as file exchange, not simultaneous notebook collaboration. Teaching staff can view all teams for their module without occupying a student place.
 - Do not advise a student to use `sudo`, change permissions, alter centrally managed configuration or bypass the copy workflow.
 - Internet access, external websites and external APIs may be restricted or unavailable. Do not assume that an arbitrary API or download can be reached.
 - Never request, expose or embed passwords, API keys, access tokens or other credentials in code, notebooks or chat messages.

@@ -14,6 +14,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - NumPy, pandas, SciPy, Statsmodels, Matplotlib, scikit-learn, SymPy, openpyxl, NetworkX, Seaborn and Requests.
 - A GenAI challenge toolkit including Streamlit, Flask, Dash, Plotly, OpenAI, ipywidgets, Voilà, Gradio, PuLP, Altair, Pydantic, dotenv, Pillow, Beautiful Soup, Folium, geopy, Joblib, Faker, python-docx, ReportLab and qrcode.
 - Authenticated VM classroom previews: `run_app()` displays an opaque QR code that any account on the same ManSci VM can open after signing in. The share contains no credential and expires with the app. Local installations remain loopback-only.
+- VM Team Exchange: students can create or join a named ad hoc team, then copy immutable, sender-labelled snapshots from `My Work` into a shared read-only folder. The MSIN0023 limit is six students; teaching staff have oversight access. Local installations are unchanged.
 - One **Management Science Python** Jupyter kernel.
 - One shared coding home: `Documents/ManSci Code`.
 - Spyder with an isolated Light/Spyder configuration.

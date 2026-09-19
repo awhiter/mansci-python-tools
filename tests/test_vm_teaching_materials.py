@@ -48,3 +48,23 @@ def test_installer_keeps_extension_backups_outside_scan_path():
     installer = (ROOT / "vm/mansci-copy-to-my-work/install-vm.sh").read_text()
     assert "/var/backups/mansci-jupyterlab-extensions" in installer
     assert "LEGACY_BACKUP" in installer
+
+
+def test_team_exchange_is_copy_based_and_vm_only():
+    source = (ROOT / "vm/mansci-copy-to-my-work/src/index.ts").read_text()
+    backend = (ROOT / "vm/mansci-copy-to-my-work/mansci-team-exchange-backend").read_text()
+    installer = (ROOT / "vm/mansci-copy-to-my-work/install-vm.sh").read_text()
+    context = (ROOT / "docs/ManSci_AI_Chat_Environment_Context.md").read_text()
+    assert "Copy to Team Exchange" in source
+    assert "Team Exchange: Create, Join or View Team" in source
+    assert "model.readOnly = true" in source.split("const teamExchange", 1)[1]
+    assert 'MSIN0023|6' in installer
+    assert "__from-{username}__" in backend
+    assert "setfacl" in backend
+    assert "Teaching staff can view all teams" in context
+
+
+def test_small_future_timestamp_skew_is_clamped():
+    source = (ROOT / "vm/mansci-copy-to-my-work/src/index.ts").read_text()
+    assert "correctFutureTimestampLabel" in source
+    assert "next yr." in source

@@ -1,7 +1,7 @@
 {
   "name": "@mansci/copy-to-my-work",
-  "version": "0.2.2",
-  "description": "Copy ManSci teaching materials and enforce view-only teaching notebooks",
+  "version": "0.3.0",
+  "description": "Copy ManSci teaching materials and exchange team snapshots safely",
   "license": "BSD-3-Clause",
   "files": [
     "lib/**/*.js",
@@ -30,7 +30,7 @@
     "extension": true,
     "outputDir": "mansci_copy_to_my_work/labextension",
     "_build": {
-      "load": "static/remoteEntry.67f0a630f6929a68.js",
+      "load": "static/remoteEntry.067c07abe4faf250.js",
       "extension": "./extension"
     }
   },

@@ -229,6 +229,17 @@ System layout you must explain accurately:
   to rename their existing file or folder first, then use **Copy to My Work** again if they want a fresh copy.
 - Students may edit and save normally within `My Work`. Do not advise changing permissions, using sudo,
   bypassing the copy action, or modifying Teaching Materials.
+- `Team Exchange/<module display name>/<team name>/...` is the VM's copy-based team sharing area.
+  A student uses **Team Exchange: Create, Join or View Team** in JupyterLab to create a named team or
+  join one with its short code. For MSIN0023, a team can contain up to six students. Team membership
+  may be changed later by leaving and joining another team. The team name and member list are shown
+  by the same action. Teaching staff can view every team exchange for their module and do not occupy
+  a student place.
+- To share an item, select one file or folder inside that module's `My Work` folder and use **Copy to
+  Team Exchange**. This creates a dated snapshot labelled with the sender; it never overwrites an
+  earlier contribution. Team Exchange snapshots are view-only. To edit or run one, select it and use
+  **Copy to My Work**. This is file exchange, not simultaneous collaborative editing. Do not suggest
+  Linux permissions, direct access to another student's home folder, or live notebook collaboration.
 - Module leads may create and incrementally upload files/folders in their module's Teaching Materials.
 - On this VM, authorised module leads can review current enrolments with
   `mansci-enrol MODULE --list` and obtain the actual count with `mansci-enrol MODULE --count`.

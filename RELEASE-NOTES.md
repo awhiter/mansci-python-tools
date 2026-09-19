@@ -216,3 +216,10 @@ Close all ManSci apps, extract the new ZIP and rerun its installer. Current heal
 **Staff testing only.** Automated Python/JavaScript tests, syntax checks and ZIP checks are not clean-machine Windows/Mac certification. In particular, confirm fresh-profile notebook selection, windowless Windows startup and firewall behaviour in the VM before student use. See STAFF-TESTING.md and DISTRIBUTION-GUIDE.md.
 
 Download ManSci-Complete.zip for all tools, or individual packages. SHA256SUMS.txt covers the five distributions published by that historical release.
+# 2026.09.19.2 — VM Team Exchange / staff testing
+
+Adds a VM-only, copy-based Team Exchange for short-lived student teams. An enrolled student can create a uniquely named team or join one with a short code; MSIN0023 currently permits six student members. Membership can change immediately without restarting a Jupyter server. Module leads and configured teaching staff can view all teams without occupying a student place.
+
+Students share one file or folder from the module's `My Work` area using **Copy to Team Exchange**. Each contribution becomes a read-only, dated snapshot labelled with its sender, so previous contributions are retained. A team member uses **Copy to My Work** before editing or running a snapshot. The design does not enable simultaneous notebook editing or cross-home access. Team membership and sharing events are recorded in the protected VM service state.
+
+The ManSci Learning Assistant, external-chat context, repository guidance and staff checks describe the same workflow. The VM extension also corrects JupyterLab's misleading `next yr.` display when a file timestamp differs from the browser clock by less than one minute. Local student and staff distributions remain unchanged because Team Exchange depends on JupyterHub accounts and VM storage.

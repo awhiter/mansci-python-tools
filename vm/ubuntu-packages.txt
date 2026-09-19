@@ -1,2 +1,3 @@
 # Ubuntu packages required by documented VM workflows.
 unzip
+acl
