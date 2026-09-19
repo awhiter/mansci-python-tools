@@ -58,10 +58,19 @@ def test_team_exchange_is_copy_based_and_vm_only():
     assert "Copy to Team Exchange" in source
     assert "Team Exchange: Create, Join or View Team" in source
     assert "model.readOnly = true" in source.split("const teamExchange", 1)[1]
-    assert 'MSIN0023|6' in installer
+    assert 'DEFAULT|6' in installer
     assert "__from-{username}__" in backend
     assert "setfacl" in backend
+    assert "enrolled(" not in backend
+    assert 'rel.parts[0] == "Teaching Materials"' in backend
     assert "Teaching staff can view all teams" in context
+
+
+def test_live_document_rooms_are_disabled_and_locked():
+    script = (ROOT / "vm/disable-rtc-document-providers.sh").read_text()
+    assert "@jupyter-ai-contrib/server-documents'" in script
+    assert "@jupyter-ai-contrib/live-content'" in script
+    assert "conventional saving" in script
 
 
 def test_small_future_timestamp_skew_is_clamped():

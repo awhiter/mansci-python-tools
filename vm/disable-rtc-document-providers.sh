@@ -9,12 +9,20 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
   '@jupyter/docprovider-extension:yfile' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension disable \
   '@jupyter-ai-contrib/server-documents:server-cell-executor' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension disable \
+  '@jupyter-ai-contrib/server-documents' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension disable \
+  '@jupyter-ai-contrib/live-content' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter/docprovider-extension:ynotebook' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter/docprovider-extension:yfile' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter-ai-contrib/server-documents:server-cell-executor' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension lock \
+  '@jupyter-ai-contrib/server-documents' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension lock \
+  '@jupyter-ai-contrib/live-content' --level=sys_prefix
 
 # The collaboration package disables JupyterLab's normal cell executor because
 # it supplies its own. Restore the normal executor after disabling that
@@ -35,4 +43,4 @@ temporary.chmod(0o644)
 temporary.replace(path)
 PY
 
-echo "Disabled collaborative document providers and restored standard cell execution."
+echo "Disabled collaborative/live document providers and restored conventional saving and cell execution."

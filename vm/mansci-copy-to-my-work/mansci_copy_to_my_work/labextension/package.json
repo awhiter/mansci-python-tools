@@ -1,6 +1,6 @@
 {
   "name": "@mansci/copy-to-my-work",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Copy ManSci teaching materials and exchange team snapshots safely",
   "license": "BSD-3-Clause",
   "files": [
@@ -30,7 +30,7 @@
     "extension": true,
     "outputDir": "mansci_copy_to_my_work/labextension",
     "_build": {
-      "load": "static/remoteEntry.067c07abe4faf250.js",
+      "load": "static/remoteEntry.0f168958a6519455.js",
       "extension": "./extension"
     }
   },

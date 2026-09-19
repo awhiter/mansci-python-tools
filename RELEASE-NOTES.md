@@ -1,3 +1,19 @@
+# 2026.09.19.3 — Cohort-wide Team Exchange and conventional notebook saving / staff testing
+
+Removes module and enrolment concepts from Team Exchange. Any ordinary ManSci student account can create one named team or join one by code, and the configured overall student limit remains six. Existing teams, memberships and shared files are retained. Team folders now appear directly beneath `Team Exchange/<team name>`, while teaching staff retain oversight access without occupying a student place.
+
+**Copy to Team Exchange** is now available for ordinary files and folders anywhere in a student's visible workspace, including its top level and `My Work`; only centrally managed `Teaching Materials` is excluded. Shared snapshots remain read-only and Copy to My Work places an editable copy beneath `My Work/Team Exchange/<team name>`.
+
+Disables and locks the remaining Jupyter AI live/server-document front-end extensions. These had continued to create document rooms and replace JupyterLab's normal save commands even after the standard collaborative providers were disabled. Notebooks now use conventional Jupyter saving throughout. The Learning Assistant retains its saved-workspace file reader but no longer depends on live collaborative document state.
+
+# 2026.09.19.2 — VM Team Exchange / staff testing
+
+Adds a VM-only, copy-based Team Exchange for short-lived student teams. An enrolled student can create a uniquely named team or join one with a short code; MSIN0023 currently permits six student members. Membership can change immediately without restarting a Jupyter server. Module leads and configured teaching staff can view all teams without occupying a student place.
+
+Students share one file or folder from the module's `My Work` area using **Copy to Team Exchange**. Each contribution becomes a read-only, dated snapshot labelled with its sender, so previous contributions are retained. A team member uses **Copy to My Work** before editing or running a snapshot. The design does not enable simultaneous notebook editing or cross-home access. Team membership and sharing events are recorded in the protected VM service state.
+
+The ManSci Learning Assistant, external-chat context, repository guidance and staff checks describe the same workflow. The VM extension also corrects JupyterLab's misleading `next yr.` display when a file timestamp differs from the browser clock by less than one minute. Local student and staff distributions remain unchanged because Team Exchange depends on JupyterHub accounts and VM storage.
+
 # 2026.09.19.1 — Notebook recovery and conventional document saving / staff testing
 
 Responds to a central MSIN0023 notebook being replaced by a stale browser state. The server log showed the module-lead browser reconnecting with “divergent history” at 09:22:41 UTC; one second later the collaborative provider replaced the current notebook with a single blank cell. This was automatic collaboration behaviour rather than an intentional user deletion or save.
@@ -216,10 +232,3 @@ Close all ManSci apps, extract the new ZIP and rerun its installer. Current heal
 **Staff testing only.** Automated Python/JavaScript tests, syntax checks and ZIP checks are not clean-machine Windows/Mac certification. In particular, confirm fresh-profile notebook selection, windowless Windows startup and firewall behaviour in the VM before student use. See STAFF-TESTING.md and DISTRIBUTION-GUIDE.md.
 
 Download ManSci-Complete.zip for all tools, or individual packages. SHA256SUMS.txt covers the five distributions published by that historical release.
-# 2026.09.19.2 — VM Team Exchange / staff testing
-
-Adds a VM-only, copy-based Team Exchange for short-lived student teams. An enrolled student can create a uniquely named team or join one with a short code; MSIN0023 currently permits six student members. Membership can change immediately without restarting a Jupyter server. Module leads and configured teaching staff can view all teams without occupying a student place.
-
-Students share one file or folder from the module's `My Work` area using **Copy to Team Exchange**. Each contribution becomes a read-only, dated snapshot labelled with its sender, so previous contributions are retained. A team member uses **Copy to My Work** before editing or running a snapshot. The design does not enable simultaneous notebook editing or cross-home access. Team membership and sharing events are recorded in the protected VM service state.
-
-The ManSci Learning Assistant, external-chat context, repository guidance and staff checks describe the same workflow. The VM extension also corrects JupyterLab's misleading `next yr.` display when a file timestamp differs from the browser clock by less than one minute. Local student and staff distributions remain unchanged because Team Exchange depends on JupyterHub accounts and VM storage.

@@ -19,8 +19,15 @@ install -m 0644 "$SOURCE_DIR/mansci_copy_to_my_work/handlers.py" "$SITE_PACKAGES
 install -o root -g root -m 0755 "$SOURCE_DIR/mansci-team-exchange-backend" /usr/local/libexec/mansci-team-exchange-backend
 if [[ ! -f /etc/mansci/team-exchange.conf ]]; then
   cat > /etc/mansci/team-exchange.conf <<'EOF'
-# MODULE|MAXIMUM_STUDENT_TEAM_SIZE
-MSIN0023|6
+# DEFAULT|MAXIMUM_STUDENT_TEAM_SIZE
+DEFAULT|6
+EOF
+elif ! grep -q '^DEFAULT|' /etc/mansci/team-exchange.conf; then
+  current_limit=$(awk -F'|' '!/^#/ && NF == 2 {gsub(/[[:space:]]/, "", $2); print $2; exit}' /etc/mansci/team-exchange.conf)
+  current_limit=${current_limit:-6}
+  cat > /etc/mansci/team-exchange.conf <<EOF
+# DEFAULT|MAXIMUM_STUDENT_TEAM_SIZE
+DEFAULT|$current_limit
 EOF
 fi
 chown root:root /etc/mansci/team-exchange.conf
@@ -36,4 +43,4 @@ rm -rf "$LABEXT_DIR/static"
 cp -a "$SOURCE_DIR/mansci_copy_to_my_work/labextension/." "$LABEXT_DIR/"
 install -m 0644 "$SOURCE_DIR/../jupyter_server_config.py" /etc/jupyter/jupyter_server_config.py
 
-echo "Installed ManSci Copy to My Work and Team Exchange 0.3.0. Restart affected user servers to load the current workflow."
+echo "Installed ManSci Copy to My Work and Team Exchange 0.3.1. Restart affected user servers to load the current workflow."

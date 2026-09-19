@@ -29,9 +29,7 @@ interface TeamInfo {
   maximum_members: number;
 }
 
-interface ModuleInfo {
-  code: string;
-  name: string;
+interface TeamStatus {
   role: 'student' | 'staff';
   maximum_members: number;
   team?: TeamInfo | null;
@@ -86,60 +84,37 @@ async function teamRequest(payload?: object): Promise<any> {
   return result;
 }
 
-async function chooseModule(modules: ModuleInfo[]): Promise<ModuleInfo | null> {
-  if (modules.length === 0) {
-    await message('Team Exchange', 'No eligible module was found for this account.');
-    return null;
-  }
-  if (modules.length === 1) {
-    return modules[0];
-  }
-  const chosen = await InputDialog.getItem({
-    title: 'Choose a module',
-    items: modules.map(item => `${item.code} — ${item.name}`),
-    current: 0
-  });
-  if (!chosen.button.accept) {
-    return null;
-  }
-  return modules.find(item => `${item.code} — ${item.name}` === chosen.value) || null;
-}
-
 function teamSummary(team: TeamInfo): string {
   return `${team.name}\n\nJoin code: ${team.join_code}\nStudents: ${team.members.join(', ') || 'none'}\nPlaces: ${team.member_count}/${team.maximum_members}`;
 }
 
 async function manageTeamExchange(browserFactory: IFileBrowserFactory): Promise<void> {
   try {
-    const status = await teamRequest();
-    const module = await chooseModule(status.modules as ModuleInfo[]);
-    if (!module) {
-      return;
-    }
-    if (module.role === 'staff') {
-      const teams = module.teams || [];
+    const status = await teamRequest() as TeamStatus;
+    if (status.role === 'staff') {
+      const teams = status.teams || [];
       await message(
-        `Team Exchange — ${module.code}`,
+        'Team Exchange — staff view',
         teams.length
           ? teams.map(team => teamSummary(team)).join('\n\n———\n\n')
           : 'No student teams have been created yet.'
       );
       return;
     }
-    if (module.team) {
+    if (status.team) {
       const result = await showDialog({
-        title: `Team Exchange — ${module.team.name}`,
-        body: teamSummary(module.team),
+        title: `Team Exchange — ${status.team.name}`,
+        body: teamSummary(status.team),
         buttons: [Dialog.cancelButton({ label: 'Close' }), Dialog.warnButton({ label: 'Leave team' })]
       });
       if (result.button.label === 'Leave team') {
         const confirm = await showDialog({
-          title: `Leave ${module.team.name}?`,
+          title: `Leave ${status.team.name}?`,
           body: 'You will lose access to this Team Exchange. Files you already shared will remain with the team.',
           buttons: [Dialog.cancelButton(), Dialog.warnButton({ label: 'Leave team' })]
         });
         if (confirm.button.label === 'Leave team') {
-          const left = await teamRequest({ action: 'leave', module: module.code });
+          const left = await teamRequest({ action: 'leave' });
           await browserFactory.tracker.currentWidget?.model.refresh();
           await message('Team Exchange', left.message);
         }
@@ -147,8 +122,8 @@ async function manageTeamExchange(browserFactory: IFileBrowserFactory): Promise<
       return;
     }
     const decision = await showDialog({
-      title: `Team Exchange — ${module.code}`,
-      body: `Create a named team or join one using its code. Teams can contain up to ${module.maximum_members} students.`,
+      title: 'Team Exchange',
+      body: `Create a named team or join one using its code. Teams can contain up to ${status.maximum_members} students.`,
       buttons: [
         Dialog.cancelButton(),
         Dialog.createButton({ label: 'Join a team' }),
@@ -162,7 +137,7 @@ async function manageTeamExchange(browserFactory: IFileBrowserFactory): Promise<
         placeholder: 'For example: Decision Dynamics'
       });
       if (entered.button.accept && entered.value) {
-        const created = await teamRequest({ action: 'create', module: module.code, name: entered.value });
+        const created = await teamRequest({ action: 'create', name: entered.value });
         await browserFactory.tracker.currentWidget?.model.refresh();
         await message(`Team Exchange — ${created.team.name}`, teamSummary(created.team));
       }
@@ -173,7 +148,7 @@ async function manageTeamExchange(browserFactory: IFileBrowserFactory): Promise<
         placeholder: 'For example: MAPLE-47'
       });
       if (entered.button.accept && entered.value) {
-        const joined = await teamRequest({ action: 'join', module: module.code, code: entered.value });
+        const joined = await teamRequest({ action: 'join', code: entered.value });
         await browserFactory.tracker.currentWidget?.model.refresh();
         await message(`Joined ${joined.team.name}`, teamSummary(joined.team));
       }
@@ -337,7 +312,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
           return false;
         }
         const selected = Array.from(browser.selectedItems());
-        return selected.length === 1 && selected[0].path.startsWith('My Work/');
+        return selected.length === 1 &&
+          !selected[0].path.startsWith('Teaching Materials/') &&
+          selected[0].path !== 'Teaching Materials';
       },
       execute: async () => {
         const browser = browserFactory.tracker.currentWidget;
@@ -346,22 +323,18 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
         const selected = Array.from(browser.selectedItems());
         if (selected.length !== 1) {
-          return message('Team Exchange', 'Select one file or folder inside My Work.');
+          return message('Team Exchange', 'Select one file or folder in your workspace.');
         }
         try {
-          const status = await teamRequest();
-          const modules = (status.modules as ModuleInfo[]).filter(item =>
-            selected[0].path.startsWith(`My Work/${item.name}/`)
-          );
-          const module = await chooseModule(modules);
-          if (!module || !module.team) {
+          const status = await teamRequest() as TeamStatus;
+          if (!status.team) {
             return message('Team Exchange', 'Create or join a team before sharing work.');
           }
           const result = await teamRequest({
-            action: 'share', module: module.code, source: selected[0].path
+            action: 'share', source: selected[0].path
           });
           await browser.model.refresh();
-          await message(`Team Exchange — ${module.team.name}`, result.message);
+          await message(`Team Exchange — ${status.team.name}`, result.message);
         } catch (error) {
           await message('Team Exchange', error instanceof Error ? error.message : String(error));
         }

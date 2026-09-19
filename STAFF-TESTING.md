@@ -60,8 +60,9 @@ Record release, OS, architecture, VM/native, RAM/disk and log path for each test
 - [ ] As a module lead, run a code cell in the restored central teaching notebook and confirm the standard JupyterLab executor starts the Management Science Python kernel normally.
 - [ ] As a module lead, edit and save a central teaching notebook; confirm the previous version appears beneath `/srv/mansci/teaching-backups/<module>/versions` and the saved notebook reopens correctly.
 - [ ] As a student, confirm a Teaching Materials notebook remains view-only and **Copy to My Work** opens an editable conventional notebook in `My Work`.
-- [ ] On the VM, create a named Team Exchange as one enrolled student, join it by code as another, share a file and folder from `My Work`, and confirm both appear as dated sender-labelled snapshots without overwriting earlier versions.
-- [ ] Confirm Team Exchange snapshots are read-only, **Copy to My Work** creates an editable copy, leaving removes access immediately, the configured student limit is enforced, and authorised teaching staff can view all module teams without counting towards that limit.
+- [ ] On the VM, create a named Team Exchange as one student, join it by code as another, share a top-level notebook and a folder from `My Work`, and confirm both appear as dated sender-labelled snapshots without overwriting earlier versions. Confirm `Teaching Materials` cannot be shared.
+- [ ] Confirm Team Exchange snapshots are read-only, **Copy to My Work** creates an editable copy, leaving removes access immediately, the configured student limit is enforced, and authorised teaching staff can view all teams without counting towards that limit.
+- [ ] Create, edit, save, close and reopen notebooks at the workspace top level and in `My Work`; confirm conventional saves retain cells and outputs and that no `ServerDocsApp` room handles the files.
 - [ ] Confirm the ManSci Learning Assistant can still locate a saved notebook or `.py` file and provide guidance after RTC document providers are disabled.
 
 Do not approve student rollout until relevant platform results are recorded and failures resolved. Do not put credentials or sensitive student data in issue reports.

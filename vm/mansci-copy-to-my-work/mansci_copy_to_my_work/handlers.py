@@ -28,9 +28,9 @@ def destination_for(source: str) -> PurePosixPath:
     if parts[0] == TEACHING:
         module = parts[1]
         remainder = parts[2:]
-    elif parts[0] == TEAM_EXCHANGE and len(parts) >= 4:
-        module = parts[1]
-        remainder = parts[3:]
+    elif parts[0] == TEAM_EXCHANGE and len(parts) >= 3:
+        module = TEAM_EXCHANGE
+        remainder = parts[1:]
     else:
         raise CopyError("Only files and folders beneath Teaching Materials or Team Exchange can be copied.")
     if not module or module in {".", ".."}:
@@ -45,7 +45,7 @@ def copy_item(root: Path, source: str) -> Path:
     source_path = root.joinpath(*relative_source.parts)
     destination = root.joinpath(*relative_destination.parts)
     if relative_source.parts[0] == TEAM_EXCHANGE:
-        source_area = root.joinpath(*relative_source.parts[:3])
+        source_area = root.joinpath(*relative_source.parts[:2])
     else:
         source_area = root.joinpath(*relative_source.parts[:2])
     work_module = root / MY_WORK / relative_source.parts[1]
@@ -56,10 +56,11 @@ def copy_item(root: Path, source: str) -> Path:
         source_path.resolve(strict=True).relative_to(source_area.resolve(strict=True))
     except (OSError, ValueError):
         raise CopyError("The selected item is not valid shared material.")
-    try:
-        work_module.resolve(strict=True).relative_to((root / MY_WORK).resolve(strict=True))
-    except (OSError, ValueError):
-        raise CopyError("The corresponding module folder does not exist in My Work.")
+    if relative_source.parts[0] != TEAM_EXCHANGE:
+        try:
+            work_module.resolve(strict=True).relative_to((root / MY_WORK).resolve(strict=True))
+        except (OSError, ValueError):
+            raise CopyError("The corresponding module folder does not exist in My Work.")
     if os.path.lexists(destination):
         raise FileExistsError(
             f"{relative_destination.name} already exists in My Work. "

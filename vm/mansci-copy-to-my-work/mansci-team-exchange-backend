@@ -1,28 +1,17 @@
 #!/opt/miniforge3/envs/mansci-python/bin/python
 from __future__ import annotations
 
-import fcntl
-import grp
-import json
-import os
-import pwd
-import re
-import secrets
-import shutil
-import sqlite3
-import subprocess
-import sys
-from dataclasses import dataclass
+import fcntl, grp, json, os, pwd, re, secrets, shutil, sqlite3, subprocess, sys
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
 MODULES_FILE = Path("/etc/mansci/modules.conf")
-ENROLMENTS_DIR = Path("/etc/mansci/enrolments")
 CONFIG_FILE = Path("/etc/mansci/team-exchange.conf")
 STATE_ROOT = Path("/srv/mansci/team-exchange")
 FILES_ROOT = STATE_ROOT / "files"
 DATABASE = STATE_ROOT / "teams.sqlite3"
 LOCK_FILE = STATE_ROOT / ".lock"
+GLOBAL_SCOPE = "_GLOBAL"
 MAX_ITEM_BYTES = 500 * 1024 * 1024
 TEAM_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 '&().,_-]{1,39}$")
 WORDS = ("MAPLE", "RIVER", "ORBIT", "CEDAR", "EMBER", "CORAL", "NOVA", "WILLOW")
@@ -32,162 +21,108 @@ class TeamError(RuntimeError):
     pass
 
 
-@dataclass(frozen=True)
-class Module:
-    code: str
-    directory: str
-    display_name: str
-    staff_group: str
-    lead_account: str
-
-
-def modules() -> dict[str, Module]:
-    result = {}
-    for raw in MODULES_FILE.read_text(encoding="utf-8").splitlines():
-        if not raw.strip() or raw.lstrip().startswith("#"):
-            continue
-        fields = [field.strip() for field in raw.split("|")]
-        if len(fields) == 5 and all(fields):
-            module = Module(*fields)
-            result[module.code.upper()] = module
-    return result
-
-
-def limits() -> dict[str, int]:
-    result = {}
-    try:
-        lines = CONFIG_FILE.read_text(encoding="utf-8").splitlines()
-    except FileNotFoundError:
-        return result
-    for raw in lines:
-        if not raw.strip() or raw.lstrip().startswith("#"):
-            continue
-        code, value = [part.strip() for part in raw.split("|", 1)]
-        size = int(value)
-        if size < 2 or size > 30:
-            raise TeamError(f"Invalid team limit for {code}.")
-        result[code.upper()] = size
-    return result
-
-
-def caller() -> str:
-    username = os.environ.get("SUDO_USER", "")
-    if not username or username == "root":
-        raise TeamError("Team Exchange must be used from an authenticated ManSci account.")
-    account = pwd.getpwnam(username)
-    if account.pw_uid < 1000:
-        raise TeamError("System accounts cannot use Team Exchange.")
-    return username
-
-
-def enrolled(username: str, module: Module) -> bool:
-    path = ENROLMENTS_DIR / f"{module.code.lower()}_students.txt"
-    try:
-        return username in {
-            line.strip() for line in path.read_text(encoding="utf-8").splitlines()
-            if line.strip() and not line.lstrip().startswith("#")
-        }
-    except FileNotFoundError:
-        return False
-
-
-def staff_users(module: Module) -> set[str]:
-    users = {module.lead_account}
-    try:
-        users.update(grp.getgrnam(module.staff_group).gr_mem)
-    except KeyError:
-        pass
-    return {
-        name for name in users
-        if name and _account(name) is not None
-        and (Path(pwd.getpwnam(name).pw_dir) / "notebooks").is_dir()
-    }
-
-
-def _account(username: str):
+def account(username):
     try:
         return pwd.getpwnam(username)
     except KeyError:
         return None
 
 
-def is_staff(username: str, module: Module) -> bool:
-    return username in staff_users(module) or username == "mansci-build"
+def caller():
+    username = os.environ.get("SUDO_USER", "")
+    user = account(username)
+    if not username or username == "root" or user is None or user.pw_uid < 1000:
+        raise TeamError("Team Exchange must be used from an authenticated ManSci account.")
+    if not (Path(user.pw_dir) / "notebooks").is_dir():
+        raise TeamError("This account does not have a ManSci workspace.")
+    return username
 
 
-def connect() -> sqlite3.Connection:
+def staff_users():
+    users = {"mansci-build"}
+    try:
+        lines = MODULES_FILE.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        lines = []
+    for raw in lines:
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        fields = [field.strip() for field in raw.split("|")]
+        if len(fields) != 5:
+            continue
+        users.add(fields[4])
+        try:
+            users.update(grp.getgrnam(fields[3]).gr_mem)
+        except KeyError:
+            pass
+    return {name for name in users if account(name) is not None and
+            (Path(pwd.getpwnam(name).pw_dir) / "notebooks").is_dir()}
+
+
+def is_staff(username):
+    return username in staff_users()
+
+
+def maximum_members():
+    values = {}
+    try:
+        lines = CONFIG_FILE.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return 6
+    for raw in lines:
+        if not raw.strip() or raw.lstrip().startswith("#"):
+            continue
+        key, value = [part.strip() for part in raw.split("|", 1)]
+        size = int(value)
+        if size < 2 or size > 30:
+            raise TeamError(f"Invalid Team Exchange limit for {key}.")
+        values[key.upper()] = size
+    return values.get("DEFAULT", next(iter(values.values()), 6))
+
+
+def connect():
     db = sqlite3.connect(DATABASE)
     os.chmod(DATABASE, 0o600)
     db.row_factory = sqlite3.Row
     db.execute("PRAGMA foreign_keys=ON")
     db.executescript("""
         CREATE TABLE IF NOT EXISTS teams (
-            id INTEGER PRIMARY KEY,
-            module TEXT NOT NULL,
-            name TEXT NOT NULL,
-            name_key TEXT NOT NULL,
-            join_code TEXT NOT NULL UNIQUE,
-            created_by TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            UNIQUE(module, name_key)
-        );
+            id INTEGER PRIMARY KEY, module TEXT NOT NULL, name TEXT NOT NULL,
+            name_key TEXT NOT NULL, join_code TEXT NOT NULL UNIQUE,
+            created_by TEXT NOT NULL, created_at TEXT NOT NULL,
+            UNIQUE(module, name_key));
         CREATE TABLE IF NOT EXISTS members (
-            module TEXT NOT NULL,
-            username TEXT NOT NULL,
+            module TEXT NOT NULL, username TEXT NOT NULL,
             team_id INTEGER NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-            joined_at TEXT NOT NULL,
-            PRIMARY KEY(module, username)
-        );
+            joined_at TEXT NOT NULL, PRIMARY KEY(module, username));
         CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY,
-            occurred_at TEXT NOT NULL,
-            module TEXT NOT NULL,
-            team_id INTEGER,
-            username TEXT NOT NULL,
-            action TEXT NOT NULL,
-            detail TEXT NOT NULL
-        );
+            id INTEGER PRIMARY KEY, occurred_at TEXT NOT NULL, module TEXT NOT NULL,
+            team_id INTEGER, username TEXT NOT NULL, action TEXT NOT NULL,
+            detail TEXT NOT NULL);
     """)
     return db
 
 
-def now() -> str:
+def now():
     return datetime.now(timezone.utc).isoformat()
 
 
-def event(db, module, team_id, username, action, detail=""):
-    db.execute(
-        "INSERT INTO events(occurred_at,module,team_id,username,action,detail) VALUES(?,?,?,?,?,?)",
-        (now(), module.code, team_id, username, action, detail),
-    )
+def event(db, team, username, action, detail=""):
+    db.execute("INSERT INTO events(occurred_at,module,team_id,username,action,detail) VALUES(?,?,?,?,?,?)",
+               (now(), team["module"], team["id"], username, action, detail))
 
 
-def module_for(code: str) -> Module:
-    try:
-        module = modules()[str(code).upper()]
-    except KeyError:
-        raise TeamError("Unknown module.")
-    return module
+def team_dir(team):
+    return FILES_ROOT / team["module"].lower() / f"team-{team['id']}"
 
 
-def require_module_access(username: str, module: Module):
-    if not enrolled(username, module) and not is_staff(username, module):
-        raise TeamError(f"{username} is not enrolled on or authorised for {module.code}.")
+def exchange_dir(username):
+    return Path(pwd.getpwnam(username).pw_dir) / "notebooks/Team Exchange"
 
 
-def team_dir(module: Module, team_id: int) -> Path:
-    return FILES_ROOT / module.code.lower() / f"team-{team_id}"
-
-
-def safe_link_name(name: str) -> str:
-    return name.replace("/", "-")
-
-
-def exchange_module_dir(username: str, module: Module) -> Path:
-    return Path(pwd.getpwnam(username).pw_dir) / "notebooks/Team Exchange" / module.display_name
-
-
-def apply_acl(path: Path, username: str, add: bool):
+def apply_acl(path, username, add):
+    if not path.exists():
+        return
     if add:
         subprocess.run(["setfacl", "-R", "-m", f"u:{username}:r-X", str(path)], check=True)
         directories = [path, *[p for p in path.rglob("*") if p.is_dir()]] if path.is_dir() else []
@@ -195,55 +130,50 @@ def apply_acl(path: Path, username: str, add: bool):
             subprocess.run(["setfacl", "-m", f"d:u:{username}:r-X", str(directory)], check=True)
     else:
         subprocess.run(["setfacl", "-R", "-x", f"u:{username}", str(path)], check=False)
-        for directory in [path, *[p for p in path.rglob("*") if p.is_dir()]]:
+        directories = [path, *[p for p in path.rglob("*") if p.is_dir()]] if path.is_dir() else []
+        for directory in directories:
             subprocess.run(["setfacl", "-x", f"d:u:{username}", str(directory)], check=False)
 
 
-def add_link(username: str, module: Module, team: sqlite3.Row):
-    account = pwd.getpwnam(username)
-    parent = exchange_module_dir(username, module)
-    parent.mkdir(parents=True, exist_ok=True)
-    os.chown(parent.parent, account.pw_uid, account.pw_gid)
-    os.chown(parent, account.pw_uid, account.pw_gid)
-    os.chmod(parent.parent, 0o700)
-    os.chmod(parent, 0o700)
-    link = parent / safe_link_name(team["name"])
-    target = team_dir(module, team["id"])
-    for existing in parent.iterdir():
-        if existing.is_symlink() and existing.resolve(strict=False) == target and existing != link:
-            existing.unlink()
-    if link.is_symlink():
-        if link.resolve(strict=False) != target:
-            raise TeamError(f"Unexpected Team Exchange link at {link}.")
-    elif link.exists():
-        raise TeamError(f"A non-link item already uses the team name {team['name']}.")
-    else:
-        link.symlink_to(target)
-        os.lchown(link, account.pw_uid, account.pw_gid)
-
-
-def remove_links(username: str, module: Module, team_id: int):
-    parent = exchange_module_dir(username, module)
+def remove_team_links(username, target):
+    parent = exchange_dir(username)
     if not parent.is_dir():
         return
-    target = team_dir(module, team_id)
-    for item in parent.iterdir():
+    for item in sorted(parent.rglob("*"), reverse=True):
         if item.is_symlink() and item.resolve(strict=False) == target:
             item.unlink()
+        elif item.is_dir() and not any(item.iterdir()):
+            item.rmdir()
 
 
-def grant_access(username: str, module: Module, team: sqlite3.Row):
-    path = team_dir(module, team["id"])
-    apply_acl(path, username, True)
-    add_link(username, module, team)
+def add_link(username, team):
+    user = pwd.getpwnam(username)
+    parent = exchange_dir(username)
+    parent.mkdir(parents=True, exist_ok=True)
+    os.chown(parent, user.pw_uid, user.pw_gid)
+    os.chmod(parent, 0o700)
+    target = team_dir(team)
+    remove_team_links(username, target)
+    link = parent / team["name"].replace("/", "-")
+    if link.exists() or link.is_symlink():
+        if not link.is_symlink() or link.resolve(strict=False) != target:
+            raise TeamError(f"An item already uses the Team Exchange name {team['name']}.")
+    else:
+        link.symlink_to(target)
+        os.lchown(link, user.pw_uid, user.pw_gid)
 
 
-def revoke_access(username: str, module: Module, team: sqlite3.Row):
-    remove_links(username, module, team["id"])
-    apply_acl(team_dir(module, team["id"]), username, False)
+def grant_access(username, team):
+    apply_acl(team_dir(team), username, True)
+    add_link(username, team)
 
 
-def create_code(db) -> str:
+def revoke_access(username, team):
+    remove_team_links(username, team_dir(team))
+    apply_acl(team_dir(team), username, False)
+
+
+def create_code(db):
     for _ in range(100):
         code = f"{secrets.choice(WORDS)}-{secrets.randbelow(90) + 10}"
         if not db.execute("SELECT 1 FROM teams WHERE join_code=?", (code,)).fetchone():
@@ -251,200 +181,153 @@ def create_code(db) -> str:
     raise TeamError("Could not allocate a join code. Please try again.")
 
 
-def public_team(db, module: Module, team: sqlite3.Row, include_code=True):
+def public_team(db, team):
     members = [row[0] for row in db.execute(
-        "SELECT username FROM members WHERE team_id=? ORDER BY joined_at, username", (team["id"],)
-    )]
-    result = {
-        "id": team["id"], "module": module.code, "module_name": module.display_name,
-        "name": team["name"], "members": members, "member_count": len(members),
-        "maximum_members": limits().get(module.code, 6),
-    }
-    if include_code:
-        result["join_code"] = team["join_code"]
-    return result
+        "SELECT username FROM members WHERE team_id=? ORDER BY joined_at, username", (team["id"],))]
+    return {"id": team["id"], "name": team["name"], "join_code": team["join_code"],
+            "members": members, "member_count": len(members),
+            "maximum_members": maximum_members()}
 
 
-def status(db, username: str, payload: dict):
-    result = []
-    for module in modules().values():
-        if not enrolled(username, module) and not is_staff(username, module):
-            continue
-        if is_staff(username, module):
-            rows = list(db.execute(
-                "SELECT * FROM teams WHERE module=? ORDER BY name_key", (module.code,)
-            ))
-            # Reconcile access here as well as at team creation so a newly added
-            # member of teaching staff can see existing exchanges immediately.
-            for row in rows:
-                grant_access(username, module, row)
-            teams = [public_team(db, module, row) for row in rows]
-            result.append({
-                "code": module.code, "name": module.display_name, "role": "staff",
-                "maximum_members": limits().get(module.code, 6), "teams": teams,
-            })
-        else:
-            team = db.execute(
-                "SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id WHERE m.module=? AND m.username=?",
-                (module.code, username),
-            ).fetchone()
-            result.append({
-                "code": module.code, "name": module.display_name, "role": "student",
-                "maximum_members": limits().get(module.code, 6),
-                "team": public_team(db, module, team) if team else None,
-            })
-    return {"modules": result}
+def status(db, username, payload):
+    teams = list(db.execute("SELECT * FROM teams ORDER BY name_key, id"))
+    if is_staff(username):
+        for team in teams:
+            grant_access(username, team)
+        return {"role": "staff", "maximum_members": maximum_members(),
+                "teams": [public_team(db, team) for team in teams]}
+    team = db.execute("SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id "
+                      "WHERE m.username=? ORDER BY m.joined_at LIMIT 1", (username,)).fetchone()
+    if team:
+        grant_access(username, team)
+    return {"role": "student", "maximum_members": maximum_members(),
+            "team": public_team(db, team) if team else None}
 
 
-def create_team(db, username: str, payload: dict):
-    module = module_for(payload.get("module", ""))
-    require_module_access(username, module)
-    if is_staff(username, module):
-        raise TeamError("Teaching staff do not create student teams.")
+def create_team(db, username, payload):
+    if is_staff(username):
+        raise TeamError("Teaching staff have oversight access and do not create student teams.")
     name = " ".join(str(payload.get("name", "")).split())
     if not TEAM_NAME_RE.fullmatch(name):
         raise TeamError("Use a team name of 2–40 letters, numbers, spaces or simple punctuation.")
-    if db.execute("SELECT 1 FROM members WHERE module=? AND username=?", (module.code, username)).fetchone():
-        raise TeamError("You already belong to a team for this module.")
-    code = create_code(db)
-    try:
-        cursor = db.execute(
-            "INSERT INTO teams(module,name,name_key,join_code,created_by,created_at) VALUES(?,?,?,?,?,?)",
-            (module.code, name, name.casefold(), code, username, now()),
-        )
-    except sqlite3.IntegrityError:
-        raise TeamError("That team name is already in use for this module.")
+    if db.execute("SELECT 1 FROM members WHERE username=?", (username,)).fetchone():
+        raise TeamError("You already belong to a team.")
+    if db.execute("SELECT 1 FROM teams WHERE name_key=?", (name.casefold(),)).fetchone():
+        raise TeamError("That team name is already in use.")
+    cursor = db.execute("INSERT INTO teams(module,name,name_key,join_code,created_by,created_at) "
+                        "VALUES(?,?,?,?,?,?)",
+                        (GLOBAL_SCOPE, name, name.casefold(), create_code(db), username, now()))
     team_id = cursor.lastrowid
-    db.execute("INSERT INTO members VALUES(?,?,?,?)", (module.code, username, team_id, now()))
-    path = team_dir(module, team_id)
+    db.execute("INSERT INTO members VALUES(?,?,?,?)", (GLOBAL_SCOPE, username, team_id, now()))
+    team = db.execute("SELECT * FROM teams WHERE id=?", (team_id,)).fetchone()
+    path = team_dir(team)
     path.mkdir(parents=True)
     os.chmod(path.parent, 0o711)
     os.chmod(path, 0o700)
-    team = db.execute("SELECT * FROM teams WHERE id=?", (team_id,)).fetchone()
-    for staff in staff_users(module):
-        grant_access(staff, module, team)
-    grant_access(username, module, team)
-    event(db, module, team_id, username, "create", name)
-    return {"team": public_team(db, module, team)}
+    for staff in staff_users():
+        grant_access(staff, team)
+    grant_access(username, team)
+    event(db, team, username, "create", name)
+    return {"team": public_team(db, team)}
 
 
-def join_team(db, username: str, payload: dict):
-    module = module_for(payload.get("module", ""))
-    require_module_access(username, module)
-    if is_staff(username, module):
+def join_team(db, username, payload):
+    if is_staff(username):
         raise TeamError("Teaching staff already have oversight access.")
-    if db.execute("SELECT 1 FROM members WHERE module=? AND username=?", (module.code, username)).fetchone():
+    if db.execute("SELECT 1 FROM members WHERE username=?", (username,)).fetchone():
         raise TeamError("Leave your current team before joining another one.")
-    code = str(payload.get("code", "")).strip().upper()
-    team = db.execute("SELECT * FROM teams WHERE module=? AND join_code=?", (module.code, code)).fetchone()
+    team = db.execute("SELECT * FROM teams WHERE join_code=?",
+                      (str(payload.get("code", "")).strip().upper(),)).fetchone()
     if not team:
-        raise TeamError("That join code is not valid for this module.")
-    maximum = limits().get(module.code, 6)
+        raise TeamError("That join code is not valid.")
     count = db.execute("SELECT COUNT(*) FROM members WHERE team_id=?", (team["id"],)).fetchone()[0]
-    if count >= maximum:
-        raise TeamError(f"{team['name']} already has its maximum of {maximum} students.")
-    db.execute("INSERT INTO members VALUES(?,?,?,?)", (module.code, username, team["id"], now()))
-    grant_access(username, module, team)
-    event(db, module, team["id"], username, "join")
-    return {"team": public_team(db, module, team)}
+    if count >= maximum_members():
+        raise TeamError(f"{team['name']} already has its maximum of {maximum_members()} students.")
+    db.execute("INSERT INTO members VALUES(?,?,?,?)", (team["module"], username, team["id"], now()))
+    grant_access(username, team)
+    event(db, team, username, "join")
+    return {"team": public_team(db, team)}
 
 
-def leave_team(db, username: str, payload: dict):
-    module = module_for(payload.get("module", ""))
-    require_module_access(username, module)
-    row = db.execute(
-        "SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id WHERE m.module=? AND m.username=?",
-        (module.code, username),
-    ).fetchone()
-    if not row:
-        raise TeamError("You do not currently belong to a team for this module.")
-    db.execute("DELETE FROM members WHERE module=? AND username=?", (module.code, username))
-    revoke_access(username, module, row)
-    event(db, module, row["id"], username, "leave")
-    return {"message": f"You have left {row['name']}. Shared snapshots remain with the team."}
+def leave_team(db, username, payload):
+    team = db.execute("SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id "
+                      "WHERE m.username=? ORDER BY m.joined_at LIMIT 1", (username,)).fetchone()
+    if not team:
+        raise TeamError("You do not currently belong to a team.")
+    db.execute("DELETE FROM members WHERE username=?", (username,))
+    revoke_access(username, team)
+    event(db, team, username, "leave")
+    return {"message": f"You have left {team['name']}. Shared snapshots remain with the team."}
 
 
-def validate_source(username: str, module: Module, source: str) -> Path:
+def validate_source(username, source):
     rel = PurePosixPath(source)
-    prefix = PurePosixPath("My Work", module.display_name)
-    if rel.is_absolute() or ".." in rel.parts or tuple(rel.parts[:2]) != prefix.parts or len(rel.parts) < 3:
-        raise TeamError(f"Select an item inside My Work/{module.display_name}.")
+    if rel.is_absolute() or ".." in rel.parts or not rel.parts:
+        raise TeamError("Select a file or folder in your JupyterLab workspace.")
+    if rel.parts[0] == "Teaching Materials":
+        raise TeamError("Teaching Materials cannot be copied to Team Exchange.")
     root = Path(pwd.getpwnam(username).pw_dir) / "notebooks"
     candidate = root.joinpath(*rel.parts)
-    if not candidate.exists() or candidate.is_symlink():
-        raise TeamError("The selected item does not exist or is a symbolic link.")
+    if not candidate.exists():
+        raise TeamError("The selected item does not exist.")
+    resolved = candidate.resolve(strict=True)
+    if not (resolved.is_relative_to(root.resolve()) or resolved.is_relative_to(FILES_ROOT.resolve())):
+        raise TeamError("The selected item is outside your ManSci workspace.")
     if candidate.is_dir() and any(path.is_symlink() for path in candidate.rglob("*")):
         raise TeamError("Folders containing symbolic links cannot be shared.")
-    total = sum(path.stat().st_size for path in ([candidate] if candidate.is_file() else candidate.rglob("*")) if path.is_file())
-    if total > MAX_ITEM_BYTES:
+    files = [candidate] if candidate.is_file() else candidate.rglob("*")
+    if sum(path.stat().st_size for path in files if path.is_file()) > MAX_ITEM_BYTES:
         raise TeamError("This item is too large for Team Exchange (maximum 500 MB).")
     return candidate
 
 
-def share(db, username: str, payload: dict):
-    module = module_for(payload.get("module", ""))
-    require_module_access(username, module)
-    team = db.execute(
-        "SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id WHERE m.module=? AND m.username=?",
-        (module.code, username),
-    ).fetchone()
+def share(db, username, payload):
+    team = db.execute("SELECT t.* FROM teams t JOIN members m ON m.team_id=t.id "
+                      "WHERE m.username=? ORDER BY m.joined_at LIMIT 1", (username,)).fetchone()
     if not team:
         raise TeamError("Create or join a team before sharing work.")
-    source = validate_source(username, module, str(payload.get("source", "")))
+    source = validate_source(username, str(payload.get("source", "")))
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     suffix = "".join(source.suffixes) if source.is_file() else ""
     base = source.name[:-len(suffix)] if suffix else source.name
-    name = f"{base}__from-{username}__{stamp}{suffix}"
-    destination = team_dir(module, team["id"]) / name
+    destination = team_dir(team) / f"{base}__from-{username}__{stamp}{suffix}"
     counter = 2
     while destination.exists():
         destination = destination.with_name(f"{base}__from-{username}__{stamp}-{counter}{suffix}")
         counter += 1
-    if source.is_dir():
-        shutil.copytree(source, destination, symlinks=False)
-    else:
-        shutil.copy2(source, destination)
-    for path in [destination, *destination.rglob("*")] if destination.is_dir() else [destination]:
+    shutil.copytree(source, destination, symlinks=False) if source.is_dir() else shutil.copy2(source, destination)
+    paths = [destination, *destination.rglob("*")] if destination.is_dir() else [destination]
+    for path in paths:
         os.chown(path, 0, 0)
         os.chmod(path, 0o500 if path.is_dir() else 0o400)
-    for member in [row[0] for row in db.execute("SELECT username FROM members WHERE team_id=?", (team["id"],))]:
-        apply_acl(destination, member, True)
-    for staff in staff_users(module):
-        apply_acl(destination, staff, True)
-    event(db, module, team["id"], username, "share", destination.name)
-    return {"message": f"Shared as {destination.name} in Team Exchange — {team['name']}.", "name": destination.name}
+    members = [row[0] for row in db.execute("SELECT username FROM members WHERE team_id=?", (team["id"],))]
+    for viewer in set(members) | staff_users():
+        apply_acl(destination, viewer, True)
+    event(db, team, username, "share", destination.name)
+    return {"message": f"Shared as {destination.name} in Team Exchange — {team['name']}.",
+            "name": destination.name}
 
 
-def main() -> int:
+def main():
     try:
         if os.geteuid() != 0:
             raise TeamError("This protected helper must run through sudo.")
-        username = caller()
-        payload = json.load(sys.stdin)
-        action = payload.get("action", "status")
+        username, payload = caller(), json.load(sys.stdin)
         STATE_ROOT.mkdir(parents=True, exist_ok=True)
         FILES_ROOT.mkdir(parents=True, exist_ok=True)
-        os.chmod(STATE_ROOT, 0o711)
-        os.chmod(FILES_ROOT, 0o711)
+        os.chmod(STATE_ROOT, 0o711); os.chmod(FILES_ROOT, 0o711)
         LOCK_FILE.touch(mode=0o600, exist_ok=True)
         with LOCK_FILE.open("r+") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             with connect() as db:
-                result = {
-                    "status": status,
-                    "create": create_team,
-                    "join": join_team,
-                    "leave": leave_team,
-                    "share": share,
-                }.get(action)
-                if result is None:
+                function = {"status": status, "create": create_team, "join": join_team,
+                            "leave": leave_team, "share": share}.get(payload.get("action", "status"))
+                if function is None:
                     raise TeamError("Unknown Team Exchange action.")
-                response = result(db, username, payload)
-        print(json.dumps(response))
-        return 0
+                response = function(db, username, payload)
+        print(json.dumps(response)); return 0
     except (TeamError, OSError, ValueError, KeyError, sqlite3.Error, subprocess.CalledProcessError) as exc:
-        print(json.dumps({"error": str(exc)}))
-        return 1
+        print(json.dumps({"error": str(exc)})); return 1
 
 
 if __name__ == "__main__":
