@@ -72,7 +72,12 @@ def test_live_document_rooms_are_disabled_and_locked():
     assert "jupyter_server_documents --sys-prefix" in script
     assert "@jupyter-ai-contrib/server-documents'" in script
     assert "@jupyter-ai-contrib/live-content'" in script
-    assert "@jupyter/collaboration-extension'" in script
+    assert "labextension enable" in script
+    assert "@jupyter/collaboration-extension' --level=sys_prefix" in script
+    assert "@jupyter/collaboration-extension:$plugin" in script
+    assert "rtcGlobalAwareness" in script
+    assert "userEditorCursors" in script
+    assert "ICollaborativeContentProvider" in script
     assert "@jupyter/docprovider-extension'" in script
     assert "conventional saving" in script
 

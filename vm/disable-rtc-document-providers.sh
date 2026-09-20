@@ -15,8 +15,26 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
   '@jupyter-ai-contrib/server-documents' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension disable \
   '@jupyter-ai-contrib/live-content' --level=sys_prefix
-"$ENV_PREFIX/bin/jupyter" labextension disable \
+# Jupyter AI chat needs
+# @jupyter/collaboration-extension:ICollaborativeContentProvider.
+# Keep that token available while disabling every collaboration UI feature.
+"$ENV_PREFIX/bin/jupyter" labextension unlock \
+  '@jupyter/collaboration-extension' --level=sys_prefix || true
+"$ENV_PREFIX/bin/jupyter" labextension enable \
   '@jupyter/collaboration-extension' --level=sys_prefix
+for plugin in \
+  rtcGlobalAwareness \
+  rtcPanel \
+  shared-link \
+  user-menu-bar \
+  userEditorCursors \
+  userMenu
+do
+  "$ENV_PREFIX/bin/jupyter" labextension disable \
+    "@jupyter/collaboration-extension:$plugin" --level=sys_prefix
+  "$ENV_PREFIX/bin/jupyter" labextension lock \
+    "@jupyter/collaboration-extension:$plugin" --level=sys_prefix
+done
 "$ENV_PREFIX/bin/jupyter" labextension disable \
   '@jupyter/docprovider-extension' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
@@ -29,8 +47,6 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
   '@jupyter-ai-contrib/server-documents' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter-ai-contrib/live-content' --level=sys_prefix
-"$ENV_PREFIX/bin/jupyter" labextension lock \
-  '@jupyter/collaboration-extension' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter/docprovider-extension' --level=sys_prefix
 

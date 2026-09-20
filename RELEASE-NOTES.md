@@ -1,3 +1,9 @@
+# 2026.09.20.2 — Notebook and chat provider separation / staff testing
+
+Restores the collaboration content-provider token required by the Jupyter AI chat controls while leaving collaborative notebook/document providers disabled. This corrects the blank persona and model selectors introduced by the complete package shutdown in 2026.09.20.1.
+
+Collaboration panels, shared links, global awareness, cursors and user-presence controls remain disabled and locked. Notebooks continue to use conventional loading, saving and cell execution, and the ManSci Learning Assistant is again available in chat.
+
 # 2026.09.20.1 — Complete collaboration shutdown / staff testing
 
 Disables and locks the complete Jupyter Collaboration interface and document-provider extensions on the VM. The previous correction disabled their notebook/text providers and the Jupyter AI live-document provider, but left the surrounding collaboration packages active. Those packages could continue waiting for a document provider, allowing a notebook to appear after a delay while preventing cell execution from reaching an otherwise healthy kernel.
