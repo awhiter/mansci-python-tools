@@ -1,3 +1,9 @@
+# 2026.09.20.1 — Complete collaboration shutdown / staff testing
+
+Disables and locks the complete Jupyter Collaboration interface and document-provider extensions on the VM. The previous correction disabled their notebook/text providers and the Jupyter AI live-document provider, but left the surrounding collaboration packages active. Those packages could continue waiting for a document provider, allowing a notebook to appear after a delay while preventing cell execution from reaching an otherwise healthy kernel.
+
+The VM now uses JupyterLab's conventional document loading, saving and standard notebook executor throughout. Active module-lead and test-student servers are restarted so they cannot retain the previous front-end configuration. Team Exchange remains copy-based and unaffected.
+
 # 2026.09.19.3 — Cohort-wide Team Exchange and conventional notebook saving / staff testing
 
 Removes module and enrolment concepts from Team Exchange. Any ordinary ManSci student account can create one named team or join one by code, and the configured overall student limit remains six. Existing teams, memberships and shared files are retained. Team folders now appear directly beneath `Team Exchange/<team name>`, while teaching staff retain oversight access without occupying a student place.

@@ -68,8 +68,12 @@ def test_team_exchange_is_copy_based_and_vm_only():
 
 def test_live_document_rooms_are_disabled_and_locked():
     script = (ROOT / "vm/disable-rtc-document-providers.sh").read_text()
+    assert "server extension disable" in script
+    assert "jupyter_server_documents --sys-prefix" in script
     assert "@jupyter-ai-contrib/server-documents'" in script
     assert "@jupyter-ai-contrib/live-content'" in script
+    assert "@jupyter/collaboration-extension'" in script
+    assert "@jupyter/docprovider-extension'" in script
     assert "conventional saving" in script
 
 

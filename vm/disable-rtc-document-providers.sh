@@ -3,6 +3,8 @@ set -euo pipefail
 
 ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
 
+"$ENV_PREFIX/bin/jupyter" server extension disable \
+  jupyter_server_documents --sys-prefix
 "$ENV_PREFIX/bin/jupyter" labextension disable \
   '@jupyter/docprovider-extension:ynotebook' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension disable \
@@ -13,6 +15,10 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
   '@jupyter-ai-contrib/server-documents' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension disable \
   '@jupyter-ai-contrib/live-content' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension disable \
+  '@jupyter/collaboration-extension' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension disable \
+  '@jupyter/docprovider-extension' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter/docprovider-extension:ynotebook' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
@@ -23,6 +29,10 @@ ENV_PREFIX=${ENV_PREFIX:-/opt/miniforge3/envs/mansci-python}
   '@jupyter-ai-contrib/server-documents' --level=sys_prefix
 "$ENV_PREFIX/bin/jupyter" labextension lock \
   '@jupyter-ai-contrib/live-content' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension lock \
+  '@jupyter/collaboration-extension' --level=sys_prefix
+"$ENV_PREFIX/bin/jupyter" labextension lock \
+  '@jupyter/docprovider-extension' --level=sys_prefix
 
 # The collaboration package disables JupyterLab's normal cell executor because
 # it supplies its own. Restore the normal executor after disabling that

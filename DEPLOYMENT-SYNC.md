@@ -1,6 +1,6 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.19.3 (cohort-wide Team Exchange and conventional notebook saving / staff testing)**
+Current coordinated release: **2026.09.20.1 (complete collaboration shutdown / staff testing)**
 Shared Python Core: **2026.09.18.2**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
@@ -27,7 +27,7 @@ Staff Lab and VM: ManSci Learning Assistant and the compatible Jupyter AI tool/r
 
 Both personas require verification of ManSci-specific commands, capabilities and observed results. Unverified claims and illustrative output must be labelled. The VM additionally documents authorised `mansci-enrol MODULE --list` and `--count` operations for module leads.
 
-VM only: JupyterHub accounts, enrolment-specific folders, centrally managed view-only Teaching Materials notebooks, Copy to My Work, and cohort-wide Team Exchange. Students create or join named ad hoc teams and exchange immutable, sender-labelled snapshots from any ordinary workspace location except Teaching Materials; staff have read-only oversight access and do not count towards the configured student limit. All collaborative and Jupyter AI live/server-document providers are disabled and locked because stale document-room state can replace a current server file after reconnecting. Conventional saves of central teaching files first preserve the existing file beneath `/srv/mansci/teaching-backups`; up to 50 distinct prior versions are retained per file.
+VM only: JupyterHub accounts, enrolment-specific folders, centrally managed view-only Teaching Materials notebooks, Copy to My Work, and cohort-wide Team Exchange. Students create or join named ad hoc teams and exchange immutable, sender-labelled snapshots from any ordinary workspace location except Teaching Materials; staff have read-only oversight access and do not count towards the configured student limit. The complete Jupyter Collaboration interface/document-provider packages and Jupyter AI live/server-document providers are disabled and locked because partial disabling can leave notebooks unable to load or execute, while stale document-room state can replace a current server file. Conventional saves of central teaching files first preserve the existing file beneath `/srv/mansci/teaching-backups`; up to 50 distinct prior versions are retained per file.
 
 The VM HTTPS server block must include `client_max_body_size 250m;`. Validate the complete Nginx configuration before reloading it. JupyterLab uploads use JSON/base64 encoding, so the maximum original file size is lower than the HTTP request-body limit.
 
