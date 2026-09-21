@@ -37,7 +37,7 @@ class QwenLocalChatPersona(BasePersona):
         remaining = self.MAX_HISTORY_CHARACTERS
         candidates = [
             item
-            for item in self.ychat.get_messages()
+            for item in self.chat.get_messages()
             if not item.deleted
             and item.sender in {current.sender, self.id}
             and item.body.strip()

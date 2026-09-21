@@ -139,7 +139,7 @@ def run():
         def prepare():
             try:
                 workspace = lab.documents_dir(); workspace.mkdir(parents=True, exist_ok=True)
-                lab.install_local_persona(workspace); lab.write_private_kernelspec()
+                lab.write_private_kernelspec()
                 runtime = lab.data_dir() / 'jupyter-runtime'; runtime.mkdir(parents=True, exist_ok=True)
                 threading.Thread(target=lab.start_ollama, daemon=True).start()
                 url = wait_for_server(lab, runtime, workspace, owner.stop)

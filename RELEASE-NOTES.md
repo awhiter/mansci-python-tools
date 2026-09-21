@@ -1,3 +1,9 @@
+# 2026.09.21.5 — Local Qwen persona correction / staff testing
+
+Corrects Qwen Local Chat after the Persona Manager interface changed from `ychat` to `chat`. The repair leaves its Qwen2.5-Coder model, system guidance, 12-message/12,000-character history limits and generation settings unchanged.
+
+Student ManSci Lab now loads personas exclusively from its own installed support folder and offers only **Qwen Local Chat**. It no longer displays the Staff Lab's ManSci Learning Assistant from the shared coding workspace or the Jupyternaut package entry point from the shared Python environment. Staff Lab and the JupyterHub VM retain their existing persona arrangements. Updating ManSci Lab stops its authenticated private server so the corrected registration is active on the next launch.
+
 # 2026.09.21.4 — Restored UCL PowerPoint template / staff testing
 
 Rebuilds both MSIN0023 Scenario Week PowerPoint decks as genuine descendants of the supplied UCL PowerPoint template. The editable files now retain the full UCL master, 42 layouts, theme, UCL Sans references and master logos while preserving the latest content and speaker notes.

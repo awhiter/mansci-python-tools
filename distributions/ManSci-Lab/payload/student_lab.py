@@ -14,7 +14,7 @@ import webbrowser
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 
 APP_NAME = "ManagementSciencePython"
@@ -133,14 +133,6 @@ def write_private_kernelspec() -> None:
     )
 
 
-def install_local_persona(workspace: Path) -> None:
-    source = Path(__file__).resolve().parent / "personas"
-    target = workspace / ".jupyter" / "personas"
-    target.mkdir(parents=True, exist_ok=True)
-    for name in ("qwen_local_persona.py", "qwen-local.svg"):
-        shutil.copy2(source / name, target / name)
-
-
 def running_server_url(runtime: Path, workspace: Path) -> str | None:
     """Reopen this distribution's live server instead of starting a duplicate."""
     for server_file in sorted(runtime.glob("jpserver-*.json"), reverse=True):
@@ -175,6 +167,31 @@ def open_existing_server(runtime: Path, workspace: Path) -> bool:
     return False
 
 
+def stop_private_server() -> None:
+    """Stop this Lab's authenticated local server so updates load immediately."""
+    stopped = False
+    runtime = data_dir() / "jupyter-runtime"
+    for server_file in sorted(runtime.glob("jpserver-*.json")):
+        try:
+            details = json.loads(server_file.read_text(encoding="utf-8"))
+            base = str(details["url"]).rstrip("/")
+            if urlsplit(base).hostname not in ("localhost", "127.0.0.1", "::1"):
+                continue
+            token = quote(str(details.get("token", "")), safe="")
+            request = Request(f"{base}/api/shutdown?token={token}", method="POST")
+            with urlopen(request, timeout=3) as response:
+                if response.status not in (200, 202):
+                    continue
+            stopped = True
+        except (FileNotFoundError, KeyError, ValueError, TypeError, OSError, json.JSONDecodeError):
+            continue
+    if stopped:
+        print("Previous ManSci Lab server stopped so the corrected Qwen persona will load.")
+        time.sleep(1)
+    else:
+        print("No running ManSci Lab server needed to be stopped.")
+
+
 def launch() -> int:
     from lab_window import run
     return run()
@@ -182,11 +199,16 @@ def launch() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("launch", "setup-qwen"), nargs="?", default="launch")
+    parser.add_argument(
+        "action", choices=("launch", "setup-qwen", "stop-server"), nargs="?", default="launch"
+    )
     args = parser.parse_args()
     try:
         if args.action == "setup-qwen":
             setup_local_model()
+            return 0
+        if args.action == "stop-server":
+            stop_private_server()
             return 0
         return launch()
     except (RuntimeError, subprocess.CalledProcessError, OSError) as exc:

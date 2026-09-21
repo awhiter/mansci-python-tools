@@ -11,7 +11,7 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.21.3'
+VERSION = '2026.09.21.5'
 CORE_VERSION = '2026.09.21.3'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
@@ -216,7 +216,7 @@ def install_tool(kind, source, conda, python, code, ollama):
     else:
         root = support() / kind
         target = root
-        names = ('student_lab.py', 'lab_window.py') if kind == 'Lab' else ('spyder_setup.py',)
+        names = ('student_lab.py', 'lab_window.py', 'mansci_student_persona_guard.py') if kind == 'Lab' else ('spyder_setup.py',)
         title, icon = ('ManSci Lab', 'jupyterlab') if kind == 'Lab' else ('ManSci Spyder', 'spyder')
     target.mkdir(parents=True, exist_ok=True)
     for name in names: shutil.copy2(source / name, target / name)
@@ -234,6 +234,8 @@ def install_tool(kind, source, conda, python, code, ollama):
         if kind == 'Staff-Lab':
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'staff_lab.py', 'stop-server'])
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'staff_lab.py', 'ensure-configured'])
+        elif kind == 'Lab':
+            run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'student_lab.py', 'stop-server'])
     if kind == 'VS-Code':
         for action in ('configure', 'install-extensions'):
             run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', target / 'vscode_setup.py', action,
