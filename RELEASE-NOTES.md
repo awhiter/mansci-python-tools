@@ -1,3 +1,9 @@
+# 2026.09.21.1 — Fixed VM persona model / staff testing
+
+Removes the model-selection control from the VM's ManSci Learning Assistant. The persona now always uses the centrally configured model through its **Default** behavior, preventing students and staff from selecting catalogue entries that the managed VM does not support.
+
+This is a VM-only interface correction. The local Staff Lab retains its useful Azure/local-model choice.
+
 # 2026.09.20.2 — Notebook and chat provider separation / staff testing
 
 Restores the collaboration content-provider token required by the Jupyter AI chat controls while leaving collaborative notebook/document providers disabled. This corrects the blank persona and model selectors introduced by the complete package shutdown in 2026.09.20.1.

@@ -14,7 +14,7 @@ from jupyter_ai_jupyternaut.jupyternaut.jupyternaut import (
     JUPYTERNAUT_AVATAR_PATH,
     JupyternautPersona,
 )
-from jupyter_ai_persona_manager import PersonaDefaults
+from jupyter_ai_persona_manager import ModelConfiguration, PersonaDefaults
 
 MODULES_FILE = Path("/etc/mansci/modules.conf")
 GUIDANCE_ROOT = Path("/etc/mansci/ai-guidance")
@@ -139,6 +139,10 @@ class ManSciLearningAssistantPersona(JupyternautPersona):
     async def get_tools(self):
         tools = list(await super().get_tools())
         return tools + [find_workspace_files, read_workspace_text]
+
+    def _build_model_configuration(self):
+        """Use the centrally configured model without offering alternatives."""
+        return ModelConfiguration(current=None, options=[], settings=[])
 
     @property
     def defaults(self):

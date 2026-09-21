@@ -24,6 +24,7 @@ class VMAssetTests(unittest.TestCase):
         self.assertIn("mansci-enrol MODULE --list", persona)
         self.assertIn("illustrative output as hypothetical", persona)
         self.assertIn("QR contains no credential", persona)
+        self.assertIn("ModelConfiguration(current=None, options=[], settings=[])", persona)
         self.assertIn("Do not", persona)
 
 
