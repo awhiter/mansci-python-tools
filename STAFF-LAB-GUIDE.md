@@ -36,6 +36,8 @@ The persona must verify ManSci-specific commands, files, capabilities and observ
 
 Core also installs **ManSci Help** for the shared installation, platform, kernel, model and log FAQs.
 
+Markdown (`.md`) files open as a formatted **Markdown Preview** by default. To edit one, right-click it in the file browser and choose **Open With → Editor**. Keep both views open side by side if useful; saving the editor updates the preview.
+
 ## Staff support tools
 
 The ZIP’s **Support Tools** folder contains platform-specific scripts to:

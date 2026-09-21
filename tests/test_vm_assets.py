@@ -28,6 +28,9 @@ class VMAssetTests(unittest.TestCase):
         self.assertIn("Do not", persona)
         self.assertIn("Team_Project_Context.md", persona)
         self.assertIn("coordination evidence, not independent proof", persona)
+        self.assertIn("Open With → Editor", persona)
+        overrides = (ROOT / "vm/jupyterlab-overrides.json").read_text()
+        self.assertEqual(__import__('json').loads(overrides)["@jupyterlab/docmanager-extension:plugin"]["defaultViewers"]["markdown"], "Markdown Preview")
 
 
 if __name__ == "__main__":

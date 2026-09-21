@@ -1,3 +1,9 @@
+# 2026.09.21.3 — Markdown preview workflow / staff testing
+
+Markdown files now open in JupyterLab's built-in formatted **Markdown Preview** by default on the ManSci VM and in local ManSci Lab/Staff Lab. Students edit through **Open With → Editor** and may keep both views side by side. The setting is merged into the managed JupyterLab defaults without replacing unrelated settings.
+
+The VM Learning Assistant, external-chat environment sheet, distribution guides and MSIN0023 Scenario Week materials now describe the same workflow, including the need to copy a view-only Team Exchange snapshot to My Work before editing. VM persona version 1.0.10 is included. Qwen Local Chat behaviour and prompting are unchanged.
+
 # 2026.09.21.2 — Team Project Context guidance / staff testing
 
 - Adds coordinated guidance for a shared `Team_Project_Context.md` across the VM Learning Assistant, external AI environment context and Scenario Week teaching assets.

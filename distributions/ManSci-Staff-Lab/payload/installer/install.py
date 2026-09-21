@@ -11,8 +11,8 @@ import sys
 import time
 from urllib.request import urlopen
 
-VERSION = '2026.09.18.2'
-CORE_VERSION = '2026.09.18.2'  # Bump whenever environment.yml or Core runtime checks change.
+VERSION = '2026.09.21.3'
+CORE_VERSION = '2026.09.21.3'  # Bump whenever environment.yml or Core runtime checks change.
 MODEL = 'qwen2.5-coder:3b'
 PACKAGES = (
     'numpy', 'pandas', 'scipy', 'statsmodels', 'matplotlib', 'sklearn', 'sympy',
@@ -140,13 +140,21 @@ def core_payload(package, kind):
     return package / 'payload/core/payload'
 
 def configure_jupyterlab(conda):
-    """Keep optional Dash integration from requesting a user-managed Lab build."""
+    """Apply the managed Lab defaults and suppress an obsolete Dash build prompt."""
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'jupyter',
          'labextension', 'disable', '--level=sys_prefix', '--no-build',
          '@plotly/dash-jupyterlab'])
     run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
          'import sys; from pathlib import Path; '
          '(Path(sys.prefix)/"share/jupyter/lab/extensions/dash-jupyterlab.tgz").unlink(missing_ok=True)'])
+    run([conda, 'run', '--no-capture-output', '-n', 'mansci-python', 'python', '-c',
+         'import json,sys; from pathlib import Path; '
+         'p=Path(sys.prefix)/"share/jupyter/lab/settings/overrides.json"; '
+         'p.parent.mkdir(parents=True,exist_ok=True); '
+         'd=json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}; '
+         'v=d.setdefault("@jupyterlab/docmanager-extension:plugin",{}).setdefault("defaultViewers",{}); '
+         'v["markdown"]="Markdown Preview"; '
+         'p.write_text(json.dumps(d,indent=2)+"\\n",encoding="utf-8")'])
 
 def install_core(conda, payload, ollama):
     root = support() / 'Core'

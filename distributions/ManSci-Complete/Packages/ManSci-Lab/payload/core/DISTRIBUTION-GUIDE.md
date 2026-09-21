@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.16.3 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.21.3 is public for staff testing, not yet approved for student rollout.
 
 Core installs an offline **ManSci Help** guide on the Desktop and in the Windows Start menu or Mac `~/Applications`. It covers installation, shared working practices, Mac and Windows launcher behaviour, kernels, local AI, reinstalling, logs and what to send staff. Its heading displays the installed distribution release. The installer does not pin it automatically.
 
@@ -90,6 +90,8 @@ Save notebooks before closing the Lab window. Closing the window leaves the loca
 Launchers start the installed environment's Python directly, with its saved activation paths, rather than rerunning Conda each time. Windows uses windowless Python; closing Spyder ends its launcher process without leaving a terminal. Spyder opens the Files pane in the shared home. JupyterLab loads its authenticated local HTTP URL in the dedicated window, not a temporary HTML file. Treat local launch logs as private because a Jupyter startup log may contain its access token.
 
 JupyterLab does not wait for Ollama to start. Reopening Lab checks the existing local server over HTTP. VS Code no longer scans/rewrites all notebooks at startup. The ManSci Startup helper explicitly selects the installed interpreter and, when a Python notebook is opened, its live kernel. Wait for the **Preparing ManSci kernel** status to finish before pressing Run. The helper uses Jupyter's exported but unstable `openNotebook` API, so Jupyter is pinned to 2025.9.1. If selection fails, it reports this instead of pretending success; send staff the **Output → ManSci Startup** messages. No notebook cells are executed automatically.
+
+In ManSci Lab, double-clicking a Markdown (`.md`) file opens the formatted **Markdown Preview**. To change it, right-click the file in the file browser and choose **Open With → Editor**. Preview and editor can be kept side by side; save the editor to refresh the preview.
 
 The local model uses an 8,192-token context allocation rather than 16,384, retains recent conversation history, and caps individual replies at 1,536 tokens. In Lab it is kept loaded for up to 15 minutes after use where memory permits. First use still loads the model; long conversations, concurrent AI requests and CPU-only inference can be slow. Use a new chat for an unrelated topic. If VS Code AI competes with typing/chat on a slow machine, turn off **Continue: Enable Tab Autocomplete**; chat and inline edits still work.
 

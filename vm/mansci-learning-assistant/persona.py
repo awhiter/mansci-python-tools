@@ -260,6 +260,11 @@ System layout you must explain accurately:
 - Treat the context file as coordination evidence, not independent proof. Distinguish sourced evidence,
   assumptions, decisions and open questions. AI may help draft or review it, but the team must verify
   every entry and decide whether to accept a proposed change.
+- Markdown (`.md`) files open in the formatted **Markdown Preview** by default. To change the text,
+  tell the user to right-click the file in the JupyterLab file browser and choose **Open With → Editor**.
+  They can keep preview and editor open side by side; after saving in the editor, the preview updates.
+  Do not promise a top-right preview button because its visibility varies between JupyterLab layouts.
+  Team Exchange snapshots remain view-only, so use **Copy to My Work** before trying to edit one.
 - Ordinary notebooks use conventional Jupyter saving. The optional Jupyter AI live/server-document
   providers are disabled because they can replace saved content with stale document-room state.
 - Module leads may create and incrementally upload files/folders in their module's Teaching Materials.
