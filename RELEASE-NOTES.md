@@ -1,3 +1,13 @@
+# 2026.09.21.7 — Local Qwen saved-file context / testing candidate
+
+- Qwen Local Chat now reads bounded content from supported saved text, code and notebook attachments within the visible ManSci workspace.
+- Clear filename references such as `party.py` resolve when exactly one safe saved match exists; ambiguous or missing files produce context notes rather than invented content.
+- Notebook context is rendered from markdown, raw and code cell sources instead of raw notebook JSON.
+- Access remains read-only, workspace-contained and size-limited; binary, oversized and unsupported files are rejected.
+- Student and Staff Lab carry the same implementation.
+- Qwen is automatically primed with a compact Student ManSci Lab context covering only local workspace behaviour, installed packages, local run instructions and learning guidance.
+- This build is prepared for local testing before any GitHub publication.
+
 # 2026.09.21.6 — Shared local persona-stack compatibility / staff testing
 
 Corrects Qwen Local Chat across both supported Persona Manager interfaces: version 0.1 uses `ychat`, while version 0.2 uses `chat`. The Qwen persona now selects the available interface safely in both Student Lab and Staff Lab, without changing its model, prompt, 12-message/12,000-character history limits or generation settings.

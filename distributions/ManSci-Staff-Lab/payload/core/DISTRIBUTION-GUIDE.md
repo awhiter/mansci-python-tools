@@ -1,6 +1,6 @@
 # Management Science tools — guided installation / staff testing
 
-Release 2026.09.21.6 is public for staff testing, not yet approved for student rollout.
+Release 2026.09.21.7 is public for staff testing, not yet approved for student rollout.
 
 Core installs an offline **ManSci Help** guide on the Desktop and in the Windows Start menu or Mac `~/Applications`. It covers installation, shared working practices, Mac and Windows launcher behaviour, kernels, local AI, reinstalling, logs and what to send staff. Its heading displays the installed distribution release. The installer does not pin it automatically.
 
@@ -60,7 +60,7 @@ The Mac installer chooses Apple silicon or Intel Miniconda automatically. Window
 
 Core creates test.py, test.ipynb and a short README in Documents/ManSci Code without overwriting existing files. Keep code, notebooks and data there, in module/assignment subfolders. Back up important work. To change the home, edit Documents/ManSci Code Home.txt to contain one absolute folder path and restart the tools.
 
-Spyder uses Light/Spyder and resets its initial Files/working directory to the shared home on launch. VS Code uses Light+, an isolated profile, Continue and a private ManSci kernelspec. JupyterLab uses the managed kernel and offers only the tool-free **Qwen Local Chat** persona, retaining recent chat context. Continue's first-run Hub card may need dismissing once, without sign-in. Small models still make mistakes and do not automatically know every file/cell.
+Spyder uses Light/Spyder and resets its initial Files/working directory to the shared home on launch. VS Code uses Light+, an isolated profile, Continue and a private ManSci kernelspec. JupyterLab uses the managed kernel and offers only **Qwen Local Chat**, retaining recent chat context. Qwen is automatically given compact local-only context covering the workspace, installed packages, running code and learning expectations. It can add bounded content from supported saved text/code files and notebooks when they are attached or clearly named in a prompt; save editor changes first. Continue's first-run Hub card may need dismissing once, without sign-in. Small models still make mistakes and do not automatically know unsaved editor content or files that were neither attached nor clearly named.
 
 On Mac, the red close button closes the VS Code window but normally leaves the application running in the Dock; **Command-Q** quits it. If clicking the active ManSci VS Code Dock icon creates an empty window, the ManSci startup helper reopens the current shared coding folder in that same window. It does not replace a folder/workspace, loose file, unsaved tab or remote window that the user deliberately opened, and it does not affect ordinary VS Code.
 

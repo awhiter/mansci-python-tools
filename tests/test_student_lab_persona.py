@@ -1,6 +1,9 @@
 import ast
+import json
 from pathlib import Path
+import re
 from types import SimpleNamespace
+import tempfile
 import unittest
 
 
@@ -9,6 +12,26 @@ PAYLOAD = ROOT / "distributions/ManSci-Lab/payload"
 
 
 class StudentLabPersonaTests(unittest.TestCase):
+    def _qwen_helpers(self):
+        source = (PAYLOAD / "personas/qwen_local_persona.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        names = {
+            "_chat_document", "_workspace_root", "_safe_workspace_path",
+            "_notebook_text", "_read_workspace_text", "_referenced_paths",
+            "_message_content",
+        }
+        nodes = [
+            node for node in tree.body
+            if (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in names)
+            or (isinstance(node, ast.Assign) and any(
+                isinstance(target, ast.Name) and target.id in {"SUPPORTED_TEXT_SUFFIXES", "FILE_REFERENCE_RE"}
+                for target in node.targets
+            ))
+        ]
+        namespace = {"Path": Path, "json": json, "re": re}
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), "qwen_helpers", "exec"), namespace)
+        return namespace
+
     def test_qwen_supports_both_persona_manager_chat_interfaces(self):
         source = (PAYLOAD / "personas/qwen_local_persona.py").read_text(encoding="utf-8")
         tree = ast.parse(source)
@@ -22,6 +45,63 @@ class StudentLabPersonaTests(unittest.TestCase):
         self.assertIn("chat_document.get_messages()", source)
         self.assertIn("MAX_HISTORY_MESSAGES = 12", source)
         self.assertIn("MAX_HISTORY_CHARACTERS = 12_000", source)
+
+    def test_qwen_adds_saved_attachment_content(self):
+        helpers = self._qwen_helpers()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "party.py").write_text("print('party')\n", encoding="utf-8")
+            attachment = SimpleNamespace(value="party.py")
+            chat = SimpleNamespace(get_attachments=lambda: {"a1": attachment})
+            persona = SimpleNamespace(parent=SimpleNamespace(root_dir=directory), chat=chat)
+            message = SimpleNamespace(body="Explain this", attachments=["a1"])
+            content = helpers["_message_content"](persona, message, 12_000)
+            self.assertIn("Saved ManSci workspace file: party.py", content)
+            self.assertIn("print('party')", content)
+
+    def test_qwen_resolves_unambiguous_filename_reference_and_notebook_sources(self):
+        helpers = self._qwen_helpers()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "project"
+            nested.mkdir()
+            (nested / "party.py").write_text("x = 3\n", encoding="utf-8")
+            paths, notices = helpers["_referenced_paths"](root, "Please explain party.py")
+            self.assertEqual(paths, [nested / "party.py"])
+            self.assertEqual(notices, [])
+            notebook = root / "lesson.ipynb"
+            notebook.write_text(json.dumps({"cells": [
+                {"cell_type": "markdown", "source": ["# Lesson\n"]},
+                {"cell_type": "code", "source": ["print(2)\n"]},
+            ]}), encoding="utf-8")
+            text, error = helpers["_read_workspace_text"](root, notebook, 8_000)
+            self.assertIsNone(error)
+            self.assertIn("markdown cell 1", text)
+            self.assertIn("print(2)", text)
+
+    def test_qwen_rejects_paths_outside_workspace(self):
+        helpers = self._qwen_helpers()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            with self.assertRaisesRegex(ValueError, "outside"):
+                helpers["_safe_workspace_path"](root, "../secret.txt")
+
+    def test_qwen_uses_matching_compact_local_only_context(self):
+        student = (PAYLOAD / "personas/qwen_local_context.md").read_text(encoding="utf-8")
+        staff = (
+            ROOT / "distributions/ManSci-Staff-Lab/payload/personas/qwen_local_context.md"
+        ).read_text(encoding="utf-8")
+        persona = (PAYLOAD / "personas/qwen_local_persona.py").read_text(encoding="utf-8")
+        self.assertEqual(student, staff)
+        self.assertIn("_local_context()", persona)
+        for expected in (
+            "Python 3.13", "Documents/ManSci Code", "streamlit", "flask",
+            "pandas", "sklearn", "run_app", "stop_app", "mansci-python",
+        ):
+            self.assertIn(expected, student)
+        for vm_only in ("Team Exchange", "JupyterHub", "classroom phone", "Teaching Materials"):
+            self.assertNotIn(vm_only, student)
+        self.assertLess(len(student), 6_000)
 
     def test_student_and_staff_pin_the_same_persona_manager_stack(self):
         student = (PAYLOAD / "requirements-student.txt").read_text(encoding="utf-8")

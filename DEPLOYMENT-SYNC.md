@@ -1,6 +1,6 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.21.6 (shared local persona-stack compatibility / staff testing)**
+Current coordinated release: **2026.09.21.7 (shared local persona-stack compatibility / staff testing)**
 Shared Python Core: **2026.09.21.3**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
