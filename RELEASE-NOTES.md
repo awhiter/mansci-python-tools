@@ -1,3 +1,9 @@
+# 2026.09.21.4 — Restored UCL PowerPoint template / staff testing
+
+Rebuilds both MSIN0023 Scenario Week PowerPoint decks as genuine descendants of the supplied UCL PowerPoint template. The editable files now retain the full UCL master, 42 layouts, theme, UCL Sans references and master logos while preserving the latest content and speaker notes.
+
+The repository now includes the recovered source template and a mandatory validation tool. Future generated PowerPoints must use this source and pass structural template validation before packaging or publication. This release changes teaching assets only; VM and local software remain at the behaviour delivered in 2026.09.21.3.
+
 # 2026.09.21.3 — Markdown preview workflow / staff testing
 
 Markdown files now open in JupyterLab's built-in formatted **Markdown Preview** by default on the ManSci VM and in local ManSci Lab/Staff Lab. Students edit through **Open With → Editor** and may keep both views side by side. The setting is merged into the managed JupyterLab defaults without replacing unrelated settings.

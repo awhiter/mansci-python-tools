@@ -17,6 +17,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - VM Team Exchange: students can create or join a named cohort-wide team, then copy immutable, sender-labelled snapshots from anywhere in their workspace except `Teaching Materials` into a shared read-only folder. The current limit is six students; teaching staff have oversight access. Local installations are unchanged.
 - Team Project Context: the VM Learning Assistant and Scenario Week materials guide teams to maintain one agreed `Team_Project_Context.md`, share dated snapshots through Team Exchange and treat it as a reviewed working record rather than independent evidence.
 - Markdown files open in a formatted preview by default on the VM and in ManSci Lab; **Open With → Editor** provides the editable view.
+- Generated PowerPoint teaching assets use the complete supplied UCL template stored under `templates/`. Run `tools/validate_ucl_powerpoint.py` before packaging or publishing them.
 - One **Management Science Python** Jupyter kernel.
 - One shared coding home: `Documents/ManSci Code`.
 - Spyder with an isolated Light/Spyder configuration.

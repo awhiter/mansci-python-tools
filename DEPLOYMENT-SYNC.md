@@ -1,6 +1,6 @@
 # ManSci deployment and asset synchronization record
 
-Current coordinated release: **2026.09.21.3 (Markdown preview workflow / staff testing)**
+Current coordinated release: **2026.09.21.4 (restored UCL PowerPoint template / staff testing)**
 Shared Python Core: **2026.09.21.3**
 
 Review this record before proposing or approving a change. Do not change a listed deployment or asset until Andrew has approved the cross-asset change set.
@@ -13,7 +13,7 @@ Review this record before proposing or approving a change. Do not change a liste
 | GitHub downloads | Six tool ZIPs, the Scenario Week artifact pack and `SHA256SUMS.txt` | Complete, Core, Lab, Spyder, Staff Lab and VS Code are rebuilt from the same installer source; the synchronized teaching pack is attached to the same release. |
 | Student environment guidance | `ManSci_AI_Chat_Environment_Context.md` in the Scenario Week pack | Describes VM-first use, local JupyterLab, installed modules, Team Exchange and critical use of `Team_Project_Context.md` for external AI chats. |
 | User/support guides | README, Distribution Guide, Staff Lab Guide, Staff Testing | Must state the current application release, Core version and platform-specific limits. |
-| Scenario Week teaching assets | Launch deck, Challenge Brief, Coursework Brief, Facilitator Guide and artifact ZIP | Must use current environment names, supported packages, launch routes, Team Exchange, Team Project Context and AI-use guidance. Generated PowerPoint decks use the current UCL Sans template branding. |
+| Scenario Week teaching assets | Launch deck, Challenge Brief, Coursework Brief, Facilitator Guide and artifact ZIP | Must use current environment names, supported packages, launch routes, Team Exchange, Team Project Context and AI-use guidance. Every generated PowerPoint must be built from `templates/UCL-PowerPoint-Template-UCL-Sans.pptx` and pass `tools/validate_ucl_powerpoint.py`; reproducing only the colours or logo is insufficient. |
 
 ## Capability boundaries
 
