@@ -1,3 +1,6 @@
-jupyter-ai==3.1.0
-jupyter-ai-litellm==0.0.3
+jupyter-ai==3.2.0
+jupyter-ai-litellm==0.1.0
+jupyter-ai-router==0.1.1
+jupyter-ai-persona-manager==0.2.0
+jupyterlab-chat==0.25.0
 pywebview==6.2.1

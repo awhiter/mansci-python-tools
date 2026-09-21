@@ -1,3 +1,9 @@
+# 2026.09.21.6 — Shared local persona-stack compatibility / staff testing
+
+Corrects Qwen Local Chat across both supported Persona Manager interfaces: version 0.1 uses `ychat`, while version 0.2 uses `chat`. The Qwen persona now selects the available interface safely in both Student Lab and Staff Lab, without changing its model, prompt, 12-message/12,000-character history limits or generation settings.
+
+Student Lab and Staff Lab now pin the same Jupyter AI 3.2, Persona Manager 0.2, router, LiteLLM adapter and JupyterLab Chat versions. Because the two applications share the `mansci-python` environment, this prevents installing one Lab from silently downgrading the other's runtime. Staff-only Jupyternaut, tools and Azure functionality remain additive, while Student Lab continues to display only Qwen Local Chat.
+
 # 2026.09.21.5 — Local Qwen persona correction / staff testing
 
 Corrects Qwen Local Chat after the Persona Manager interface changed from `ychat` to `chat`. The repair leaves its Qwen2.5-Coder model, system guidance, 12-message/12,000-character history limits and generation settings unchanged.

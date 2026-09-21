@@ -7,6 +7,11 @@ from jupyter_ai_persona_manager import BasePersona, PersonaDefaults
 from jupyterlab_chat.models import Message
 
 
+def _chat_document(persona):
+    """Return the chat document across Persona Manager 0.1 and 0.2."""
+    return getattr(persona, "chat", None) or getattr(persona, "ychat")
+
+
 class QwenLocalChatPersona(BasePersona):
     """Use Qwen as a conventional chat model without unreliable agent tools."""
 
@@ -35,9 +40,11 @@ class QwenLocalChatPersona(BasePersona):
     def conversation_messages(self, current: Message) -> list[dict[str, str]]:
         transcript: list[dict[str, str]] = []
         remaining = self.MAX_HISTORY_CHARACTERS
+        # Persona Manager 0.1 calls this ``ychat``; 0.2 calls it ``chat``.
+        chat_document = _chat_document(self)
         candidates = [
             item
-            for item in self.chat.get_messages()
+            for item in chat_document.get_messages()
             if not item.deleted
             and item.sender in {current.sender, self.id}
             and item.body.strip()
