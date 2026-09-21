@@ -26,6 +26,8 @@ class VMAssetTests(unittest.TestCase):
         self.assertIn("QR contains no credential", persona)
         self.assertIn("ModelConfiguration(current=None, options=[], settings=[])", persona)
         self.assertIn("Do not", persona)
+        self.assertIn("Team_Project_Context.md", persona)
+        self.assertIn("coordination evidence, not independent proof", persona)
 
 
 if __name__ == "__main__":

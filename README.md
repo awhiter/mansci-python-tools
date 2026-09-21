@@ -15,6 +15,7 @@ Do not download an installer from the source-code ZIP generated automatically by
 - A GenAI challenge toolkit including Streamlit, Flask, Dash, Plotly, OpenAI, ipywidgets, Voilà, Gradio, PuLP, Altair, Pydantic, dotenv, Pillow, Beautiful Soup, Folium, geopy, Joblib, Faker, python-docx, ReportLab and qrcode.
 - Authenticated VM classroom previews: `run_app()` displays an opaque QR code that any account on the same ManSci VM can open after signing in. The share contains no credential and expires with the app. Local installations remain loopback-only.
 - VM Team Exchange: students can create or join a named cohort-wide team, then copy immutable, sender-labelled snapshots from anywhere in their workspace except `Teaching Materials` into a shared read-only folder. The current limit is six students; teaching staff have oversight access. Local installations are unchanged.
+- Team Project Context: the VM Learning Assistant and Scenario Week materials guide teams to maintain one agreed `Team_Project_Context.md`, share dated snapshots through Team Exchange and treat it as a reviewed working record rather than independent evidence.
 - One **Management Science Python** Jupyter kernel.
 - One shared coding home: `Documents/ManSci Code`.
 - Spyder with an isolated Light/Spyder configuration.

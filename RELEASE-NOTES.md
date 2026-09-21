@@ -1,3 +1,12 @@
+# 2026.09.21.2 — Team Project Context guidance / staff testing
+
+- Adds coordinated guidance for a shared `Team_Project_Context.md` across the VM Learning Assistant, external AI environment context and Scenario Week teaching assets.
+- Guides teams to record scope, decisions, evidence, prototype files, tests, limitations and next actions, with one rotating context steward and dated Team Exchange snapshots.
+- Makes clear that the context file is a working coordination record rather than independent evidence, and that teams must verify AI-proposed changes.
+- Corrects the local ManSci Python version in the external context document to Python 3.13.
+- Updates generated Scenario Week PowerPoint decks to current UCL Sans template branding.
+- Leaves Qwen Local Chat unchanged.
+
 # 2026.09.21.1 — Fixed VM persona model / staff testing
 
 Removes the model-selection control from the VM's ManSci Learning Assistant. The persona now always uses the centrally configured model through its **Default** behavior, preventing students and staff from selecting catalogue entries that the managed VM does not support.
